@@ -10,6 +10,7 @@
     "backend": "file:",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "multer": "^1.4.5-lts.2",
     "mysql2": "^3.14.1",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2"
@@ -19,6 +20,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^5.0.1",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.15.17",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
