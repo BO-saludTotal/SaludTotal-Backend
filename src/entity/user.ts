@@ -2,10 +2,10 @@ import {Entity , Column, PrimaryGeneratedColumn, CreateDateColumn, Index, Before
     ManyToOne, JoinColumn, OneToOne } from "typeorm";
 import { v4 as uuidv4 } from 'uuid'; //por si necesitamos usar esto para los caarnets
 import { UsersPhone } from "./users-Phone";
-import { UserAddress } from "./UserAdress";
+import { UserAddress } from "./userAdress";
 import { Role } from "./role";
 import { PatientDetail } from "./patientDetails";
-import { UserAssignedRole } from "./UserAssignedRole";
+import { UserAssignedRole } from "./userAssignedRole";
 import { DoctorDetail } from "./doctorDetail";
 import { AdministrativeStaffDetail } from "./administrativeStaffDetail";
 import { GovernmentStaffDetail } from "./governmentStaffDetail";

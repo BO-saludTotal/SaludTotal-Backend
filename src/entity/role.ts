@@ -10,7 +10,7 @@ import {
     BaseEntity
 } from "typeorm";
 import { User } from "./user";
-import { UserAssignedRole } from "./UserAssignedRole";
+import { UserAssignedRole } from "./userAssignedRole";
 @Entity({ name: 'RolesCatalogo' }) 
 export class Role extends BaseEntity{
     @PrimaryGeneratedColumn({
