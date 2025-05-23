@@ -13,7 +13,7 @@ import {
 import { HealthEntity } from "./healthEntity";
 import { DoctorScheduleTemplate } from "./doctorScheduleTemplate";
 import { AvailabilitySlot } from "./availabilitySlot";
-
+import { ClinicalRecordEntry } from "./clinicalRecordEntry";
 
 export type SpaceType = 'Consultorio Médico' | 'Sala Procedimientos' | 'Laboratorio Toma Muestras' | 'Quirófano';
 
@@ -77,6 +77,9 @@ export class PhysicalAttentionSpace {
     @OneToMany(() => AvailabilitySlot, (slot) => slot.space)
     availabilitySlots: AvailabilitySlot[];
     
+    @OneToMany(() => ClinicalRecordEntry, (record) => record.space)
+    clinicalRecords: ClinicalRecordEntry[];
+
     @Index('IDX_EspacioUnicoPorEntidad', { unique: true })
     @Column()
     uniqueSpaceConstraint: string; 

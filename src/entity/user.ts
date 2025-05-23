@@ -1,6 +1,6 @@
-import {Entity , Column, PrimaryGeneratedColumn, CreateDateColumn, Index, BeforeInsert, BeforeUpdate, BeforeRemove, BaseEntity, OneToMany, 
+import {Entity , Column, PrimaryColumn, CreateDateColumn, Index, BaseEntity, OneToMany, 
     ManyToOne, JoinColumn, OneToOne } from "typeorm";
-import { v4 as uuidv4 } from 'uuid'; //por si necesitamos usar esto para los caarnets
+import { v4 as uuidv4 } from 'uuid'; 
 import { UsersPhone } from "./users-Phone";
 import { UserAddress } from "./userAdress";
 import { Role } from "./role";
@@ -9,12 +9,15 @@ import { UserAssignedRole } from "./userAssignedRole";
 import { DoctorDetail } from "./doctorDetail";
 import { AdministrativeStaffDetail } from "./administrativeStaffDetail";
 import { GovernmentStaffDetail } from "./governmentStaffDetail";
-export type EstadoCuentaType = 'Activo' | 'Inactivo' | 'Bloqueado' | 'Verificacion pendiente';
+import { SentNotificationLog } from "./sentNotificationLog";
+import { GeneratedReportHistory } from "./generatedReportHistory";
+import { SystemAuditLog } from "./systemAuditLog";
 
+export type EstadoCuentaType = 'Activo' | 'Inactivo' | 'Bloqueado' | 'Verificacion pendiente';
 @Entity()
 export class User extends BaseEntity{
-    @PrimaryGeneratedColumn({ name: 'UsuarioID' })
-    id: number;
+    @PrimaryColumn({ name: 'UsuarioID' })
+    id: string = uuidv4();
 
     @Column({
         name: 'NombreUsuario',
@@ -23,7 +26,7 @@ export class User extends BaseEntity{
         unique: true,
         nullable: false
     })
-    @Index('IDX_NombreUsuario', { unique: true }) //busqueda rapida de usuario
+    @Index('IDX_NombreUsuario', { unique: true })
     nombreUsuario: string;
 
     @Column({
@@ -104,13 +107,16 @@ export class User extends BaseEntity{
     })
     governmentStaffDetail: GovernmentStaffDetail;
 
-    @BeforeInsert()
-    @BeforeUpdate()
-    normalizeUsername() {
-        this.nombreUsuario = this.nombreUsuario.toLowerCase().trim();
-    }
-    	//para encadenamiento osea consultas seguidas retornar el this
+    @OneToMany(() => SentNotificationLog, (notification) => notification.recipient)
+    receivedNotifications: SentNotificationLog[];
+
+    @OneToMany(() => GeneratedReportHistory, (report) => report.requestedBy)
+    generatedReports: GeneratedReportHistory[];
     
+    
+    @OneToMany(() => SystemAuditLog, (log) => log.actor)
+    auditLogs: SystemAuditLog[];
+
     marcarComoActivo() {
         this.estadoCuenta = 'Activo';
         return this;

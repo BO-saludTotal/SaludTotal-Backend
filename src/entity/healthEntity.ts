@@ -13,6 +13,9 @@ import { AdministrativeStaffDetail } from "./administrativeStaffDetail";
 import { PhysicalAttentionSpace } from "./physicalAttentionSpace";
 import { DoctorScheduleTemplate } from "./doctorScheduleTemplate";
 import { AvailabilitySlot } from "./availabilitySlot";
+import { HealthEntitySpecialty } from "./healthEntitySpecialty";
+import { DoctorHealthEntityAffiliation } from "./doctorHealthEntityAffiliation";
+import { ClinicalRecordEntry } from "./clinicalRecordEntry";
 
 export type HealthEntityType = 'Hospital' | 'Clínica' | 'Consultorio' | 'Laboratorio' | 'Centro Diagnóstico';
 
@@ -75,6 +78,15 @@ export class HealthEntity {
 
     @OneToMany(() => AvailabilitySlot, (slot) => slot.healthEntity)
     availabilitySlots: AvailabilitySlot[];
+
+    @OneToMany(() => HealthEntitySpecialty, (hes) => hes.healthEntity)
+    offeredSpecialties: HealthEntitySpecialty[];
+
+    @OneToMany(() => DoctorHealthEntityAffiliation, (affiliation) => affiliation.healthEntity)
+    doctorAffiliations: DoctorHealthEntityAffiliation[];
+
+    @OneToMany(() => ClinicalRecordEntry, (record) => record.healthEntity)
+    clinicalRecords: ClinicalRecordEntry[];
 
     getEntityTypeLabel(): string {
         const labels = {

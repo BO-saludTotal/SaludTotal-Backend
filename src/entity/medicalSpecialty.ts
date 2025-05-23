@@ -10,6 +10,7 @@ import {
     BaseEntity
 } from "typeorm";
 import { DoctorSpecialtyCertification } from "./doctorSpecialtyCertification";
+import { HealthEntitySpecialty } from "./healthEntitySpecialty";
 
 @Entity({ name: 'EspecialidadesMedicasCatalogo' })
 export class MedicalSpecialty extends BaseEntity{
@@ -55,6 +56,8 @@ export class MedicalSpecialty extends BaseEntity{
     @OneToMany(() => DoctorSpecialtyCertification, (cert) => cert.specialty)
     doctorCertifications: DoctorSpecialtyCertification[];
 
+    @OneToMany(() => HealthEntitySpecialty, (hes) => hes.specialty)
+    healthEntities: HealthEntitySpecialty[];
 
     static async findByName(name: string): Promise<MedicalSpecialty | null> {
         return await this.findOne({ where: { name } });

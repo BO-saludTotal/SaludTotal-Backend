@@ -9,6 +9,8 @@ import {
 } from "typeorm";
 import { User } from "./user";
 import { MedicalAppointment } from "./medicalAppointment";
+import { ClinicalRecordEntry } from "./clinicalRecordEntry";
+
 export type GenderType = 'Male' | 'Female' | 'Other' | 'PreferNotToSay';
 
 @Entity({ name: 'PacientesDetalles' })
@@ -59,6 +61,9 @@ export class PatientDetail {
 
     @OneToMany(() => MedicalAppointment, (appointment) => appointment.patient)
     appointments: MedicalAppointment[];
+
+    @OneToMany(() => ClinicalRecordEntry, (record) => record.patient)
+    clinicalRecords: ClinicalRecordEntry[];
 
     getAge(): number | null {
         if (!this.birthDate) return null;

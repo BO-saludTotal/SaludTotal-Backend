@@ -4,14 +4,15 @@ import {
     PrimaryGeneratedColumn,
     Column,
     ManyToOne,
-    OneToOne,
     JoinColumn,
     CreateDateColumn,
-    UpdateDateColumn
+    OneToMany
 } from "typeorm";
 import { AvailabilitySlot } from "./availabilitySlot";
 import { PatientDetail } from "./patientDetails";
 import { AttentionType } from "./attentionType";
+import { AppointmentChangeHistory } from "./appointmentChangeHistory";
+import { ClinicalRecordEntry } from "./clinicalRecordEntry";
 
 export type AppointmentStatus = 
     'Solicitada' | 
@@ -97,7 +98,9 @@ export class MedicalAppointment {
     @JoinColumn({ name: 'PacienteUsuarioID_Ref' })
     patient: PatientDetail;
 
-   
+    @OneToMany(() => ClinicalRecordEntry, (record) => record.appointment)
+    clinicalRecords: ClinicalRecordEntry[];
+
     confirm(): this {
         this.status = 'Confirmada';
         return this;
@@ -113,4 +116,9 @@ export class MedicalAppointment {
         this.status = 'Realizada';
         return this;
     }
+
+    @OneToMany(() => AppointmentChangeHistory, (history) => history.appointment)
+    changeHistory: AppointmentChangeHistory[];
+
+
 }

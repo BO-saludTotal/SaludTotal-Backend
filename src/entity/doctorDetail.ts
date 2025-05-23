@@ -13,6 +13,8 @@ import { ScheduleBlockException } from "./scheduleBlockException";
 import { DoctorSpecialtyCertification } from "./doctorSpecialtyCertification";
 import { DoctorScheduleTemplate } from "./doctorScheduleTemplate";
 import { AvailabilitySlot } from "./availabilitySlot";
+import { DoctorHealthEntityAffiliation } from "./doctorHealthEntityAffiliation";
+import { ClinicalRecordEntry } from "./clinicalRecordEntry";
 
 @Entity({ name: 'MedicosDetalles' })
 export class DoctorDetail {
@@ -51,6 +53,12 @@ export class DoctorDetail {
 
     @OneToMany(() => AvailabilitySlot, (slot) => slot.doctor)
     availabilitySlots: AvailabilitySlot[];
+
+    @OneToMany(() => DoctorHealthEntityAffiliation, (affiliation) => affiliation.doctor)
+    healthEntityAffiliations: DoctorHealthEntityAffiliation[];
+
+    @OneToMany(() => ClinicalRecordEntry, (record) => record.doctor)
+    clinicalRecords: ClinicalRecordEntry[];
 
     validateLicenseNumber(): boolean {
        
