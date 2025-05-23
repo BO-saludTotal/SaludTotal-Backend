@@ -81,22 +81,4 @@ export class SystemAuditLog extends BaseEntity {
     @JoinColumn({ name: 'TipoAccionID_Ref' })
     actionType: AuditActionType;
 
- 
-    static async logAction(
-        actionTypeId: number,
-        userId: number | null,
-        description: string,
-        result: ActionResult,
-        ipAddress?: string
-    ): Promise<SystemAuditLog> {
-        const log = new SystemAuditLog();
-        log.actionTypeId = actionTypeId;
-        log.actorUserId = userId;
-        log.description = description;
-        log.result = result;
-        log.sourceIp = ipAddress || null;
-        await log.save();
-        return log;
-    }
-
 }

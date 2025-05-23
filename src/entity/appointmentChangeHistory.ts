@@ -79,21 +79,4 @@ export class AppointmentChangeHistory extends BaseEntity {
     @JoinColumn({ name: 'UsuarioID_RealizaCambio_Ref' })
     changedByUser: User | null;
 
-   
-    static async trackChange(
-        appointmentId: number,
-        previousStatus: string,
-        newStatus: string,
-        userId?: number,
-        reason?: string
-    ): Promise<AppointmentChangeHistory> {
-        const history = new AppointmentChangeHistory();
-        history.appointmentId = appointmentId;
-        history.previousStatus = previousStatus;
-        history.newStatus = newStatus;
-        history.changedByUserId = userId || null;
-        history.changeReason = reason || null;
-        await history.save();
-        return history;
-    }
 }

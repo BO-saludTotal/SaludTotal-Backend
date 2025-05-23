@@ -61,8 +61,5 @@ export class ClinicalRecordAttachment {
     @JoinColumn({ name: 'EntradaHistorialID_Ref' })
     recordEntry: ClinicalRecordEntry;
 
-    
-    getPublicUrl(): string {
-        return `${process.env.STORAGE_BASE_URL}/${this.storagePath}`;
-    }
+
 }

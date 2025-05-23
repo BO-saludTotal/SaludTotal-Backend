@@ -51,11 +51,4 @@ export class DiagnosisCode extends BaseEntity{
     @OneToMany(() => ClinicalRecordDiagnosis, (diagnosis) => diagnosis.diagnosis)
     clinicalRecords: ClinicalRecordDiagnosis[];
 
-    static async findByCodeOrDescription(searchTerm: string): Promise<DiagnosisCode[]> {
-        return await this.createQueryBuilder('diagnosis')
-            .where('diagnosis.code LIKE :search OR diagnosis.description LIKE :search', {
-                search: `%${searchTerm}%`
-            })
-            .getMany();
-    }
 }

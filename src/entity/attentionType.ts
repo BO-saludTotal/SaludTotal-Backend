@@ -61,9 +61,5 @@ export class AttentionType {
     @OneToMany(() => AvailabilitySlot, (slot) => slot.attentionType)
     availabilitySlots: AvailabilitySlot[];
 
-    getDurationDescription(): string {
-        return this.estimatedDurationMinutes 
-            ? `Approx. ${this.estimatedDurationMinutes} minutes` 
-            : 'Duration varies';
-    }
+
 }

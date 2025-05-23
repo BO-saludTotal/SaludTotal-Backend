@@ -10,11 +10,7 @@ import {
     BaseEntity
 } from "typeorm";
 import { User } from "./user";
-<<<<<<< HEAD
 import { UserAssignedRole } from "./userAssignedRole";
-=======
-import { UserAssignedRole } from "./userAssignedRole"
->>>>>>> 185aefe (api)
 @Entity({ name: 'RolesCatalogo' }) 
 export class Role extends BaseEntity{
     @PrimaryGeneratedColumn({
@@ -64,20 +60,4 @@ export class Role extends BaseEntity{
     @OneToMany(() => UserAssignedRole, (assignment) => assignment.role)
     userAssignments: UserAssignedRole[];
    
-    updateDescription(newDescription: string): this {
-        this.description = newDescription;
-        return this;
-    }
-
-   
-    static async findByName(roleName: string): Promise<Role | null> {
-        return await this.findOne({ where: { name: roleName } });
-    }
-
-    static async getRolesWithUsers(): Promise<Role[]> {
-        return await this.find({
-            relations: ['users'],
-            order: { name: 'ASC' }
-        });
-    }
 }

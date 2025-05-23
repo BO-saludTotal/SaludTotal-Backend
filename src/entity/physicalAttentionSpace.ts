@@ -84,8 +84,4 @@ export class PhysicalAttentionSpace {
     @Column()
     uniqueSpaceConstraint: string; 
 
-
-    getFullSpaceName(): string {
-        return `${this.name} (${this.spaceType}) - ${this.healthEntity.officialName}`;
-    }
 }

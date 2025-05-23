@@ -63,8 +63,4 @@ export class CommercialMedicationPresentation {
     @JoinColumn({ name: 'MedicamentoGeneralID_Ref' })
     generalMedication: GeneralMedication;
 
-   
-    getFullDescription(): string {
-        return `${this.brandName} (${this.manufacturer || 'No manufacturer'})`;
-    }
 }

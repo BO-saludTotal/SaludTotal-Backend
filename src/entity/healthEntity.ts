@@ -88,14 +88,4 @@ export class HealthEntity {
     @OneToMany(() => ClinicalRecordEntry, (record) => record.healthEntity)
     clinicalRecords: ClinicalRecordEntry[];
 
-    getEntityTypeLabel(): string {
-        const labels = {
-            'Hospital': 'Hospital',
-            'Clínica': 'Clinic',
-            'Consultorio': 'Medical Office',
-            'Laboratorio': 'Laboratory',
-            'Centro Diagnóstico': 'Diagnostic Center'
-        };
-        return labels[this.entityType] || this.entityType;
-    }
 }

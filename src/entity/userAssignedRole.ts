@@ -48,13 +48,4 @@ export class UserAssignedRole {
     @JoinColumn({ name: 'RolID_Ref' })
     role: Role;
 
-
-    isActive(): boolean {
-        return this.endDate === null || this.endDate > new Date();
-    }
-
-    deactivate(): this {
-        this.endDate = new Date();
-        return this;
-    }
 }

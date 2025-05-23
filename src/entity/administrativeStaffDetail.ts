@@ -50,15 +50,4 @@ export class AdministrativeStaffDetail {
     assignedHealthEntity: HealthEntity | null;
 
 
-    assignToHealthEntity(healthEntity: HealthEntity): this {
-        this.assignedHealthEntity = healthEntity;
-        this.assignedHealthEntityId = healthEntity.id;
-        return this;
-    }
-
-    removeFromHealthEntity(): this {
-        this.assignedHealthEntity = null;
-        this.assignedHealthEntityId = null;
-        return this;
-    }
 }

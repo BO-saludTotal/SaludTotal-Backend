@@ -55,17 +55,4 @@ export class MedicalEventType extends BaseEntity{
     @OneToMany(() => ClinicalRecordEntry, (record) => record.eventType)
     clinicalRecords: ClinicalRecordEntry[];
 
-    static async findOrCreate(
-        name: string,
-        description?: string
-    ): Promise<MedicalEventType> {
-        let eventType = await this.findOne({ where: { name } });
-        if (!eventType) {
-            eventType = new MedicalEventType();
-            eventType.name = name;
-            eventType.description = description || null;
-            await eventType.save();
-        }
-        return eventType;
-    }
 }

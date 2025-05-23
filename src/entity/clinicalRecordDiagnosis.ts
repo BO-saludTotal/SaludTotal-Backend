@@ -52,17 +52,4 @@ export class ClinicalRecordDiagnosis extends BaseEntity{
     @JoinColumn({ name: 'CodigoCIE_Ref' })
     diagnosis: DiagnosisCode;
 
- 
-    static async assignDiagnosisToRecord(
-        recordEntryId: number,
-        diagnosisCode: string,
-        type: DiagnosisType = 'Principal'
-    ): Promise<ClinicalRecordDiagnosis> {
-        const diagnosis = new ClinicalRecordDiagnosis();
-        diagnosis.recordEntryId = recordEntryId;
-        diagnosis.diagnosisCode = diagnosisCode;
-        diagnosis.diagnosisType = type;
-        await diagnosis.save();
-        return diagnosis;
-    }
 }

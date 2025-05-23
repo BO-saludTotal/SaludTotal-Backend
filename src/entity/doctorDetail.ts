@@ -60,8 +60,4 @@ export class DoctorDetail {
     @OneToMany(() => ClinicalRecordEntry, (record) => record.doctor)
     clinicalRecords: ClinicalRecordEntry[];
 
-    validateLicenseNumber(): boolean {
-       
-        return /^[A-Za-z0-9-]+$/.test(this.medicalLicenseNumber);
-    }
 }

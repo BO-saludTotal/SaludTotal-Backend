@@ -4,7 +4,7 @@ import {
     PrimaryGeneratedColumn,
     Column,
     ManyToOne,
-    OneToOne,
+    OneToMany,
     JoinColumn,
     Index,
     CreateDateColumn,
@@ -127,24 +127,7 @@ export class AvailabilitySlot {
     @JoinColumn({ name: 'TipoAtencionOfrecidaID_Ref' })
     attentionType: AttentionType | null;
 
-    @OneToOne(() => MedicalAppointment, (appointment) => appointment.slot)
-    appointment: MedicalAppointment;
+    @OneToMany(() => MedicalAppointment, appointment => appointment.slot)  
+    appointments: MedicalAppointment[]; 
 
-  
-    isAvailable(): boolean {
-        return this.status === 'Disponible';
-    }
-
-    reserve(): this {
-        if (this.status !== 'Disponible') {
-            throw new Error('Slot is not available for reservation');
-        }
-        this.status = 'Reservado';
-        return this;
-    }
-
-    confirm(): this {
-        this.status = 'Confirmado';
-        return this;
-    }
 }

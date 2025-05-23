@@ -95,34 +95,4 @@ export class SentNotificationLog extends BaseEntity{
     @JoinColumn({ name: 'TipoNotificacionID_Ref' })
     notificationType: NotificationType | null;
 
-    
-    markAsSent(): this {
-        this.status = 'EnviadoExitoso';
-        this.sentAt = new Date();
-        return this;
-    }
-
-    markAsFailed(): this {
-        this.status = 'Fallido';
-        this.sentAt = new Date();
-        return this;
-    }
-
-    static async logNotification(
-        recipientId: number | null,
-        typeId: number,
-        channel: NotificationChannel,
-        destination: string,
-        message: string
-    ): Promise<SentNotificationLog> {
-        const log = new SentNotificationLog();
-        log.recipientUserId = recipientId;
-        log.notificationTypeId = typeId;
-        log.channel = channel;
-        log.destinationAddress = destination;
-        log.messageContent = message;
-        log.status = 'Pendiente';
-        await log.save();
-        return log;
-    }
 }

@@ -77,7 +77,7 @@ export class MedicalAppointment {
     patientReason: string | null;
 
   
-    @ManyToOne(() => AvailabilitySlot, (slot) => slot.appointment, {
+    @ManyToOne(() => AvailabilitySlot, (slot) => slot.appointments, {
         onDelete: 'RESTRICT',
         onUpdate: 'CASCADE'
     })
@@ -100,22 +100,6 @@ export class MedicalAppointment {
 
     @OneToMany(() => ClinicalRecordEntry, (record) => record.appointment)
     clinicalRecords: ClinicalRecordEntry[];
-
-    confirm(): this {
-        this.status = 'Confirmada';
-        return this;
-    }
-
-    cancelByPatient(reason?: string): this {
-        this.status = 'CanceladaPorPaciente';
-        if (reason) this.patientReason = reason;
-        return this;
-    }
-
-    complete(): this {
-        this.status = 'Realizada';
-        return this;
-    }
 
     @OneToMany(() => AppointmentChangeHistory, (history) => history.appointment)
     changeHistory: AppointmentChangeHistory[];

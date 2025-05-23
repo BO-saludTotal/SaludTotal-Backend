@@ -66,31 +66,4 @@ export class UsersPhone extends BaseEntity{
     @JoinColumn({ name: 'UsuarioID_Ref' })
     usuario: User;
 
-    
-    marcarComoPrincipal() {
-        this.esPrincipal = true;
-        return this; 
-    }
-
-    desmarcarComoPrincipal() {
-        this.esPrincipal = false;
-        return this;
-    }
-
-
-    static async buscarPorUsuario(usuarioId: number): Promise<UsersPhone[]> {
-        return this.find({ 
-            where: { usuarioId },
-            order: { esPrincipal: 'DESC' } 
-        });
-    }
-
-    static async buscarPrincipal(usuarioId: number): Promise<UsersPhone | null> {
-        return await this.findOne({ 
-            where: { 
-                usuarioId, 
-                esPrincipal: true 
-            } 
-        });
-    }
 }

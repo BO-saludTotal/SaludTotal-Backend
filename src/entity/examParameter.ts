@@ -60,17 +60,4 @@ export class ExamParameter extends BaseEntity{
     @OneToMany(() => PrescriptionMedicationDetail, (prescriptions) => prescriptions.results)
     prescriptions: PrescriptionMedicationDetail[];
 
-    static async findOrCreate(
-        name: string,
-        unit?: string
-    ): Promise<ExamParameter> {
-        let param = await this.findOne({ where: { name } });
-        if (!param) {
-            param = new ExamParameter();
-            param.name = name;
-            param.defaultUnit = unit || null;
-            await param.save();
-        }
-        return param;
-    }
 }

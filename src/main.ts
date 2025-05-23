@@ -7,10 +7,6 @@ import { error } from 'console';
 
 
 async function bootstrap() {
-<<<<<<< HEAD
-  const app = await NestFactory.create(AppModule);
-  await app.listen(5000);
-=======
   try {
     await AppDataSource.initialize()
 
@@ -22,6 +18,5 @@ async function bootstrap() {
   }
 
   
->>>>>>> 185aefe (api)
 }
 bootstrap();

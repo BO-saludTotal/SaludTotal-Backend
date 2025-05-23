@@ -46,13 +46,4 @@ export class DoctorSpecialtyCertification {
     @JoinColumn({ name: 'EspecialidadID_Ref' })
     specialty: MedicalSpecialty;
 
-
-    isCertified(): boolean {
-        return this.certificationDate !== null;
-    }
-
-    certify(): this {
-        this.certificationDate = new Date();
-        return this;
-    }
 }

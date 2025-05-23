@@ -47,12 +47,4 @@ export class HealthEntitySpecialty extends BaseEntity{
     @JoinColumn({ name: 'EspecialidadID_Ref' })
     specialty: MedicalSpecialty;
 
-   
-    static async assignSpecialtyToEntity(healthEntityId: number, specialtyId: number) {
-        const assignment = new HealthEntitySpecialty();
-        assignment.healthEntityId = healthEntityId;
-        assignment.specialtyId = specialtyId;
-        await assignment.save();
-        return assignment;
-    }
 }

@@ -65,10 +65,4 @@ export class ScheduleBlockException {
     })
     @JoinColumn({ name: 'MedicoUsuarioID_Ref' })
     doctor: DoctorDetail;
-
-
-    isActive(): boolean {
-        const now = new Date();
-        return now >= this.startDateTime && now <= this.endDateTime;
-    }
 }

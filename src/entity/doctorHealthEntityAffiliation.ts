@@ -70,15 +70,4 @@ export class DoctorHealthEntityAffiliation {
     @JoinColumn({ name: 'EntidadSaludID_Ref' })
     healthEntity: HealthEntity;
 
-  
-    isActive(): boolean {
-        const today = new Date();
-        return today >= this.startDate && 
-               (this.endDate === null || today <= this.endDate);
-    }
-
-    terminateAffiliation(): this {
-        this.endDate = new Date();
-        return this;
-    }
 }

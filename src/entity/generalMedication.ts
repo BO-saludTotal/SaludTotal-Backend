@@ -64,31 +64,4 @@ export class GeneralMedication extends BaseEntity{
     @OneToMany(() => CommercialMedicationPresentation, (presentation) => presentation.generalMedication)
     commercialPresentations: CommercialMedicationPresentation[];
 
-    getFullDescription(): string {
-        return `${this.activeIngredient} ${this.concentration} (${this.pharmaceuticalForm})`;
-    }
-
-    static async findOrCreate(
-        activeIngredient: string,
-        pharmaceuticalForm: string,
-        concentration: string
-    ): Promise<GeneralMedication> {
-        let med = await this.findOne({ 
-            where: { 
-                activeIngredient, 
-                pharmaceuticalForm, 
-                concentration 
-            } 
-        });
-        
-        if (!med) {
-            med = new GeneralMedication();
-            med.activeIngredient = activeIngredient;
-            med.pharmaceuticalForm = pharmaceuticalForm;
-            med.concentration = concentration;
-            await med.save();
-        }
-        
-        return med;
-    }
 }

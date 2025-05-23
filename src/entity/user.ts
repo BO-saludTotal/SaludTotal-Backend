@@ -116,27 +116,4 @@ export class User extends BaseEntity{
     
     @OneToMany(() => SystemAuditLog, (log) => log.actor)
     auditLogs: SystemAuditLog[];
-
-    marcarComoActivo() {
-        this.estadoCuenta = 'Activo';
-        return this;
-    }
-
-    bloquearCuenta() {
-        this.estadoCuenta = 'Bloqueado';
-        return this;
-    }
-
-    marcarComoInactivo() {
-        this.estadoCuenta = "Inactivo";
-        return this;
-    }
-
-    registrarAcceso() {
-        this.ultimoAcceso = new Date();
-        return this;
-    }
-    static async usuariosActivos(): Promise<User[]> {
-        return this.find({ where: { estadoCuenta: 'Activo' } });
-    }
 }

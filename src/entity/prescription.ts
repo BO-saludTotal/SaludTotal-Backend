@@ -51,13 +51,4 @@ export class Prescription extends BaseEntity{
     @OneToMany(() => PrescriptionMedicationDetail, (detail) => detail.prescription)
     medications: PrescriptionMedicationDetail[];
 
-    
-    static async createForRecord(
-        recordEntryId: number
-    ): Promise<Prescription> {
-        const prescription = new Prescription();
-        prescription.recordEntryId = recordEntryId;
-        await prescription.save();
-        return prescription;
-    }
 }

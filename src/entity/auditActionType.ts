@@ -55,18 +55,4 @@ export class AuditActionType extends BaseEntity{
     @OneToMany(() => SystemAuditLog, (log) => log.actionType)
     auditLogs: SystemAuditLog[];
 
-
-    static async findOrCreate(
-        name: string,
-        severity?: SeverityLevel
-    ): Promise<AuditActionType> {
-        let actionType = await this.findOne({ where: { name } });
-        if (!actionType) {
-            actionType = new AuditActionType();
-            actionType.name = name;
-            actionType.severityLevel = severity || null;
-            await actionType.save();
-        }
-        return actionType;
-    }
 }

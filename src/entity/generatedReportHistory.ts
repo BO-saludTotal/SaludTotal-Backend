@@ -75,24 +75,4 @@ export class GeneratedReportHistory extends BaseEntity{
     @JoinColumn({ name: 'UsuarioID_Solicitante_Ref' })
     requestedBy: User | null;
 
- 
-    static async logReportGeneration(
-        reportTypeId: number,
-        userId: number | null,
-        parameters: Record<string, any>,
-        storageLink: string
-    ): Promise<GeneratedReportHistory> {
-        const report = new GeneratedReportHistory();
-        report.reportTypeId = reportTypeId;
-        report.requestedByUserId = userId;
-        report.parametersUsed = parameters;
-        report.storageLink = storageLink;
-        await report.save();
-        return report;
-    }
-
-    getPublicUrl(): string | null {
-        if (!this.storageLink) return null;
-        return `${process.env.REPORTS_BASE_URL}/${this.storageLink}`;
-    }
 }

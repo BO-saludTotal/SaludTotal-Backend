@@ -106,10 +106,8 @@ export class ClinicalRecordEntry extends BaseEntity {
     @JoinColumn({ name: 'PacienteUsuarioID_Ref' })
     patient: PatientDetail;
 
-    @ManyToOne(() => DoctorDetail, (doctor) => doctor.clinicalRecords, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'CASCADE'
-    })
+    
+    @ManyToOne(() => DoctorDetail, (doctor) => doctor.clinicalRecords)
     @JoinColumn({ name: 'MedicoUsuarioID_Atendio_Ref' })
     doctor: DoctorDetail;
 
@@ -156,21 +154,4 @@ export class ClinicalRecordEntry extends BaseEntity {
     @OneToMany(() => Prescription, (prescription) => prescription.recordEntry)
     prescriptions: Prescription[];
 
-    static async createFromAppointment(
-        appointment: MedicalAppointment,
-        eventType: MedicalEventType,
-        summary?: string
-    ): Promise<ClinicalRecordEntry> {
-        const record = new ClinicalRecordEntry();
-        record.patientUserId = appointment.patientUserId;
-        record.doctorUserId = appointment.slot.doctorUserId;
-        record.healthEntityId = appointment.slot.healthEntityId;
-        record.spaceId = appointment.slot.spaceId;
-        record.appointmentId = appointment.id;
-        record.eventTypeId = eventType.id;
-        record.attentionStartDateTime = appointment.slot.startDateTime;
-        record.narrativeSummary = summary || null;
-        await record.save();
-        return record;
-    }
 }

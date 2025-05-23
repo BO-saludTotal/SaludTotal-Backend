@@ -45,8 +45,4 @@ export class ReportType extends BaseEntity{
     @OneToMany(() => GeneratedReportHistory, (report) => report.reportType)
     generatedReports: GeneratedReportHistory[];
 
- 
-    static async findByName(name: string): Promise<ReportType | null> {
-        return await this.findOne({ where: { name } });
-    }
 }

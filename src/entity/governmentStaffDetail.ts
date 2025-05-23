@@ -57,9 +57,4 @@ export class GovernmentStaffDetail {
     @JoinColumn({ name: 'GobiernoUsuarioID_Ref' })
     user: User;
 
-
-    updatePosition(newPosition: string): this {
-        this.institutionPosition = newPosition;
-        return this;
-    }
 }

@@ -115,10 +115,4 @@ export class DoctorScheduleTemplate {
     @JoinColumn({ name: 'EspacioID_Ref' })
     space: PhysicalAttentionSpace | null;
 
-
-    isCurrentlyValid(): boolean {
-        const today = new Date();
-        return today >= this.validFrom && 
-               (this.validUntil === null || today <= this.validUntil);
-    }
 }

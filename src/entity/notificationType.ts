@@ -52,9 +52,5 @@ export class NotificationType extends BaseEntity {
     @OneToMany(() => SentNotificationLog, (log) => log.notificationType)
     sentNotifications: SentNotificationLog[];
 
-   
-    static async findByName(name: string): Promise<NotificationType | null> {
-        return await this.findOne({ where: { name } });
-    }
 
 }
