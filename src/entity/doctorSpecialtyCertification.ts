@@ -6,6 +6,7 @@ import {
     ManyToOne,
     JoinColumn
 } from "typeorm";
+
 import { DoctorDetail } from "./doctorDetail";
 import { MedicalSpecialty } from "./medicalSpecialty";
 
@@ -31,18 +32,12 @@ export class DoctorSpecialtyCertification {
     certificationDate: Date | null;
 
 
-    @ManyToOne(() => DoctorDetail, (doctor) => doctor.specialtyCertifications, {
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-    })
+    @ManyToOne(() => DoctorDetail, (doctor) => doctor.specialtyCertifications)
     @JoinColumn({ name: 'MedicoUsuarioID_Ref' })
     doctor: DoctorDetail;
 
    
-    @ManyToOne(() => MedicalSpecialty, (specialty) => specialty.doctorCertifications, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'CASCADE'
-    })
+    @ManyToOne(() => MedicalSpecialty, (specialty) => specialty.doctorCertifications)
     @JoinColumn({ name: 'EspecialidadID_Ref' })
     specialty: MedicalSpecialty;
 

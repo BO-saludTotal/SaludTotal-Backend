@@ -8,6 +8,7 @@ import { AttentionType } from "./entity/attentionType";
 import { AppointmentChangeHistory } from "./entity/appointmentChangeHistory";
 import { ClinicalRecordEntry } from "./entity/clinicalRecordEntry";
 import { DoctorDetail } from "./entity/doctorDetail"
+import { DoctorSpecialtyCertification } from "./entity/doctorSpecialtyCertification"
 
 export const dataSourceOptions:DataSourceOptions =({
     type: "mysql",
@@ -19,7 +20,7 @@ export const dataSourceOptions:DataSourceOptions =({
     synchronize: true,
     logging: true,
     entities: [MedicalAppointment, User, UsersPhone, AvailabilitySlot, PatientDetail, AttentionType, AppointmentChangeHistory,
-        DoctorDetail, MedicalAppointment
+        DoctorDetail, MedicalAppointment, DoctorSpecialtyCertification, ClinicalRecordEntry
     ],
     subscribers: [],
     migrations: [],
