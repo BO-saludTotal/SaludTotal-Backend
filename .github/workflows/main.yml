@@ -1,0 +1,28 @@
+name: build_in_backend
+
+on:
+  push:
+    branches: ["develop"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Set up node
+        uses: actions/setup-node@v3
+        with: 
+          node-version: '20'
+          cache: 'npm'
+
+      - name : Install dependencies
+        run: npm run ci
+
+      - name: Compile
+        run: npm run build
+
+      - name: Check build output
+        run: ls -la dist/ || echo "Build completed"
