@@ -1,50 +1,46 @@
-
 import {
-    Entity,
-    PrimaryColumn,
-    ManyToOne,
-    JoinColumn,
-    CreateDateColumn,
-    BaseEntity
-} from "typeorm";
-import { HealthEntity } from "./healthEntity";
-import { MedicalSpecialty } from "./medicalSpecialty";
+  Entity,
+  PrimaryColumn,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  BaseEntity,
+} from 'typeorm';
+import { HealthEntity } from './healthEntity';
+import { MedicalSpecialty } from './medicalSpecialty';
 
 @Entity({ name: 'EntidadSaludOfreceEspecialidades' })
-export class HealthEntitySpecialty extends BaseEntity{
-    @PrimaryColumn({
-        name: 'EntidadSaludID_Ref',
-        type: 'int'
-    })
-    healthEntityId: number;
+export class HealthEntitySpecialty extends BaseEntity {
+  @PrimaryColumn({
+    name: 'EntidadSaludID_Ref',
+    type: 'int',
+  })
+  healthEntityId: number;
 
-    @PrimaryColumn({
-        name: 'EspecialidadID_Ref',
-        type: 'int'
-    })
-    specialtyId: number;
+  @PrimaryColumn({
+    name: 'EspecialidadID_Ref',
+    type: 'int',
+  })
+  specialtyId: number;
 
-    @CreateDateColumn({
-        name: 'FechaCreacion',
-        type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP'
-    })
-    createdAt: Date;
+  @CreateDateColumn({
+    name: 'FechaCreacion',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
 
-    
-    @ManyToOne(() => HealthEntity, (entity) => entity.offeredSpecialties, {
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-    })
-    @JoinColumn({ name: 'EntidadSaludID_Ref' })
-    healthEntity: HealthEntity;
+  @ManyToOne(() => HealthEntity, (entity) => entity.offeredSpecialties, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'EntidadSaludID_Ref' })
+  healthEntity: HealthEntity;
 
-  
-    @ManyToOne(() => MedicalSpecialty, (specialty) => specialty.healthEntities, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'CASCADE'
-    })
-    @JoinColumn({ name: 'EspecialidadID_Ref' })
-    specialty: MedicalSpecialty;
-
+  @ManyToOne(() => MedicalSpecialty, (specialty) => specialty.healthEntities, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'EspecialidadID_Ref' })
+  specialty: MedicalSpecialty;
 }

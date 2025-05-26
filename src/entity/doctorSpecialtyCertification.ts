@@ -1,44 +1,37 @@
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    ManyToOne,
-    JoinColumn
-} from "typeorm";
-
-import { DoctorDetail } from "./doctorDetail";
-import { MedicalSpecialty } from "./medicalSpecialty";
+import { DoctorDetail } from './doctorDetail';
+import { MedicalSpecialty } from './medicalSpecialty';
 
 @Entity({ name: 'MedicoTieneEspecialidadesCertificadas' })
 export class DoctorSpecialtyCertification {
-    @PrimaryColumn({
-        name: 'MedicoUsuarioID_Ref',
-        type: 'int'
-    })
-    doctorUserId: number;
+  @PrimaryColumn({
+    name: 'MedicoUsuarioID_Ref',
+    type: 'int',
+  })
+  doctorUserId: number;
 
-    @PrimaryColumn({
-        name: 'EspecialidadID_Ref',
-        type: 'int'
-    })
-    specialtyId: number;
+  @PrimaryColumn({
+    name: 'EspecialidadID_Ref',
+    type: 'int',
+  })
+  specialtyId: number;
 
-    @Column({
-        name: 'FechaCertificacion',
-        type: 'date',
-        nullable: true
-    })
-    certificationDate: Date | null;
+  @Column({
+    name: 'FechaCertificacion',
+    type: 'date',
+    nullable: true,
+  })
+  certificationDate: Date | null;
 
+  @ManyToOne(() => DoctorDetail, (doctor) => doctor.specialtyCertifications)
+  @JoinColumn({ name: 'MedicoUsuarioID_Ref' })
+  doctor: DoctorDetail;
 
-    @ManyToOne(() => DoctorDetail, (doctor) => doctor.specialtyCertifications)
-    @JoinColumn({ name: 'MedicoUsuarioID_Ref' })
-    doctor: DoctorDetail;
-
-   
-    @ManyToOne(() => MedicalSpecialty, (specialty) => specialty.doctorCertifications)
-    @JoinColumn({ name: 'EspecialidadID_Ref' })
-    specialty: MedicalSpecialty;
-
+  @ManyToOne(
+    () => MedicalSpecialty,
+    (specialty) => specialty.doctorCertifications,
+  )
+  @JoinColumn({ name: 'EspecialidadID_Ref' })
+  specialty: MedicalSpecialty;
 }
