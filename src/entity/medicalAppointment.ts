@@ -44,12 +44,11 @@ export class MedicalAppointment {
         type: 'int',
         nullable: false
     })
-    patientUserId: number;
+    patientUserId: string;
 
     @CreateDateColumn({
         name: 'FechaHoraSolicitudCita',
         type: 'datetime',
-        default: () => 'CURRENT_TIMESTAMP'
     })
     requestDateTime: Date;
 

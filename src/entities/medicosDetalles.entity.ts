@@ -1,4 +1,4 @@
 export class MedicosDetalles {
-  MedicoUsuarioID_Ref: number;
+  medicoUsuarioID_Ref: string;
   NumeroColegiado: string;
 }

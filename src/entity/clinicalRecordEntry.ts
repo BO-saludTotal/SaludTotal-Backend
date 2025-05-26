@@ -37,7 +37,7 @@ export class ClinicalRecordEntry extends BaseEntity {
         type: 'int',
         nullable: false
     })
-    patientUserId: number;
+    patientUserId: string;
 
     @Column({
         name: 'MedicoUsuarioID_Atendio_Ref',

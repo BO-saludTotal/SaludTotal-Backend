@@ -19,7 +19,7 @@ export class PatientDetail {
         name: 'PacienteUsuarioID_Ref',
         type: 'int'
     })
-    patientUserId: number;
+    patientUserId: string;
 
     @Column({
         name: 'FechaNacimiento',

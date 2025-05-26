@@ -1,5 +1,5 @@
 export interface userAdressModel {
-  usuarioId: number;
+  usuarioId: string;
   correoElectronico: string;
   esPrincipal: boolean;
   verificado: boolean;

@@ -6,7 +6,7 @@ export type TipoTelefonoType = 'Móvil' | 'Casa' | 'Trabajo';
 @Entity({ name: 'TelefonosUsuario' })
 export class UsersPhone extends BaseEntity {
     @PrimaryColumn({ name: 'UsuarioID_Ref', type: 'int' })
-    usuarioId: number;
+    usuarioId: string;
 
     @PrimaryColumn({ name: 'NumeroTelefono', type: 'varchar', length: 25 })
     numeroTelefono: string;
