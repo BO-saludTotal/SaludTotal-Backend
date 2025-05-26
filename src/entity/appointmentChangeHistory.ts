@@ -29,7 +29,7 @@ export class AppointmentChangeHistory extends BaseEntity {
     @CreateDateColumn({
         name: 'FechaHoraCambio',
         type: 'datetime',
-        default: () => 'CURRENT_TIMESTAMP'
+        default: () => ''
     })
     changeDateTime: Date;
 

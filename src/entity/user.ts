@@ -16,7 +16,7 @@ import { SystemAuditLog } from "./systemAuditLog";
 export type EstadoCuentaType = 'Activo' | 'Inactivo' | 'Bloqueado' | 'Verificacion pendiente';
 @Entity()
 export class User extends BaseEntity{
-    @PrimaryColumn({ name: 'UsuarioID' })
+    @PrimaryColumn({ name: 'UsuarioID',  type: 'varchar'  })
     id: string = uuidv4();
 
     @Column({

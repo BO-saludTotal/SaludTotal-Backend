@@ -42,15 +42,13 @@ export class DoctorHealthEntityAffiliation {
     @CreateDateColumn({
         name: 'FechaCreacion',
         type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP'
+        default: () => 'import { User } from 'src/entity/user' '
     })
     createdAt: Date;
 
     @UpdateDateColumn({
         name: 'FechaActualizacion',
         type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP',
-        onUpdate: 'CURRENT_TIMESTAMP'
     })
     updatedAt: Date;
 

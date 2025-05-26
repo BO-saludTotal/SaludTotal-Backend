@@ -55,7 +55,7 @@ export class HealthEntity {
     @CreateDateColumn({
         name: 'FechaCreacion',
         type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP'
+        default: () => ''
     })
     createdAt: Date;
 
@@ -65,8 +65,8 @@ export class HealthEntity {
     @UpdateDateColumn({
         name: 'FechaActualizacion',
         type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP',
-        onUpdate: 'CURRENT_TIMESTAMP'
+        default: () => '',
+        onUpdate: ''
     })
     updatedAt: Date;
 
