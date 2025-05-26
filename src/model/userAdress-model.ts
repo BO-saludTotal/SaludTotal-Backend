@@ -4,4 +4,5 @@ export interface userAdressModel {
   esPrincipal: boolean;
   verificado: boolean;
   fechaCreacion: Date;
+  fechaActualizacion: Date;
 }

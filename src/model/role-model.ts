@@ -1,4 +1,4 @@
-export interface medicalSpecialityModel {
+export interface roleModel {
   id: number;
   name: string;
   description: string | null;

@@ -28,7 +28,7 @@ export type EstadoCuentaType =
   | 'Inactivo'
   | 'Bloqueado'
   | 'Verificacion pendiente';
-@Entity()
+@Entity({ name: 'Usuarios' })
 export class User extends BaseEntity {
   @PrimaryColumn({ name: 'UsuarioID' })
   id: string = uuidv4();

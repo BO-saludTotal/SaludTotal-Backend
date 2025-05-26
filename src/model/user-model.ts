@@ -1,6 +1,6 @@
-import { EstadoCuentaType } from 'src/entity/usuarios';
+import { EstadoCuentaType } from 'src/entity/user';
 export interface userModel {
-  id: number;
+  id: string;
   nombreUsuario: string;
   contrasenaHash: string;
   nombreCompleto: string;

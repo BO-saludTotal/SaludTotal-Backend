@@ -1,4 +1,4 @@
-import { HealthEntityType } from '../entity/entidadesSalud';
+import { HealthEntityType } from '../entity/healthEntity';
 export interface healthEntityModel {
   id: number;
   officialName: string;
