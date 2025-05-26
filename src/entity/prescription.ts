@@ -30,7 +30,7 @@ export class Prescription extends BaseEntity{
     @Column({
         name: 'FechaPrescripcion',
         type: 'datetime',
-        default: () => 'CURRENT_TIMESTAMP'
+
     })
     prescriptionDate: Date;
 

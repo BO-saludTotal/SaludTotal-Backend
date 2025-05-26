@@ -40,15 +40,12 @@ export class MedicalEventType extends BaseEntity{
     @CreateDateColumn({
         name: 'FechaCreacion',
         type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP'
     })
     createdAt: Date;
 
     @UpdateDateColumn({
         name: 'FechaActualizacion',
         type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP',
-        onUpdate: 'CURRENT_TIMESTAMP'
     })
     updatedAt: Date;
 

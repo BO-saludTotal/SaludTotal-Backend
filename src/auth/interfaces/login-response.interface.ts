@@ -3,7 +3,7 @@ export interface LoginResponse {
   success: boolean;
   message: string;
   usuario?: {
-    id: number;
+    id: string;
     nombre: string;
     nombreCompleto: string;
     registro: Date;

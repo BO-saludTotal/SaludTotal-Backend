@@ -34,17 +34,19 @@ export class ClinicalRecordEntry extends BaseEntity {
 
     @Column({
         name: 'PacienteUsuarioID_Ref',
-        type: 'int',
+        type: 'varchar',
+        length: 100,
         nullable: false
     })
     patientUserId: string;
 
     @Column({
         name: 'MedicoUsuarioID_Atendio_Ref',
-        type: 'int',
+        type: 'varchar',
+        length: 100,
         nullable: false
     })
-    doctorUserId: number;
+    doctorUserId: string;
 
     @Column({
         name: 'EntidadSaludID_Atencion_Ref',

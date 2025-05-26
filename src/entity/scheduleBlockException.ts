@@ -20,10 +20,11 @@ export class ScheduleBlockException {
 
     @Column({
         name: 'MedicoUsuarioID_Ref',
-        type: 'int',
+        type: 'varchar',
+        length: 100,
         nullable: false
     })
-    doctorUserId: number;
+    doctorUserId: string;
 
     @Column({
         name: 'FechaHoraInicioBloqueo',

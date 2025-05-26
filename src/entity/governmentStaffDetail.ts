@@ -14,9 +14,11 @@ import { User } from "./user";
 export class GovernmentStaffDetail {
     @PrimaryColumn({ 
         name: 'GobiernoUsuarioID_Ref',
-        type: 'int'
+        type: 'varchar',
+        length: 100,
+        nullable: false
     })
-    governmentUserId: number;
+    governmentUserId: string;
 
     @Column({
         name: 'NombreInstitucionGubernamental',

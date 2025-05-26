@@ -12,8 +12,11 @@ import { Role } from "./role";
 
 @Entity({ name: 'UsuarioRolesAsignados' })
 export class UserAssignedRole {
-    @PrimaryColumn({ name: 'UsuarioID_Ref', type: 'int' })
-    userId: number;
+    @PrimaryColumn({ name: 'UsuarioID_Ref',
+        type: 'varchar',
+        length: 100,
+        nullable: false })
+    userId: string;
 
     @PrimaryColumn({ name: 'RolID_Ref', type: 'int' })
     roleId: number;
@@ -21,7 +24,6 @@ export class UserAssignedRole {
     @CreateDateColumn({ 
         name: 'FechaAsignacion',
         type: 'datetime',
-        default: () => 'CURRENT_TIMESTAMP'
     })
     assignmentDate: Date;
 

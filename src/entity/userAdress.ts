@@ -18,9 +18,11 @@ import { User } from "./user";
 export class UserAddress extends BaseEntity{
     @PrimaryColumn({
         name: 'UsuarioID_Ref',
-        type: 'int'
+        type: 'varchar',
+        length: 100,
+        nullable: false
     })
-    usuarioId: number;
+    usuarioId: string;
 
     @PrimaryColumn({
         name: 'CorreoElectronico',
@@ -46,15 +48,12 @@ export class UserAddress extends BaseEntity{
     @CreateDateColumn({
         name: 'FechaCreacion',
         type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP'
     })
     fechaCreacion: Date;
 
     @UpdateDateColumn({
         name: 'FechaActualizacion',
         type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP',
-        onUpdate: 'CURRENT_TIMESTAMP'
     })
     fechaActualizacion: Date;
 

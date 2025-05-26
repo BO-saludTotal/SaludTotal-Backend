@@ -5,10 +5,13 @@ export type TipoTelefonoType = 'Móvil' | 'Casa' | 'Trabajo';
 
 @Entity({ name: 'TelefonosUsuario' })
 export class UsersPhone extends BaseEntity {
-    @PrimaryColumn({ name: 'UsuarioID_Ref', type: 'int' })
+    @PrimaryColumn({ name: 'UsuarioID_Ref',
+        type: 'varchar',
+        length: 100,
+        nullable: false })
     usuarioId: string;
 
-    @PrimaryColumn({ name: 'NumeroTelefono', type: 'varchar', length: 25 })
+    @PrimaryColumn({ name: 'NumeroTelefono', type: 'varchar', length: 40 })
     numeroTelefono: string;
 
     @Column({

@@ -41,7 +41,8 @@ export class MedicalAppointment {
 
     @Column({
         name: 'PacienteUsuarioID_Ref',
-        type: 'int',
+        type: 'varchar',
+        length: 100,
         nullable: false
     })
     patientUserId: string;

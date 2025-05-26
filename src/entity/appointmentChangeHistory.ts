@@ -35,10 +35,11 @@ export class AppointmentChangeHistory extends BaseEntity {
 
     @Column({
         name: 'UsuarioID_RealizaCambio_Ref',
-        type: 'int',
+        type: 'varchar',
+        length: 50,
         nullable: true
     })
-    changedByUserId: number | null;
+    changedByUserId: string | null;
 
     @Column({
         name: 'EstadoAnterior',

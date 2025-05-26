@@ -27,7 +27,6 @@ export class HealthEntitySpecialty extends BaseEntity{
     @CreateDateColumn({
         name: 'FechaCreacion',
         type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP'
     })
     createdAt: Date;
 

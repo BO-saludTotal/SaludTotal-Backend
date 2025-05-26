@@ -14,9 +14,11 @@ import { HealthEntity } from "./healthEntity";
 export class AdministrativeStaffDetail {
     @PrimaryColumn({ 
         name: 'AdminUsuarioID_Ref',
-        type: 'int'
+        type: 'varchar',
+        length: 100,
+        nullable: false
     })
-    adminUserId: number;
+    adminUserId: string;
 
     @Column({
         name: 'CargoAdministrativo',

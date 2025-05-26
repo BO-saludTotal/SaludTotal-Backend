@@ -1,5 +1,5 @@
 export class PersonalGubernamentalDetalle {
-  GobiernoUsuarioID_Ref: number;
+  GobiernoUsuarioID_Ref: string;
   NombreInstitucionGubernamental: string;
   CargoEnInstitucion: string;
 }

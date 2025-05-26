@@ -1,5 +1,5 @@
 export class Usuarios {
-  UsuarioID: number;
+  UsuarioID: string;
   NombreUsuario: string;
   ContrasenaHash: string;
   NombreCompleto: string;

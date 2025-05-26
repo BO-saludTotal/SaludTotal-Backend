@@ -17,7 +17,9 @@ export type GenderType = 'Male' | 'Female' | 'Other' | 'PreferNotToSay';
 export class PatientDetail {
     @PrimaryColumn({ 
         name: 'PacienteUsuarioID_Ref',
-        type: 'int'
+        type: 'varchar',
+        length: 100,
+        nullable: false
     })
     patientUserId: string;
 

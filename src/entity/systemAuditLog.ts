@@ -24,17 +24,18 @@ export class SystemAuditLog extends BaseEntity {
     @Column({
         name: 'TimestampEvento',
         type: 'datetime',
-        default: () => 'CURRENT_TIMESTAMP'
+
     })
     @Index('IDX_TimestampEvento')
     timestamp: Date;
 
     @Column({
         name: 'UsuarioID_Actor_Ref',
-        type: 'int',
+        type: 'varchar',
+        length: 50,
         nullable: true
     })
-    actorUserId: number | null;
+    actorUserId: string | null;
 
     @Column({
         name: 'TipoAccionID_Ref',

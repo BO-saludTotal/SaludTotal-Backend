@@ -1,5 +1,5 @@
 export class PacientesDetalles {
-  PacienteUsuarioID_Ref: number;
+  PacienteUsuarioID_Ref: string;
   FechaNacimiento?: Date;
   Genero?: 'Masculino' | 'Femenino' | 'Otro' | 'PrefieroNoDecir';
   DireccionResidencia?: string;

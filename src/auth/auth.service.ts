@@ -3,7 +3,7 @@ import { pool } from '../db';
 import { FieldPacket } from 'mysql2';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponse } from './interfaces/login-response.interface';
-import { User } from 'src/entity/usuarios' 
+import { Usuarios } from 'src/entities/usuarios.entity';
 
 @Injectable()
 export class AuthService {
@@ -16,14 +16,14 @@ export class AuthService {
         [NombreUsuario],
       );
 
-      const [rows] = result as unknown as [User [], FieldPacket[]]; 
+      const [rows] = result as unknown as [Usuarios[], FieldPacket[]];
       const Usuarios = rows[0];
 
       if (!Usuarios) {
         return { success: false, message: 'User no encontrado' };
       }
 
-      if (Usuarios.contrasenaHash !== Contrasena) {
+      if (Usuarios.ContrasenaHash !== Contrasena) {
         return { success: false, message: 'Contraseña incorrecta' };
       }
 
@@ -32,12 +32,12 @@ export class AuthService {
         success: true,
         message: `Bienvenido`,
         usuario: {
-          id: Usuarios.id,
-          username: Usuarios.nombreUsuario,
-          fullName: Usuarios.nombreCompleto,
-          createdAt: Usuarios.fechaRegistro,
-          accountStatus: Usuarios.estadoCuenta,
-          lastAccess: Usuarios.ultimoAcceso,
+          id: Usuarios.UsuarioID,
+          nombre: Usuarios.NombreUsuario,
+          nombreCompleto: Usuarios.NombreCompleto,
+          registro: Usuarios.FechaRegistro,
+          estado: Usuarios.EstadoCuenta,
+          ultimoAcceso: Usuarios.UltimoAcceso,
         },
       };
     } catch (error: unknown) {

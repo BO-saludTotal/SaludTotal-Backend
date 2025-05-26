@@ -15,9 +15,11 @@ import { HealthEntity } from "./healthEntity";
 export class DoctorHealthEntityAffiliation {
     @PrimaryColumn({
         name: 'MedicoUsuarioID_Ref',
-        type: 'int'
+        type: 'varchar',
+        length: 100,
+        nullable: false
     })
-    doctorUserId: number;
+    doctorUserId: string;
 
     @PrimaryColumn({
         name: 'EntidadSaludID_Ref',
@@ -42,7 +44,7 @@ export class DoctorHealthEntityAffiliation {
     @CreateDateColumn({
         name: 'FechaCreacion',
         type: 'timestamp',
-        default: () => 'import { User } from 'src/entity/user' '
+ 
     })
     createdAt: Date;
 

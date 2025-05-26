@@ -28,10 +28,11 @@ export class GeneratedReportHistory extends BaseEntity{
 
     @Column({
         name: 'UsuarioID_Solicitante_Ref',
-        type: 'int',
+        type: 'varchar',
+        length: 50,
         nullable: true
     })
-    requestedByUserId: number | null;
+    requestedByUserId: string | null;
 
     @Column({
         name: 'FechaHoraGeneracion',

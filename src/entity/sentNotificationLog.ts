@@ -24,10 +24,11 @@ export class SentNotificationLog extends BaseEntity{
 
     @Column({
         name: 'UsuarioID_Destinatario_Ref',
-        type: 'int',
+        type: 'varchar',
+        length: 50,
         nullable: true
     })
-    recipientUserId: number | null;
+    recipientUserId: string | null;
 
     @Column({
         name: 'TipoNotificacionID_Ref',

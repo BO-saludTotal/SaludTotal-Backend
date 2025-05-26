@@ -49,7 +49,6 @@ export class User extends BaseEntity{
     @CreateDateColumn({
         name: 'FechaRegistro',
         type: 'datetime',
-        default: () => 'CURRENT_TIMESTAMP'
     })
     fechaRegistro: Date;
 
