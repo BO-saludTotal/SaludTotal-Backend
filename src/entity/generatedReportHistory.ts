@@ -36,7 +36,7 @@ export class GeneratedReportHistory extends BaseEntity{
     @Column({
         name: 'FechaHoraGeneracion',
         type: 'datetime',
-        default: () => 'CURRENT_TIMESTAMP'
+        default: () => ''
     })
     generatedAt: Date;
 

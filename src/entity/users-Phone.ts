@@ -1,31 +1,14 @@
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    Index,
-    CreateDateColumn,
-    UpdateDateColumn,
-    BaseEntity
-} from "typeorm";
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, BaseEntity } from "typeorm";
 import { User } from "./user"; 
 
 export type TipoTelefonoType = 'Móvil' | 'Casa' | 'Trabajo';
 
-@Entity({ name: 'TelefonosUsuario' }) 
-export class UsersPhone extends BaseEntity{
-    @PrimaryColumn({
-        name: 'UsuarioID_Ref',
-        type: 'int'
-    })
+@Entity({ name: 'TelefonosUsuario' })
+export class UsersPhone extends BaseEntity {
+    @PrimaryColumn({ name: 'UsuarioID_Ref', type: 'int' })
     usuarioId: number;
 
-    @PrimaryColumn({
-        name: 'NumeroTelefono',
-        type: 'varchar',
-        length: 25
-    })
+    @PrimaryColumn({ name: 'NumeroTelefono', type: 'varchar', length: 25 })
     numeroTelefono: string;
 
     @Column({
@@ -36,34 +19,15 @@ export class UsersPhone extends BaseEntity{
     })
     tipoTelefono?: TipoTelefonoType;
 
-    @Column({
-        name: 'EsPrincipal',
-        type: 'boolean',
-        default: false
-    })
+    @Column({ name: 'EsPrincipal', type: 'boolean', default: false })
     esPrincipal: boolean;
 
-    @CreateDateColumn({
-        name: 'FechaCreacion',
-        type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP'
-    })
-    fechaCreacion: Date;
 
-    @UpdateDateColumn({
-        name: 'FechaActualizacion',
-        type: 'timestamp',
-        default: () => 'CURRENT_TIMESTAMP',
-        onUpdate: 'CURRENT_TIMESTAMP'
-    })
-    fechaActualizacion: Date;
 
-    
     @ManyToOne(() => User, (user) => user.telefonos, {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
     })
     @JoinColumn({ name: 'UsuarioID_Ref' })
     usuario: User;
-
 }

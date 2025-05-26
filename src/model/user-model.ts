@@ -1,4 +1,4 @@
-import { EstadoCuentaType } from 'src/entity/usuarios';
+import { EstadoCuentaType } from 'src/entity/user';
 export interface userModel {
   id: number;
   nombreUsuario: string;

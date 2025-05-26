@@ -8,7 +8,8 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     BaseEntity,
-    OneToMany
+    OneToMany,
+    RelationId
 } from "typeorm";
 import { PatientDetail } from "./patientDetails";
 import { DoctorDetail } from "./doctorDetail";
@@ -21,6 +22,7 @@ import { ClinicalRecordAttachment } from "./clinicalRecordAttachment";
 import { ExamResult } from "./examResult";
 import { ExamParameter } from "./examParameter";
 import { Prescription } from "./prescription";
+
 
 @Entity({ name: 'HistorialesClinicosEntradas' })
 export class ClinicalRecordEntry extends BaseEntity {
@@ -110,25 +112,16 @@ export class ClinicalRecordEntry extends BaseEntity {
     @ManyToOne(() => DoctorDetail, (doctor) => doctor.clinicalRecords)
     @JoinColumn({ name: 'MedicoUsuarioID_Atendio_Ref' })
     doctor: DoctorDetail;
-
-    @ManyToOne(() => HealthEntity, (entity) => entity.clinicalRecords, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'CASCADE'
-    })
+    
+    @ManyToOne(() => HealthEntity, (entity) => entity.clinicalRecords)
     @JoinColumn({ name: 'EntidadSaludID_Atencion_Ref' })
     healthEntity: HealthEntity;
 
-    @ManyToOne(() => PhysicalAttentionSpace, (space) => space.clinicalRecords, {
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE'
-    })
+    @ManyToOne(() => PhysicalAttentionSpace, (space) => space.clinicalRecords)
     @JoinColumn({ name: 'EspacioID_Atencion_Ref' })
     space: PhysicalAttentionSpace | null;
 
-    @ManyToOne(() => MedicalAppointment, (appointment) => appointment.clinicalRecords, {
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE'
-    })
+    @ManyToOne(() => MedicalAppointment, (appointment) => appointment.clinicalRecords)
     @JoinColumn({ name: 'CitaID_Asociada_Ref' })
     appointment: MedicalAppointment | null;
 

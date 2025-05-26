@@ -9,6 +9,36 @@ import { AppointmentChangeHistory } from "./entity/appointmentChangeHistory";
 import { ClinicalRecordEntry } from "./entity/clinicalRecordEntry";
 import { DoctorDetail } from "./entity/doctorDetail"
 import { DoctorSpecialtyCertification } from "./entity/doctorSpecialtyCertification"
+import { HealthEntity } from "./entity/healthEntity"
+import { AdministrativeStaffDetail } from "./entity/administrativeStaffDetail"
+import { AuditActionType } from "./entity/auditActionType"
+import { ClinicalRecordAttachment } from "./entity/clinicalRecordAttachment"
+import { ClinicalRecordDiagnosis } from "./entity/clinicalRecordDiagnosis"
+import { CommercialMedicationPresentation } from "./entity/commercialMedicationPresentation"
+import { DiagnosisCode } from "./entity/diagnosisCode"
+import { DoctorHealthEntityAffiliation } from "./entity/doctorHealthEntityAffiliation"
+import { DoctorScheduleTemplate } from "./entity/doctorScheduleTemplate"
+import { ExamParameter } from "./entity/examParameter"
+import { ExamResult } from "./entity/examResult"
+import { ExamResultDetail } from "./entity/examResultDetail"
+import { GeneralMedication } from "./entity/generalMedication"
+import { GeneratedReportHistory } from "./entity/generatedReportHistory"
+import { GovernmentStaffDetail } from "./entity/governmentStaffDetail"
+import { HealthEntitySpecialty } from "./entity/healthEntitySpecialty"
+import { MedicalEventType } from "./entity/medicalEventType"
+import { MedicalGeneralCatalog } from "./entity/medicalGeneralCatalog"
+import { MedicalSpecialty } from "./entity/medicalSpecialty"
+import { NotificationType } from "./entity/notificationType"
+import { PhysicalAttentionSpace } from "./entity/physicalAttentionSpace"
+import { Prescription } from "./entity/prescription"
+import { PrescriptionMedicationDetail } from "./entity/prescriptionMedicationDetail"
+import { ReportType } from "./entity/reportType"
+import { Role } from "./entity/role"
+import { ScheduleBlockException } from "./entity/scheduleBlockException"
+import { SentNotificationLog } from "./entity/sentNotificationLog"
+import { SystemAuditLog } from "./entity/systemAuditLog"
+import { UserAddress } from "./entity/userAdress"
+import { UserAssignedRole } from "./entity/userAssignedRole"
 
 export const dataSourceOptions:DataSourceOptions =({
     type: "mysql",
@@ -17,10 +47,15 @@ export const dataSourceOptions:DataSourceOptions =({
     username: "root",
     password: "kf142004",
     database: "salud",
-    synchronize: true,
+    synchronize: false,
     logging: true,
     entities: [MedicalAppointment, User, UsersPhone, AvailabilitySlot, PatientDetail, AttentionType, AppointmentChangeHistory,
-        DoctorDetail, MedicalAppointment, DoctorSpecialtyCertification, ClinicalRecordEntry
+        DoctorDetail, MedicalAppointment, DoctorSpecialtyCertification, ClinicalRecordEntry, HealthEntity, AdministrativeStaffDetail,
+        AuditActionType, ClinicalRecordAttachment, ClinicalRecordDiagnosis, CommercialMedicationPresentation, DiagnosisCode, DoctorHealthEntityAffiliation,
+        DoctorScheduleTemplate, ExamParameter, ExamResult, ExamResultDetail, GeneralMedication, GeneratedReportHistory, GovernmentStaffDetail,
+        HealthEntitySpecialty, MedicalEventType, MedicalGeneralCatalog, MedicalSpecialty, NotificationType, PatientDetail, PhysicalAttentionSpace,
+        Prescription, PrescriptionMedicationDetail, ReportType, Role, ScheduleBlockException, SentNotificationLog, SystemAuditLog, UserAddress,
+        UserAssignedRole
     ],
     subscribers: [],
     migrations: [],
