@@ -3,7 +3,7 @@ import { pool } from '../db';
 import { FieldPacket } from 'mysql2';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponse } from './interfaces/login-response.interface';
-import { Usuarios } from '../entities/usuarios.entity';
+import { User } from '../entity/usuarios';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +16,7 @@ export class AuthService {
         [NombreUsuario],
       );
 
-      const [rows] = result as unknown as [Usuarios[], FieldPacket[]];
+      const [rows] = result as unknown as [User[], FieldPacket[]];
       const Usuarios = rows[0];
 
       if (!Usuarios) {
