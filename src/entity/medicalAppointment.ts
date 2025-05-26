@@ -42,14 +42,14 @@ export class MedicalAppointment {
     @Column({
         name: 'PacienteUsuarioID_Ref',
         type: 'varchar',
-        length: 100,
+        length: 36,
         nullable: false
     })
     patientUserId: string;
 
     @CreateDateColumn({
         name: 'FechaHoraSolicitudCita',
-        type: 'datetime',
+        type: 'datetime'
     })
     requestDateTime: Date;
 

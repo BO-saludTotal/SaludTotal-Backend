@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMedicalAppointmentDto } from './dto/create-medical-appointment.dto';
 import { UpdateMedicalAppointmentDto } from './dto/update-medical-appointment.dto';
 import { MedicalAppointment } from 'src/entity/medicalAppointment';
 import { MedicalAppointmentRepository } from './medical-appointment.repository';
@@ -7,9 +6,11 @@ import { MedicalAppointmentRepository } from './medical-appointment.repository';
 @Injectable()
 export class MedicalAppointmentService {
   constructor(private MedicalAppointmentRepo:MedicalAppointmentRepository){}
-  create(createMedicalAppointmentDto: MedicalAppointment) {
-    this.MedicalAppointmentRepo.createMedicalAppointment(createMedicalAppointmentDto);
-  }
+
+async create(createMedicalAppointmentDto: MedicalAppointment): Promise<MedicalAppointment> {
+  const savedAppointment = await this.MedicalAppointmentRepo.createMedicalAppointment(createMedicalAppointmentDto);
+  return savedAppointment; // Devuelve la entidad guardada
+}
 
   findAll() {
     return this.MedicalAppointmentRepo.getAllMedicAppointment();

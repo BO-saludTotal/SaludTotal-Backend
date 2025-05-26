@@ -8,8 +8,8 @@ export class MedicalAppointmentRepository extends Repository<MedicalAppointment>
         super(MedicalAppointment, dataSource.createEntityManager());
     }
 
-    async createMedicalAppointment(medA:MedicalAppointment){
-        this.dataSource.getRepository(MedicalAppointment).save(medA);
+    async createMedicalAppointment(medA: MedicalAppointment): Promise<MedicalAppointment> {
+        return this.save(medA); 
     }
 
     async getAllMedicAppointment(){

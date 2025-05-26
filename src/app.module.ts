@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-//import { AppController } from './app.controller';
-//import { AppService } from './app.service';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { dataSourceOptions } from './data-source';
 import { MedicalAppointmentModule } from './medical-appointment/medical-appointment.module';
 
@@ -28,10 +28,11 @@ import { UserAdressModule } from './user-adress/user-adress.module';
 import { UserAssignedRoleModule } from './user-assigned-role/user-assigned-role.module';
 import { UserPhoneModule } from './user-phone/user-phone.module';
 
+
 @Module({
   imports: [TypeOrmModule.forRoot(dataSourceOptions), MedicalAppointmentModule, DoctorDetailModule, HealthEntityModule, AdministrativeStaffDetailModule, DoctorHealthEntityAffiliationModule, DoctorSpecialtyCertificationModule, GeneralMedicationModule, GovernmentStaffDetailModule, HealthEntitySpecialtyModule, MedicalSpecialtyModule, PatientDetailsModule, PhysicalAttentionSpaceModule, PrescriptionModule, RoleModule, UserModule, UserAdressModule, UserAssignedRoleModule, UserPhoneModule],
-  controllers: [AuthController, UsuariosController],
-  providers: [AuthService, UsuariosService],
+  controllers: [AppController, AuthController, UsuariosController],
+  providers: [AppService, AuthService, UsuariosService],
 })
 export class AppModule {}
 
