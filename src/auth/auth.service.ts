@@ -3,7 +3,7 @@ import { pool } from '../db';
 import { FieldPacket } from 'mysql2';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponse } from './interfaces/login-response.interface';
-import { Usuarios } from 'src/entities/usuarios.entity';
+import { Usuarios } from 'src/entities/usuarios';
 
 @Injectable()
 export class AuthService {
