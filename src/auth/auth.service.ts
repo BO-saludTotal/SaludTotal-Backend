@@ -3,27 +3,27 @@ import { pool } from '../db';
 import { FieldPacket } from 'mysql2';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponse } from './interfaces/login-response.interface';
-import { Usuarios } from 'src/entities/usuarios.entity';
+import { User } from 'src/entity/user';
 
 @Injectable()
 export class AuthService {
   async login(credentials: LoginDto): Promise<LoginResponse> {
     try {
-      const { NombreUsuario, Contrasena } = credentials;
+      const { username, passwordHash } = credentials;
 
       const result = await pool.query(
         'SELECT * FROM Usuarios WHERE NombreUsuario = ?',
-        [NombreUsuario],
+        [username],
       );
 
-      const [rows] = result as unknown as [Usuarios[], FieldPacket[]];
-      const Usuarios = rows[0];
+      const [rows] = result as unknown as [User[], FieldPacket[]];
+      const user = rows[0];
 
-      if (!Usuarios) {
-        return { success: false, message: 'User no encontrado' };
+      if (!user) {
+        return { success: false, message: 'Usuario no encontrado' };
       }
 
-      if (Usuarios.ContrasenaHash !== Contrasena) {
+      if (user.passwordHash !== passwordHash) {
         return { success: false, message: 'Contraseña incorrecta' };
       }
 
@@ -31,13 +31,14 @@ export class AuthService {
         accessToken: 'nada de momento xd',
         success: true,
         message: `Bienvenido`,
-        usuario: {
-          id: Usuarios.UsuarioID,
-          nombre: Usuarios.NombreUsuario,
-          nombreCompleto: Usuarios.NombreCompleto,
-          registro: Usuarios.FechaRegistro,
-          estado: Usuarios.EstadoCuenta,
-          ultimoAcceso: Usuarios.UltimoAcceso,
+        user: {
+          id: user.id,
+          username: user.username,
+          passwordHash: user.passwordHash,
+          fullName: user.fullName,
+          registrationDate: user.registrationDate,
+          accountStatus: user.accountStatus,
+          lastAccess: user.lastAccess,
         },
       };
     } catch (error: unknown) {
