@@ -1,40 +1,23 @@
 
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    Index,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToMany
-} from "typeorm";
-
+import { Entity, PrimaryGeneratedColumn, Column, Index, OneToMany, BaseEntity } from "typeorm";
 import { AdministrativeStaffDetail } from "./administrativeStaffDetail";
-import { PhysicalAttentionSpace } from "./physicalAttentionSpace";
+import { DoctorHealthEntityAffiliation } from "./doctorHealthEntityAffiliation";
 import { DoctorScheduleTemplate } from "./doctorScheduleTemplate";
+import { PhysicalAttentionSpace } from "./physicalAttentionSpace";
 import { AvailabilitySlot } from "./availabilitySlot";
 import { HealthEntitySpecialty } from "./healthEntitySpecialty";
-import { DoctorHealthEntityAffiliation } from "./doctorHealthEntityAffiliation";
 import { ClinicalRecordEntry } from "./clinicalRecordEntry";
+
 
 export type HealthEntityType = 'Hospital' | 'Clínica' | 'Consultorio' | 'Laboratorio' | 'Centro Diagnóstico';
 
 @Entity({ name: 'EntidadesSalud' })
-export class HealthEntity {
-    @PrimaryGeneratedColumn({ 
-        name: 'EntidadSaludID',
-        type: 'int'
-    })
+export class HealthEntity extends BaseEntity {
+    @PrimaryGeneratedColumn({ name: 'EntidadSaludID', type: 'int' })
     id: number;
 
-    @Column({
-        name: 'NombreOficial',
-        type: 'varchar',
-        length: 255,
-        unique: true,
-        nullable: false
-    })
-    @Index('IDX_NombreOficial', { unique: true })
+    @Column({ name: 'NombreOficial', type: 'varchar', length: 255, unique: true, nullable: false })
+    @Index('IDX_EntidadesSalud_NombreOficialUnico', { unique: true })
     officialName: string;
 
     @Column({
@@ -45,47 +28,27 @@ export class HealthEntity {
     })
     entityType: HealthEntityType;
 
-    @Column({
-        name: 'DireccionCompleta',
-        type: 'text',
-        nullable: true
-    })
-    fullAddress: string | null;
+    @Column({ name: 'DireccionCompleta', type: 'text', nullable: true })
+    fullAddress?: string | null;
 
-    @CreateDateColumn({
-        name: 'FechaCreacion',
-        type: 'timestamp',
-        default: () => ''
-    })
-    createdAt: Date;
-
-    @OneToMany(() => PhysicalAttentionSpace, (space) => space.healthEntity)
-    attentionSpaces: PhysicalAttentionSpace[];
-
-    @UpdateDateColumn({
-        name: 'FechaActualizacion',
-        type: 'timestamp',
-        default: () => '',
-        onUpdate: ''
-    })
-    updatedAt: Date;
-
-    @OneToMany(() => AdministrativeStaffDetail, (staff) => staff.assignedHealthEntity)
+    @OneToMany(() => AdministrativeStaffDetail, staff => staff.assignedHealthEntity)
     administrativeStaff: AdministrativeStaffDetail[];
 
-    @OneToMany(() => DoctorScheduleTemplate, (template) => template.healthEntity)
-    doctorSchedules: DoctorScheduleTemplate[];
-
-    @OneToMany(() => AvailabilitySlot, (slot) => slot.healthEntity)
-    availabilitySlots: AvailabilitySlot[];
-
-    @OneToMany(() => HealthEntitySpecialty, (hes) => hes.healthEntity)
-    offeredSpecialties: HealthEntitySpecialty[];
-
-    @OneToMany(() => DoctorHealthEntityAffiliation, (affiliation) => affiliation.healthEntity)
+    @OneToMany(() => DoctorHealthEntityAffiliation, affiliation => affiliation.healthEntity)
     doctorAffiliations: DoctorHealthEntityAffiliation[];
 
-    @OneToMany(() => ClinicalRecordEntry, (record) => record.healthEntity)
-    clinicalRecords: ClinicalRecordEntry[];
+    @OneToMany(() => DoctorScheduleTemplate, template => template.healthEntity)
+    scheduleTemplates: DoctorScheduleTemplate[];
 
+    @OneToMany(() => PhysicalAttentionSpace, space => space.healthEntity)
+    attentionSpaces: PhysicalAttentionSpace[];
+
+    @OneToMany(() => AvailabilitySlot, slot => slot.healthEntity)
+    availabilitySlots: AvailabilitySlot[];
+
+    @OneToMany(() => HealthEntitySpecialty, hes => hes.healthEntity)
+    offeredSpecialties: HealthEntitySpecialty[];
+
+    @OneToMany(() => ClinicalRecordEntry, entry => entry.attentionHealthEntity)
+    clinicalRecords: ClinicalRecordEntry[];
 }

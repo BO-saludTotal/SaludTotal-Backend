@@ -1,108 +1,54 @@
 
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    CreateDateColumn,
-    OneToMany
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne, CreateDateColumn, BaseEntity, OneToMany } from "typeorm";
 import { AvailabilitySlot } from "./availabilitySlot";
-import { PatientDetail } from "./patientDetails";
-import { AttentionType } from "./attentionType";
+import { User } from "./user";
 import { AppointmentChangeHistory } from "./appointmentChangeHistory";
 import { ClinicalRecordEntry } from "./clinicalRecordEntry";
+import { AttentionType } from "./attentionType";
 
-export type AppointmentStatus = 
-    'Solicitada' | 
-    'Confirmada' | 
-    'Modificada' | 
-    'CanceladaPorPaciente' | 
-    'CanceladaPorMedico' | 
-    'Realizada' | 
-    'NoAsistio';
+export type AppointmentStatusType = 'Solicitada' | 'Confirmada' | 'Modificada' | 'CanceladaPorPaciente' | 'CanceladaPorMedico' | 'Realizada' | 'NoAsistio';
 
 @Entity({ name: 'CitasMedicas' })
-export class MedicalAppointment {
-    @PrimaryGeneratedColumn({
-        name: 'CitaID',
-        type: 'int'
-    })
+export class MedicalAppointment extends BaseEntity {
+    @PrimaryGeneratedColumn({ name: 'CitaID', type: 'int' })
     id: number;
 
-    @Column({
-        name: 'SlotID_Ref',
-        type: 'int',
-        unique: true,
-        nullable: false
-    })
+    @Column({ name: 'SlotID_Ref', type: 'int', unique: true, nullable: false })
     slotId: number;
 
-    @Column({
-        name: 'PacienteUsuarioID_Ref',
-        type: 'varchar',
-        length: 36,
-        nullable: false
-    })
+    @Column({ name: 'PacienteUsuarioID_Ref', type: 'varchar', length: 36, nullable: false })
     patientUserId: string;
 
-    @CreateDateColumn({
-        name: 'FechaHoraSolicitudCita',
-        type: 'datetime'
-    })
+    @CreateDateColumn({ name: 'FechaHoraSolicitudCita', type: 'datetime' })
     requestDateTime: Date;
 
     @Column({
         name: 'EstadoCita',
         type: 'enum',
-        enum: [
-            'Solicitada', 
-            'Confirmada', 
-            'Modificada', 
-            'CanceladaPorPaciente', 
-            'CanceladaPorMedico', 
-            'Realizada', 
-            'NoAsistio'
-        ],
+        enum: ['Solicitada', 'Confirmada', 'Modificada', 'CanceladaPorPaciente', 'CanceladaPorMedico', 'Realizada', 'NoAsistio'],
         nullable: false
     })
-    status: AppointmentStatus;
+    status: AppointmentStatusType;
 
-    @Column({
-        name: 'MotivoConsultaPaciente',
-        type: 'text',
-        nullable: true
-    })
-    patientReason: string | null;
+    @Column({ name: 'MotivoConsultaPaciente', type: 'text', nullable: true })
+    patientReason?: string | null;
 
-  
-    @ManyToOne(() => AvailabilitySlot, (slot) => slot.appointments, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'CASCADE'
-    })
-    @JoinColumn({ name: 'SlotID_Ref' })
+    @OneToOne(() => AvailabilitySlot, { onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'SlotID_Ref', referencedColumnName: 'id' })
     slot: AvailabilitySlot;
 
-    @ManyToOne(() => AttentionType, (attentionType) => attentionType.appointments, {
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE'
-    })
-    @JoinColumn({ name: 'TipoAtencionID_Ref' })
-    attentionType: AttentionType;
+    @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' }) 
+    @JoinColumn({ name: 'PacienteUsuarioID_Ref', referencedColumnName: 'id' })
+    patientUser: User;
 
-    @ManyToOne(() => PatientDetail, (patient) => patient.appointments, {
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-    })
-    @JoinColumn({ name: 'PacienteUsuarioID_Ref' })
-    patient: PatientDetail;
-
-    @OneToMany(() => ClinicalRecordEntry, (record) => record.appointment)
-    clinicalRecords: ClinicalRecordEntry[];
-
-    @OneToMany(() => AppointmentChangeHistory, (history) => history.appointment)
+    @OneToMany(() => AppointmentChangeHistory, history => history.appointment)
     changeHistory: AppointmentChangeHistory[];
 
+    @OneToMany(() => ClinicalRecordEntry, entry => entry.associatedAppointment)
+    clinicalRecords: ClinicalRecordEntry[];
+
+    @ManyToOne(() => AttentionType, at => at.appointmentsRelacionadosConMedicalAppointment) 
+    @JoinColumn({ name: 'TipoAtencionID_Ref' }) 
+    attentionType: AttentionType;
 
 }

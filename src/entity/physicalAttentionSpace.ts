@@ -1,44 +1,24 @@
 
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    Index,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToMany
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, BaseEntity, OneToMany } from "typeorm";
 import { HealthEntity } from "./healthEntity";
 import { DoctorScheduleTemplate } from "./doctorScheduleTemplate";
 import { AvailabilitySlot } from "./availabilitySlot";
 import { ClinicalRecordEntry } from "./clinicalRecordEntry";
 
+
 export type SpaceType = 'Consultorio Médico' | 'Sala Procedimientos' | 'Laboratorio Toma Muestras' | 'Quirófano';
 
 @Entity({ name: 'EspaciosFisicosAtencion' })
-export class PhysicalAttentionSpace {
-    @PrimaryGeneratedColumn({
-        name: 'EspacioID',
-        type: 'int'
-    })
+@Index(["healthEntityId", "spaceName"], { unique: true }) // Corresponde a UNIQUE (`EntidadSaludID_Ref`, `NombreEspacio`)
+export class PhysicalAttentionSpace extends BaseEntity {
+    @PrimaryGeneratedColumn({ name: 'EspacioID', type: 'int' })
     id: number;
 
-    @Column({
-        name: 'EntidadSaludID_Ref',
-        type: 'int',
-        nullable: false
-    })
+    @Column({ name: 'EntidadSaludID_Ref', type: 'int', nullable: false })
     healthEntityId: number;
 
-    @Column({
-        name: 'NombreEspacio',
-        type: 'varchar',
-        length: 150,
-        nullable: false
-    })
-    name: string;
+    @Column({ name: 'NombreEspacio', type: 'varchar', length: 150, nullable: false })
+    spaceName: string;
 
     @Column({
         name: 'TipoEspacio',
@@ -48,38 +28,16 @@ export class PhysicalAttentionSpace {
     })
     spaceType: SpaceType;
 
-    @CreateDateColumn({
-        name: 'FechaCreacion',
-        type: 'timestamp',
-
-    })
-    createdAt: Date;
-
-    @UpdateDateColumn({
-        name: 'FechaActualizacion',
-        type: 'timestamp',
-    })
-    updatedAt: Date;
-
-  
-    @ManyToOne(() => HealthEntity, (healthEntity) => healthEntity.attentionSpaces, {
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
-    })
-    @JoinColumn({ name: 'EntidadSaludID_Ref' })
+    @ManyToOne(() => HealthEntity, healthEntity => healthEntity.attentionSpaces, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'EntidadSaludID_Ref', referencedColumnName: 'id' })
     healthEntity: HealthEntity;
 
-    @OneToMany(() => DoctorScheduleTemplate, (template) => template.space)
-    doctorSchedules: DoctorScheduleTemplate[];
+    @OneToMany(() => DoctorScheduleTemplate, template => template.attentionSpace)
+    scheduleTemplates: DoctorScheduleTemplate[];
 
-    @OneToMany(() => AvailabilitySlot, (slot) => slot.space)
+    @OneToMany(() => AvailabilitySlot, slot => slot.attentionSpace)
     availabilitySlots: AvailabilitySlot[];
-    
-    @OneToMany(() => ClinicalRecordEntry, (record) => record.space)
+
+    @OneToMany(() => ClinicalRecordEntry, entry => entry.attentionSpace)
     clinicalRecords: ClinicalRecordEntry[];
-
-    @Index('IDX_EspacioUnicoPorEntidad', { unique: true })
-    @Column()
-    uniqueSpaceConstraint: string; 
-
 }

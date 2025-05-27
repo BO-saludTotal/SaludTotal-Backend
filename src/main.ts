@@ -1,17 +1,18 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import 'reflect-metadata';
+
 
 async function bootstrap() {
   try {
-    //await AppDataSource.initialize(); 
-
     const app = await NestFactory.create(AppModule);
-    await app.listen(process.env.PORT ?? 3000);
-    console.log(`Application is running on: ${await app.getUrl()}`);
-
-  } catch(error){
-    console.log('Error durante el bootstrap:', error);
+    const port = process.env.PORT ?? 3000; 
+    await app.listen(port);
+    console.log(`Application is running on: http://localhost:${port}`);
+  } catch (error) {
+    console.error('Error durante el bootstrap:', error);
+ 
+    process.exit(1);
   }
 }
 bootstrap();

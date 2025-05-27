@@ -1,9 +1,9 @@
 import { DataSource, DataSourceOptions} from "typeorm"
 import { User } from "./entity/user"
-import { UsersPhone } from "./entity/users-Phone"
+import { UserPhone } from "./entity/userPhone"
 import { MedicalAppointment } from "./entity/medicalAppointment"
 import { AvailabilitySlot } from "./entity/availabilitySlot"
-import { PatientDetail } from "./entity/patientDetails";
+import { PatientDetail } from "./entity/patientDetail";
 import { AttentionType } from "./entity/attentionType";
 import { AppointmentChangeHistory } from "./entity/appointmentChangeHistory";
 import { ClinicalRecordEntry } from "./entity/clinicalRecordEntry";
@@ -37,7 +37,7 @@ import { Role } from "./entity/role"
 import { ScheduleBlockException } from "./entity/scheduleBlockException"
 import { SentNotificationLog } from "./entity/sentNotificationLog"
 import { SystemAuditLog } from "./entity/systemAuditLog"
-import { UserAddress } from "./entity/userAdress"
+import { UserEmail } from "./entity/userEmail"
 import { UserAssignedRole } from "./entity/userAssignedRole"
 
 export const dataSourceOptions:DataSourceOptions =({
@@ -49,12 +49,12 @@ export const dataSourceOptions:DataSourceOptions =({
     database: "salud",
     synchronize: false,
     logging: true,
-    entities: [MedicalAppointment, User, UsersPhone, AvailabilitySlot, PatientDetail, AttentionType, AppointmentChangeHistory,
+    entities: [MedicalAppointment, User, UserPhone, AvailabilitySlot, PatientDetail, AttentionType, AppointmentChangeHistory,
         DoctorDetail, MedicalAppointment, DoctorSpecialtyCertification, ClinicalRecordEntry, HealthEntity, AdministrativeStaffDetail,
         AuditActionType, ClinicalRecordAttachment, ClinicalRecordDiagnosis, CommercialMedicationPresentation, DiagnosisCode, DoctorHealthEntityAffiliation,
         DoctorScheduleTemplate, ExamParameter, ExamResult, ExamResultDetail, GeneralMedication, GeneratedReportHistory, GovernmentStaffDetail,
         HealthEntitySpecialty, MedicalEventType, MedicalGeneralCatalog, MedicalSpecialty, NotificationType, PatientDetail, PhysicalAttentionSpace,
-        Prescription, PrescriptionMedicationDetail, ReportType, Role, ScheduleBlockException, SentNotificationLog, SystemAuditLog, UserAddress,
+        Prescription, PrescriptionMedicationDetail, ReportType, Role, ScheduleBlockException, SentNotificationLog, SystemAuditLog, UserEmail,
         UserAssignedRole
     ],
     subscribers: [],

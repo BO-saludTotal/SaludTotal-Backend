@@ -1,62 +1,18 @@
 
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    Index,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToMany,
-    BaseEntity
-} from "typeorm";
-import { User } from "./user";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity } from "typeorm";
 import { UserAssignedRole } from "./userAssignedRole";
-@Entity({ name: 'RolesCatalogo' }) 
-export class Role extends BaseEntity{
-    @PrimaryGeneratedColumn({
-        name: 'RolID',
-        type: 'int',
-        comment: 'Identificador único del rol'
-    })
+
+@Entity({ name: 'RolesCatalogo' })
+export class Role extends BaseEntity {
+    @PrimaryGeneratedColumn({ name: 'RolID', type: 'int' })
     id: number;
 
-    @Column({
-        name: 'NombreRol',
-        type: 'varchar',
-        length: 50,
-        unique: true,
-        nullable: false
-    })
-    @Index('IDX_NombreRol', { unique: true })
+    @Column({ name: 'NombreRol', type: 'varchar', length: 50, unique: true, nullable: false })
     name: string;
 
-    @Column({
-        name: 'DescripcionRol',
-        type: 'text',
-        nullable: true,
-        comment: 'Descripción detallada del rol y sus permisos'
-    })
-    description: string | null;
-
-    @CreateDateColumn({
-        name: 'FechaCreacion',
-        type: 'timestamp',
-
-    })
-    createdAt: Date;
-
-    @UpdateDateColumn({
-        name: 'FechaActualizacion',
-        type: 'timestamp',
-
-    })
-    updatedAt: Date;
-
-    
-    @OneToMany(() => User, (user) => user.role)
-    users: User[];
+    @Column({ name: 'DescripcionRol', type: 'text', nullable: true })
+    description?: string | null;
 
     @OneToMany(() => UserAssignedRole, (assignment) => assignment.role)
     userAssignments: UserAssignedRole[];
-   
 }

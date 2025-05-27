@@ -1,8 +1,8 @@
-import { TipoTelefonoType } from "src/entity/users-Phone";
+import { PhoneType } from "src/entity/userPhone";
 export interface userPhoneModel {
   usuarioId: string;
   numeroTelefono: string;
-  tipoTelefono?: TipoTelefonoType;
+  tipoTelefono?: PhoneType;
   esPrincipal: boolean;
   fechaCreacion: Date;
 }
