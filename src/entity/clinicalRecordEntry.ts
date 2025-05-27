@@ -1,152 +1,156 @@
-
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-    JoinColumn,
-    CreateDateColumn,
-    UpdateDateColumn,
-    BaseEntity,
-    OneToMany,
-    RelationId
-} from "typeorm";
-import { PatientDetail } from "./patientDetails";
-import { DoctorDetail } from "./doctorDetail";
-import { HealthEntity } from "./healthEntity";
-import { PhysicalAttentionSpace } from "./physicalAttentionSpace";
-import { MedicalAppointment } from "./medicalAppointment";
-import { MedicalEventType } from "./medicalEventType";
-import { ClinicalRecordDiagnosis } from "./clinicalRecordDiagnosis";
-import { ClinicalRecordAttachment } from "./clinicalRecordAttachment";
-import { ExamResult } from "./examResult";
-import { ExamParameter } from "./examParameter";
-import { Prescription } from "./prescription";
-
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BaseEntity,
+  OneToMany,
+  //RelationId,
+} from 'typeorm';
+import { PatientDetail } from './patientDetails';
+import { DoctorDetail } from './doctorDetail';
+import { HealthEntity } from './healthEntity';
+import { PhysicalAttentionSpace } from './physicalAttentionSpace';
+import { MedicalAppointment } from './medicalAppointment';
+import { MedicalEventType } from './medicalEventType';
+import { ClinicalRecordDiagnosis } from './clinicalRecordDiagnosis';
+import { ClinicalRecordAttachment } from './clinicalRecordAttachment';
+import { ExamResult } from './examResult';
+import { ExamParameter } from './examParameter';
+import { Prescription } from './prescription';
 
 @Entity({ name: 'HistorialesClinicosEntradas' })
 export class ClinicalRecordEntry extends BaseEntity {
-    @PrimaryGeneratedColumn({
-        name: 'EntradaHistorialID',
-        type: 'int'
-    })
-    id: number;
+  @PrimaryGeneratedColumn({
+    name: 'EntradaHistorialID',
+    type: 'int',
+  })
+  id: number;
 
-    @Column({
-        name: 'PacienteUsuarioID_Ref',
-        type: 'varchar',
-        length: 100,
-        nullable: false
-    })
-    patientUserId: string;
+  @Column({
+    name: 'PacienteUsuarioID_Ref',
+    type: 'varchar',
+    length: 100,
+    nullable: false,
+  })
+  patientUserId: string;
 
-    @Column({
-        name: 'MedicoUsuarioID_Atendio_Ref',
-        type: 'varchar',
-        length: 100,
-        nullable: false
-    })
-    doctorUserId: string;
+  @Column({
+    name: 'MedicoUsuarioID_Atendio_Ref',
+    type: 'varchar',
+    length: 100,
+    nullable: false,
+  })
+  doctorUserId: string;
 
-    @Column({
-        name: 'EntidadSaludID_Atencion_Ref',
-        type: 'int',
-        nullable: false
-    })
-    healthEntityId: number;
+  @Column({
+    name: 'EntidadSaludID_Atencion_Ref',
+    type: 'int',
+    nullable: false,
+  })
+  healthEntityId: number;
 
-    @Column({
-        name: 'EspacioID_Atencion_Ref',
-        type: 'int',
-        nullable: true
-    })
-    spaceId: number | null;
+  @Column({
+    name: 'EspacioID_Atencion_Ref',
+    type: 'int',
+    nullable: true,
+  })
+  spaceId: number | null;
 
-    @Column({
-        name: 'CitaID_Asociada_Ref',
-        type: 'int',
-        nullable: true
-    })
-    appointmentId: number | null;
+  @Column({
+    name: 'CitaID_Asociada_Ref',
+    type: 'int',
+    nullable: true,
+  })
+  appointmentId: number | null;
 
-    @Column({
-        name: 'TipoEventoMedicoID_Ref',
-        type: 'int',
-        nullable: false
-    })
-    eventTypeId: number;
+  @Column({
+    name: 'TipoEventoMedicoID_Ref',
+    type: 'int',
+    nullable: false,
+  })
+  eventTypeId: number;
 
-    @Column({
-        name: 'FechaHoraAtencionInicio',
-        type: 'datetime',
-        nullable: false
-    })
-    attentionStartDateTime: Date;
+  @Column({
+    name: 'FechaHoraAtencionInicio',
+    type: 'datetime',
+    nullable: false,
+  })
+  attentionStartDateTime: Date;
 
-    @Column({
-        name: 'ResumenNarrativoAtencion',
-        type: 'text',
-        nullable: true
-    })
-    narrativeSummary: string | null;
+  @Column({
+    name: 'ResumenNarrativoAtencion',
+    type: 'text',
+    nullable: true,
+  })
+  narrativeSummary: string | null;
 
-    @CreateDateColumn({
-        name: 'FechaCreacion',
-        type: 'timestamp'
-    })
-    createdAt: Date;
+  @CreateDateColumn({
+    name: 'FechaCreacion',
+    type: 'timestamp',
+  })
+  createdAt: Date;
 
-    @UpdateDateColumn({
-        name: 'FechaActualizacion',
-        type: 'timestamp'
-    })
-    updatedAt: Date;
+  @UpdateDateColumn({
+    name: 'FechaActualizacion',
+    type: 'timestamp',
+  })
+  updatedAt: Date;
 
-   
-    @ManyToOne(() => PatientDetail, (patient) => patient.clinicalRecords, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'CASCADE'
-    })
-    @JoinColumn({ name: 'PacienteUsuarioID_Ref' })
-    patient: PatientDetail;
+  @ManyToOne(() => PatientDetail, (patient) => patient.clinicalRecords, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'PacienteUsuarioID_Ref' })
+  patient: PatientDetail;
 
-    
-    @ManyToOne(() => DoctorDetail, (doctor) => doctor.clinicalRecords)
-    @JoinColumn({ name: 'MedicoUsuarioID_Atendio_Ref' })
-    doctor: DoctorDetail;
-    
-    @ManyToOne(() => HealthEntity, (entity) => entity.clinicalRecords)
-    @JoinColumn({ name: 'EntidadSaludID_Atencion_Ref' })
-    healthEntity: HealthEntity;
+  @ManyToOne(() => DoctorDetail, (doctor) => doctor.clinicalRecords)
+  @JoinColumn({ name: 'MedicoUsuarioID_Atendio_Ref' })
+  doctor: DoctorDetail;
 
-    @ManyToOne(() => PhysicalAttentionSpace, (space) => space.clinicalRecords)
-    @JoinColumn({ name: 'EspacioID_Atencion_Ref' })
-    space: PhysicalAttentionSpace | null;
+  @ManyToOne(() => HealthEntity, (entity) => entity.clinicalRecords)
+  @JoinColumn({ name: 'EntidadSaludID_Atencion_Ref' })
+  healthEntity: HealthEntity;
 
-    @ManyToOne(() => MedicalAppointment, (appointment) => appointment.clinicalRecords)
-    @JoinColumn({ name: 'CitaID_Asociada_Ref' })
-    appointment: MedicalAppointment | null;
+  @ManyToOne(() => PhysicalAttentionSpace, (space) => space.clinicalRecords)
+  @JoinColumn({ name: 'EspacioID_Atencion_Ref' })
+  space: PhysicalAttentionSpace | null;
 
-    @ManyToOne(() => MedicalEventType, (eventType) => eventType.clinicalRecords, {
-        onDelete: 'RESTRICT',
-        onUpdate: 'CASCADE'
-    })
-    @JoinColumn({ name: 'TipoEventoMedicoID_Ref' })
-    eventType: MedicalEventType;
+  @ManyToOne(
+    () => MedicalAppointment,
+    (appointment) => appointment.clinicalRecords,
+  )
+  @JoinColumn({ name: 'CitaID_Asociada_Ref' })
+  appointment: MedicalAppointment | null;
 
-    @OneToMany(() => ClinicalRecordDiagnosis, (diagnosis) => diagnosis.recordEntry)
-    diagnoses: ClinicalRecordDiagnosis[];
-    
-    @OneToMany(() => ExamResult, (result) => result.recordEntry)
-    examResults: ExamResult[];
+  @ManyToOne(() => MedicalEventType, (eventType) => eventType.clinicalRecords, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'TipoEventoMedicoID_Ref' })
+  eventType: MedicalEventType;
 
-    @OneToMany(() => ExamParameter, (param) => param.recordEntry)
-    examParametes: ExamParameter[];
+  @OneToMany(
+    () => ClinicalRecordDiagnosis,
+    (diagnosis) => diagnosis.recordEntry,
+  )
+  diagnoses: ClinicalRecordDiagnosis[];
 
-    @OneToMany(() => ClinicalRecordAttachment, (attachment) => attachment.recordEntry)
-    attachments: ClinicalRecordAttachment[];
+  @OneToMany(() => ExamResult, (result) => result.recordEntry)
+  examResults: ExamResult[];
 
-    @OneToMany(() => Prescription, (prescription) => prescription.recordEntry)
-    prescriptions: Prescription[];
+  @OneToMany(() => ExamParameter, (param) => param.recordEntry)
+  examParametes: ExamParameter[];
 
+  @OneToMany(
+    () => ClinicalRecordAttachment,
+    (attachment) => attachment.recordEntry,
+  )
+  attachments: ClinicalRecordAttachment[];
+
+  @OneToMany(() => Prescription, (prescription) => prescription.recordEntry)
+  prescriptions: Prescription[];
 }

@@ -11,7 +11,9 @@ describe('GeneratedReportHistoryController', () => {
       providers: [GeneratedReportHistoryService],
     }).compile();
 
-    controller = module.get<GeneratedReportHistoryController>(GeneratedReportHistoryController);
+    controller = module.get<GeneratedReportHistoryController>(
+      GeneratedReportHistoryController,
+    );
   });
 
   it('should be defined', () => {

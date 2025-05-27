@@ -9,7 +9,9 @@ describe('GeneratedReportHistoryService', () => {
       providers: [GeneratedReportHistoryService],
     }).compile();
 
-    service = module.get<GeneratedReportHistoryService>(GeneratedReportHistoryService);
+    service = module.get<GeneratedReportHistoryService>(
+      GeneratedReportHistoryService,
+    );
   });
 
   it('should be defined', () => {
