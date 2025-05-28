@@ -2,23 +2,14 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
-  Index,
-  CreateDateColumn,
   BaseEntity,
-  ManyToOne,
-  JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { ExamResultDetail } from './examResultDetail';
-import { ClinicalRecordEntry } from './clinicalRecordEntry';
-import { PrescriptionMedicationDetail } from './prescriptionMedicationDetail';
 
 @Entity({ name: 'ParametrosExamenCatalogo' })
 export class ExamParameter extends BaseEntity {
-  @PrimaryGeneratedColumn({
-    name: 'ParametroExamenID',
-    type: 'int',
-  })
+  @PrimaryGeneratedColumn({ name: 'ParametroExamenID', type: 'int' })
   id: number;
 
   @Column({
@@ -28,8 +19,7 @@ export class ExamParameter extends BaseEntity {
     unique: true,
     nullable: false,
   })
-  @Index('IDX_NombreParametro', { unique: true })
-  name: string;
+  parameterName: string;
 
   @Column({
     name: 'UnidadMedidaDefault',
@@ -37,27 +27,8 @@ export class ExamParameter extends BaseEntity {
     length: 50,
     nullable: true,
   })
-  defaultUnit: string | null;
+  defaultUnitOfMeasure?: string | null;
 
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-  })
-  createdAt: Date;
-
-  @OneToMany(() => ExamResultDetail, (detail) => detail.parameter)
-  examResults: ExamResultDetail[];
-
-  @ManyToOne(() => ClinicalRecordEntry, (entry) => entry.examParametes, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'EntradaHistorialID_Ref' })
-  recordEntry: ClinicalRecordEntry;
-
-  @OneToMany(
-    () => PrescriptionMedicationDetail,
-    (prescriptions) => prescriptions.results,
-  )
-  prescriptions: PrescriptionMedicationDetail[];
+  @OneToMany(() => ExamResultDetail, (detail) => detail.examParameter)
+  examResultDetails: ExamResultDetail[];
 }

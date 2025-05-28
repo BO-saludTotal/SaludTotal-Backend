@@ -3,17 +3,15 @@ import {
   PrimaryGeneratedColumn,
   Column,
   Index,
-  CreateDateColumn,
-  UpdateDateColumn,
   OneToMany,
+  BaseEntity,
 } from 'typeorm';
-
 import { AdministrativeStaffDetail } from './administrativeStaffDetail';
-import { PhysicalAttentionSpace } from './physicalAttentionSpace';
+import { DoctorHealthEntityAffiliation } from './doctorHealthEntityAffiliation';
 import { DoctorScheduleTemplate } from './doctorScheduleTemplate';
+import { PhysicalAttentionSpace } from './physicalAttentionSpace';
 import { AvailabilitySlot } from './availabilitySlot';
 import { HealthEntitySpecialty } from './healthEntitySpecialty';
-import { DoctorHealthEntityAffiliation } from './doctorHealthEntityAffiliation';
 import { ClinicalRecordEntry } from './clinicalRecordEntry';
 
 export type HealthEntityType =
@@ -24,11 +22,8 @@ export type HealthEntityType =
   | 'Centro Diagnóstico';
 
 @Entity({ name: 'EntidadesSalud' })
-export class HealthEntity {
-  @PrimaryGeneratedColumn({
-    name: 'EntidadSaludID',
-    type: 'int',
-  })
+export class HealthEntity extends BaseEntity {
+  @PrimaryGeneratedColumn({ name: 'EntidadSaludID', type: 'int' })
   id: number;
 
   @Column({
@@ -38,7 +33,7 @@ export class HealthEntity {
     unique: true,
     nullable: false,
   })
-  @Index('IDX_NombreOficial', { unique: true })
+  @Index('IDX_EntidadesSalud_NombreOficialUnico', { unique: true })
   officialName: string;
 
   @Column({
@@ -55,30 +50,8 @@ export class HealthEntity {
   })
   entityType: HealthEntityType;
 
-  @Column({
-    name: 'DireccionCompleta',
-    type: 'text',
-    nullable: true,
-  })
-  fullAddress: string | null;
-
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
-
-  @OneToMany(() => PhysicalAttentionSpace, (space) => space.healthEntity)
-  attentionSpaces: PhysicalAttentionSpace[];
-
-  @UpdateDateColumn({
-    name: 'FechaActualizacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
+  @Column({ name: 'DireccionCompleta', type: 'text', nullable: true })
+  fullAddress?: string | null;
 
   @OneToMany(
     () => AdministrativeStaffDetail,
@@ -86,8 +59,17 @@ export class HealthEntity {
   )
   administrativeStaff: AdministrativeStaffDetail[];
 
+  @OneToMany(
+    () => DoctorHealthEntityAffiliation,
+    (affiliation) => affiliation.healthEntity,
+  )
+  doctorAffiliations: DoctorHealthEntityAffiliation[];
+
   @OneToMany(() => DoctorScheduleTemplate, (template) => template.healthEntity)
-  doctorSchedules: DoctorScheduleTemplate[];
+  scheduleTemplates: DoctorScheduleTemplate[];
+
+  @OneToMany(() => PhysicalAttentionSpace, (space) => space.healthEntity)
+  attentionSpaces: PhysicalAttentionSpace[];
 
   @OneToMany(() => AvailabilitySlot, (slot) => slot.healthEntity)
   availabilitySlots: AvailabilitySlot[];
@@ -95,12 +77,6 @@ export class HealthEntity {
   @OneToMany(() => HealthEntitySpecialty, (hes) => hes.healthEntity)
   offeredSpecialties: HealthEntitySpecialty[];
 
-  @OneToMany(
-    () => DoctorHealthEntityAffiliation,
-    (affiliation) => affiliation.healthEntity,
-  )
-  doctorAffiliations: DoctorHealthEntityAffiliation[];
-
-  @OneToMany(() => ClinicalRecordEntry, (record) => record.healthEntity)
+  @OneToMany(() => ClinicalRecordEntry, (entry) => entry.attentionHealthEntity)
   clinicalRecords: ClinicalRecordEntry[];
 }

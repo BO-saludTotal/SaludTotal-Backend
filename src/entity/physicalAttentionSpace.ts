@@ -5,8 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
   Index,
-  CreateDateColumn,
-  UpdateDateColumn,
+  BaseEntity,
   OneToMany,
 } from 'typeorm';
 import { HealthEntity } from './healthEntity';
@@ -21,18 +20,12 @@ export type SpaceType =
   | 'Quirófano';
 
 @Entity({ name: 'EspaciosFisicosAtencion' })
-export class PhysicalAttentionSpace {
-  @PrimaryGeneratedColumn({
-    name: 'EspacioID',
-    type: 'int',
-  })
+@Index(['healthEntityId', 'spaceName'], { unique: true }) // Corresponde a UNIQUE (`EntidadSaludID_Ref`, `NombreEspacio`)
+export class PhysicalAttentionSpace extends BaseEntity {
+  @PrimaryGeneratedColumn({ name: 'EspacioID', type: 'int' })
   id: number;
 
-  @Column({
-    name: 'EntidadSaludID_Ref',
-    type: 'int',
-    nullable: false,
-  })
+  @Column({ name: 'EntidadSaludID_Ref', type: 'int', nullable: false })
   healthEntityId: number;
 
   @Column({
@@ -41,7 +34,7 @@ export class PhysicalAttentionSpace {
     length: 150,
     nullable: false,
   })
-  name: string;
+  spaceName: string;
 
   @Column({
     name: 'TipoEspacio',
@@ -56,42 +49,23 @@ export class PhysicalAttentionSpace {
   })
   spaceType: SpaceType;
 
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'FechaActualizacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
-
   @ManyToOne(
     () => HealthEntity,
     (healthEntity) => healthEntity.attentionSpaces,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    },
+    { onDelete: 'CASCADE', onUpdate: 'CASCADE' },
   )
-  @JoinColumn({ name: 'EntidadSaludID_Ref' })
+  @JoinColumn({ name: 'EntidadSaludID_Ref', referencedColumnName: 'id' })
   healthEntity: HealthEntity;
 
-  @OneToMany(() => DoctorScheduleTemplate, (template) => template.space)
-  doctorSchedules: DoctorScheduleTemplate[];
+  @OneToMany(
+    () => DoctorScheduleTemplate,
+    (template) => template.attentionSpace,
+  )
+  scheduleTemplates: DoctorScheduleTemplate[];
 
-  @OneToMany(() => AvailabilitySlot, (slot) => slot.space)
+  @OneToMany(() => AvailabilitySlot, (slot) => slot.attentionSpace)
   availabilitySlots: AvailabilitySlot[];
 
-  @OneToMany(() => ClinicalRecordEntry, (record) => record.space)
+  @OneToMany(() => ClinicalRecordEntry, (entry) => entry.attentionSpace)
   clinicalRecords: ClinicalRecordEntry[];
-
-  @Index('IDX_EspacioUnicoPorEntidad', { unique: true })
-  @Column()
-  uniqueSpaceConstraint: string;
 }

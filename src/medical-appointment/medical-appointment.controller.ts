@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MedicalAppointmentService } from './medical-appointment.service';
-import { CreateMedicalAppointmentDto } from './dto/create-medical-appointment.dto';
+
 import { UpdateMedicalAppointmentDto } from './dto/update-medical-appointment.dto';
 import { MedicalAppointment } from 'src/entity/medicalAppointment';
 
@@ -9,7 +9,7 @@ export class MedicalAppointmentController {
   constructor(private readonly medicalAppointmentService: MedicalAppointmentService) {}
 
   @Post()
-  create(@Body() createMedicalAppointmentDto: MedicalAppointment) {
+  async create(@Body() createMedicalAppointmentDto: MedicalAppointment): Promise<MedicalAppointment> {
     return this.medicalAppointmentService.create(createMedicalAppointmentDto);
   }
 

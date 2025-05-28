@@ -4,7 +4,6 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
   BaseEntity,
 } from 'typeorm';
 import { User } from './user';
@@ -23,25 +22,19 @@ export type NotificationStatus =
 
 @Entity({ name: 'LogNotificacionesEnviadas' })
 export class SentNotificationLog extends BaseEntity {
-  @PrimaryGeneratedColumn({
-    name: 'NotificacionEnviadaID',
-    type: 'int',
-  })
+  @PrimaryGeneratedColumn({ name: 'NotificacionEnviadaID', type: 'int' })
   id: number;
 
   @Column({
     name: 'UsuarioID_Destinatario_Ref',
-    type: 'int',
+    type: 'varchar',
+    length: 36,
     nullable: true,
   })
-  recipientUserId: number | null;
+  recipientUserId?: string | null;
 
-  @Column({
-    name: 'TipoNotificacionID_Ref',
-    type: 'int',
-    nullable: true,
-  })
-  notificationTypeId: number | null;
+  @Column({ name: 'TipoNotificacionID_Ref', type: 'int', nullable: true })
+  notificationTypeId?: number | null;
 
   @Column({
     name: 'CanalEnvioUtilizado',
@@ -49,7 +42,7 @@ export class SentNotificationLog extends BaseEntity {
     enum: ['Email', 'SMS', 'PushApp', 'SistemaInterno'],
     nullable: true,
   })
-  channel: NotificationChannel | null;
+  channelUsed?: NotificationChannel | null;
 
   @Column({
     name: 'DireccionDestino',
@@ -57,14 +50,10 @@ export class SentNotificationLog extends BaseEntity {
     length: 255,
     nullable: true,
   })
-  destinationAddress: string | null;
+  destinationAddress?: string | null;
 
-  @Column({
-    name: 'FechaHoraEnvioEfectivo',
-    type: 'datetime',
-    nullable: true,
-  })
-  sentAt: Date | null;
+  @Column({ name: 'FechaHoraEnvioEfectivo', type: 'datetime', nullable: true })
+  effectiveSentDateTime?: Date | null;
 
   @Column({
     name: 'EstadoEnvio',
@@ -72,32 +61,27 @@ export class SentNotificationLog extends BaseEntity {
     enum: ['Pendiente', 'EnviadoExitoso', 'Fallido', 'Leido'],
     nullable: true,
   })
-  status: NotificationStatus | null;
+  sendStatus?: NotificationStatus | null;
 
-  @Column({
-    name: 'ContenidoMensajeEnviado',
-    type: 'text',
+  @Column({ name: 'ContenidoMensajeEnviado', type: 'text', nullable: true })
+  sentMessageContent?: string | null;
+
+  @ManyToOne(() => User, (user) => user.receivedNotifications, {
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
     nullable: true,
   })
-  messageContent: string | null;
-
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
+  @JoinColumn({
+    name: 'UsuarioID_Destinatario_Ref',
+    referencedColumnName: 'id',
   })
-  createdAt: Date;
+  recipientUser?: User | null;
 
-  @ManyToOne(() => User, {
+  @ManyToOne(() => NotificationType, (type) => type.sentLogs, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
+    nullable: true,
   })
-  @JoinColumn({ name: 'UsuarioID_Destinatario_Ref' })
-  recipient: User | null;
-
-  @ManyToOne(() => NotificationType, {
-    onDelete: 'SET NULL',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'TipoNotificacionID_Ref' })
-  notificationType: NotificationType | null;
+  @JoinColumn({ name: 'TipoNotificacionID_Ref', referencedColumnName: 'id' })
+  notificationType?: NotificationType | null;
 }

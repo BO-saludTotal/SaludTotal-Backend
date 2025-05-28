@@ -4,7 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  Index,
+  CreateDateColumn,
   BaseEntity,
 } from 'typeorm';
 import { User } from './user';
@@ -14,40 +14,25 @@ export type ActionResult = 'Exitoso' | 'Fallido' | 'Parcial';
 
 @Entity({ name: 'RegistrosAuditoriaSistema' })
 export class SystemAuditLog extends BaseEntity {
-  @PrimaryGeneratedColumn({
-    name: 'LogID',
-    type: 'bigint',
-  })
-  id: number;
+  @PrimaryGeneratedColumn({ name: 'LogID', type: 'bigint' })
+  id: string;
 
-  @Column({
-    name: 'TimestampEvento',
-    type: 'datetime',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  @Index('IDX_TimestampEvento')
-  timestamp: Date;
+  @CreateDateColumn({ name: 'TimestampEvento', type: 'datetime' })
+  eventTimestamp: Date;
 
   @Column({
     name: 'UsuarioID_Actor_Ref',
-    type: 'int',
+    type: 'varchar',
+    length: 36,
     nullable: true,
   })
-  actorUserId: number | null;
+  actorUserId?: string | null;
 
-  @Column({
-    name: 'TipoAccionID_Ref',
-    type: 'int',
-    nullable: false,
-  })
+  @Column({ name: 'TipoAccionID_Ref', type: 'int', nullable: false })
   actionTypeId: number;
 
-  @Column({
-    name: 'DescripcionDetalladaEvento',
-    type: 'text',
-    nullable: true,
-  })
-  description: string | null;
+  @Column({ name: 'DescripcionDetalladaEvento', type: 'text', nullable: true })
+  detailedEventDescription?: string | null;
 
   @Column({
     name: 'DireccionIPOrigen',
@@ -55,7 +40,7 @@ export class SystemAuditLog extends BaseEntity {
     length: 45,
     nullable: true,
   })
-  sourceIp: string | null;
+  sourceIpAddress?: string | null;
 
   @Column({
     name: 'ResultadoAccion',
@@ -63,19 +48,20 @@ export class SystemAuditLog extends BaseEntity {
     enum: ['Exitoso', 'Fallido', 'Parcial'],
     nullable: true,
   })
-  result: ActionResult | null;
+  actionResult?: ActionResult | null;
 
-  @ManyToOne(() => User, {
+  @ManyToOne(() => User, (user) => user.auditLogs, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
+    nullable: true,
   })
-  @JoinColumn({ name: 'UsuarioID_Actor_Ref' })
-  actor: User | null;
+  @JoinColumn({ name: 'UsuarioID_Actor_Ref', referencedColumnName: 'id' })
+  actorUser?: User | null;
 
   @ManyToOne(() => AuditActionType, (type) => type.auditLogs, {
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'TipoAccionID_Ref' })
+  @JoinColumn({ name: 'TipoAccionID_Ref', referencedColumnName: 'id' })
   actionType: AuditActionType;
 }

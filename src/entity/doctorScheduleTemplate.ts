@@ -4,14 +4,14 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
+  BaseEntity,
 } from 'typeorm';
-import { DoctorDetail } from './doctorDetail';
+
+import { User } from './user';
 import { HealthEntity } from './healthEntity';
 import { PhysicalAttentionSpace } from './physicalAttentionSpace';
 
-export type Weekday =
+export type DayOfWeek =
   | 'Lunes'
   | 'Martes'
   | 'Miércoles'
@@ -21,33 +21,23 @@ export type Weekday =
   | 'Domingo';
 
 @Entity({ name: 'HorariosPlantillaMedico' })
-export class DoctorScheduleTemplate {
-  @PrimaryGeneratedColumn({
-    name: 'HorarioPlantillaID',
-    type: 'int',
-  })
+export class DoctorScheduleTemplate extends BaseEntity {
+  @PrimaryGeneratedColumn({ name: 'HorarioPlantillaID', type: 'int' })
   id: number;
 
   @Column({
     name: 'MedicoUsuarioID_Ref',
-    type: 'int',
+    type: 'varchar',
+    length: 36,
     nullable: false,
   })
-  doctorUserId: number;
+  doctorUserId: string;
 
-  @Column({
-    name: 'EntidadSaludID_Ref',
-    type: 'int',
-    nullable: false,
-  })
+  @Column({ name: 'EntidadSaludID_Ref', type: 'int', nullable: false })
   healthEntityId: number;
 
-  @Column({
-    name: 'EspacioID_Ref',
-    type: 'int',
-    nullable: true,
-  })
-  spaceId: number | null;
+  @Column({ name: 'EspacioID_Ref', type: 'int', nullable: true })
+  attentionSpaceId?: number | null;
 
   @Column({
     name: 'DiaSemana',
@@ -63,66 +53,40 @@ export class DoctorScheduleTemplate {
     ],
     nullable: false,
   })
-  weekday: Weekday;
+  dayOfWeek: DayOfWeek;
 
-  @Column({
-    name: 'HoraInicio',
-    type: 'time',
-    nullable: false,
-  })
+  @Column({ name: 'HoraInicio', type: 'time', nullable: false })
   startTime: string;
 
-  @Column({
-    name: 'HoraFin',
-    type: 'time',
-    nullable: false,
-  })
+  @Column({ name: 'HoraFin', type: 'time', nullable: false })
   endTime: string;
 
-  @Column({
-    name: 'ValidoDesde',
-    type: 'date',
-    nullable: false,
-  })
+  @Column({ name: 'ValidoDesde', type: 'date', nullable: false })
   validFrom: Date;
 
-  @Column({
-    name: 'ValidoHasta',
-    type: 'date',
-    nullable: true,
-  })
-  validUntil: Date | null;
+  @Column({ name: 'ValidoHasta', type: 'date', nullable: true })
+  validUntil?: Date | null;
 
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'FechaActualizacion',
-    type: 'timestamp',
-  })
-  updatedAt: Date;
-
-  @ManyToOne(() => DoctorDetail, (doctor) => doctor.scheduleTemplates, {
+  @ManyToOne(() => User, (user) => user.scheduleTemplatesAsDoctor, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'MedicoUsuarioID_Ref' })
-  doctor: DoctorDetail;
+  @JoinColumn({ name: 'MedicoUsuarioID_Ref', referencedColumnName: 'id' })
+  doctorUser: User;
 
-  @ManyToOne(() => HealthEntity, (entity) => entity.doctorSchedules, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'EntidadSaludID_Ref' })
+  @ManyToOne(
+    () => HealthEntity,
+    (healthEntity) => healthEntity.scheduleTemplates,
+    { onDelete: 'CASCADE', onUpdate: 'CASCADE' },
+  )
+  @JoinColumn({ name: 'EntidadSaludID_Ref', referencedColumnName: 'id' })
   healthEntity: HealthEntity;
 
-  @ManyToOne(() => PhysicalAttentionSpace, (space) => space.doctorSchedules, {
+  @ManyToOne(() => PhysicalAttentionSpace, (space) => space.scheduleTemplates, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
+    nullable: true,
   })
-  @JoinColumn({ name: 'EspacioID_Ref' })
-  space: PhysicalAttentionSpace | null;
+  @JoinColumn({ name: 'EspacioID_Ref', referencedColumnName: 'id' })
+  attentionSpace?: PhysicalAttentionSpace | null;
 }

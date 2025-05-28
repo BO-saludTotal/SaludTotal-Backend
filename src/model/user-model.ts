@@ -1,10 +1,10 @@
-import { EstadoCuentaType } from 'src/entity/user';
+import { AccountStatusType } from 'src/entity/user';
 export interface userModel {
   id: string;
   nombreUsuario: string;
   contrasenaHash: string;
   nombreCompleto: string;
   fechaRegistro: Date;
-  estadoCuenta: EstadoCuentaType;
+  estadoCuenta: AccountStatusType;
   ultimoAcceso: Date | null;
 }

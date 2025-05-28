@@ -3,5 +3,4 @@ export interface governmentStaffDetailModel {
   governmentInstitution: string;
   institutionPosition: string;
   createdAt: Date;
-  updatedAt: Date;
 }

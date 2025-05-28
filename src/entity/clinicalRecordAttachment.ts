@@ -4,24 +4,17 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
+  BaseEntity,
 } from 'typeorm';
 import { ClinicalRecordEntry } from './clinicalRecordEntry';
 
 @Entity({ name: 'EntradaHistorialDocumentosAdjuntos' })
-export class ClinicalRecordAttachment {
-  @PrimaryGeneratedColumn({
-    name: 'DocumentoAdjuntoID',
-    type: 'int',
-  })
+export class ClinicalRecordAttachment extends BaseEntity {
+  @PrimaryGeneratedColumn({ name: 'DocumentoAdjuntoID', type: 'int' })
   id: number;
 
-  @Column({
-    name: 'EntradaHistorialID_Ref',
-    type: 'int',
-    nullable: false,
-  })
-  recordEntryId: number;
+  @Column({ name: 'EntradaHistorialID_Ref', type: 'int', nullable: false })
+  clinicalRecordEntryId: number;
 
   @Column({
     name: 'NombreArchivoOriginal',
@@ -29,33 +22,18 @@ export class ClinicalRecordAttachment {
     length: 255,
     nullable: true,
   })
-  originalFilename: string | null;
+  originalFileName?: string | null;
 
-  @Column({
-    name: 'TipoMIME',
-    type: 'varchar',
-    length: 100,
-    nullable: true,
-  })
-  mimeType: string | null;
+  @Column({ name: 'TipoMIME', type: 'varchar', length: 100, nullable: true })
+  mimeType?: string | null;
 
-  @Column({
-    name: 'RutaAlmacenamiento',
-    type: 'text',
-    nullable: false,
-  })
+  @Column({ name: 'RutaAlmacenamiento', type: 'text', nullable: false })
   storagePath: string;
-
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-  })
-  createdAt: Date;
 
   @ManyToOne(() => ClinicalRecordEntry, (entry) => entry.attachments, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'EntradaHistorialID_Ref' })
-  recordEntry: ClinicalRecordEntry;
+  clinicalRecordEntry: ClinicalRecordEntry;
 }

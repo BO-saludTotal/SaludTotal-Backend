@@ -17,18 +17,11 @@ export type DiagnosisType =
 
 @Entity({ name: 'EntradaHistorialDiagnosticos' })
 export class ClinicalRecordDiagnosis extends BaseEntity {
-  @PrimaryColumn({
-    name: 'EntradaHistorialID_Ref',
-    type: 'int',
-  })
-  recordEntryId: number;
+  @PrimaryColumn({ name: 'EntradaHistorialID_Ref', type: 'int' })
+  clinicalRecordEntryId: number;
 
-  @PrimaryColumn({
-    name: 'CodigoCIE_Ref',
-    type: 'varchar',
-    length: 10,
-  })
-  diagnosisCode: string;
+  @PrimaryColumn({ name: 'CodigoCIE_Ref', type: 'varchar', length: 10 })
+  cieCode: string;
 
   @Column({
     name: 'TipoDiagnostico',
@@ -44,12 +37,12 @@ export class ClinicalRecordDiagnosis extends BaseEntity {
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'EntradaHistorialID_Ref' })
-  recordEntry: ClinicalRecordEntry;
+  clinicalRecordEntry: ClinicalRecordEntry;
 
-  @ManyToOne(() => DiagnosisCode, (code) => code.clinicalRecords, {
+  @ManyToOne(() => DiagnosisCode, (code) => code.clinicalRecordDiagnoses, {
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'CodigoCIE_Ref' })
-  diagnosis: DiagnosisCode;
+  @JoinColumn({ name: 'CodigoCIE_Ref', referencedColumnName: 'cieCode' })
+  diagnosisCode: DiagnosisCode;
 }

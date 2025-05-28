@@ -4,66 +4,38 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
+  BaseEntity,
 } from 'typeorm';
-import { DoctorDetail } from './doctorDetail';
+
+import { User } from './user';
 import { HealthEntity } from './healthEntity';
 
 @Entity({ name: 'MedicoEjerceEnEntidadSalud' })
-export class DoctorHealthEntityAffiliation {
-  @PrimaryColumn({
-    name: 'MedicoUsuarioID_Ref',
-    type: 'int',
-  })
-  doctorUserId: number;
+export class DoctorHealthEntityAffiliation extends BaseEntity {
+  @PrimaryColumn({ name: 'MedicoUsuarioID_Ref', type: 'varchar', length: 36 })
+  doctorUserId: string;
 
-  @PrimaryColumn({
-    name: 'EntidadSaludID_Ref',
-    type: 'int',
-  })
+  @PrimaryColumn({ name: 'EntidadSaludID_Ref', type: 'int' })
   healthEntityId: number;
 
-  @Column({
-    name: 'FechaInicioAfiliacion',
-    type: 'date',
-    nullable: false,
-  })
-  startDate: Date;
+  @Column({ name: 'FechaInicioAfiliacion', type: 'date', nullable: false })
+  affiliationStartDate: Date;
 
-  @Column({
-    name: 'FechaFinAfiliacion',
-    type: 'date',
-    nullable: true,
-  })
-  endDate: Date | null;
+  @Column({ name: 'FechaFinAfiliacion', type: 'date', nullable: true })
+  affiliationEndDate?: Date | null;
 
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'FechaActualizacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
-
-  @ManyToOne(() => DoctorDetail, (doctor) => doctor.healthEntityAffiliations, {
+  @ManyToOne(() => User, (user) => user.affiliationsAsDoctor, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'MedicoUsuarioID_Ref' })
-  doctor: DoctorDetail;
+  @JoinColumn({ name: 'MedicoUsuarioID_Ref', referencedColumnName: 'id' })
+  doctorUser: User;
 
-  @ManyToOne(() => HealthEntity, (entity) => entity.doctorAffiliations, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'EntidadSaludID_Ref' })
+  @ManyToOne(
+    () => HealthEntity,
+    (healthEntity) => healthEntity.doctorAffiliations,
+    { onDelete: 'CASCADE', onUpdate: 'CASCADE' },
+  )
+  @JoinColumn({ name: 'EntidadSaludID_Ref', referencedColumnName: 'id' })
   healthEntity: HealthEntity;
 }

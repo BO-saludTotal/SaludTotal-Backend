@@ -2,21 +2,14 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  Index,
-  CreateDateColumn,
-  UpdateDateColumn,
   OneToMany,
+  BaseEntity,
 } from 'typeorm';
-
-import { MedicalAppointment } from './medicalAppointment';
 import { AvailabilitySlot } from './availabilitySlot';
-
+import { MedicalAppointment } from './medicalAppointment';
 @Entity({ name: 'TiposAtencionCatalogo' })
-export class AttentionType {
-  @PrimaryGeneratedColumn({
-    name: 'TipoAtencionID',
-    type: 'int',
-  })
+export class AttentionType extends BaseEntity {
+  @PrimaryGeneratedColumn({ name: 'TipoAtencionID', type: 'int' })
   id: number;
 
   @Column({
@@ -26,38 +19,17 @@ export class AttentionType {
     unique: true,
     nullable: false,
   })
-  @Index('IDX_NombreTipoAtencion', { unique: true })
-  name: string;
+  attentionTypeName: string;
 
-  @Column({
-    name: 'DuracionEstimadaMinutos',
-    type: 'int',
-    nullable: true,
-    comment: 'Estimated duration in minutes for this type of attention',
-  })
-  estimatedDurationMinutes: number | null;
+  @Column({ name: 'DuracionEstimadaMinutos', type: 'int', nullable: true })
+  estimatedDurationMinutes?: number | null;
 
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'FechaActualizacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
+  @OneToMany(() => AvailabilitySlot, (slot) => slot.offeredAttentionType)
+  availabilitySlots: AvailabilitySlot[];
 
   @OneToMany(
     () => MedicalAppointment,
     (appointment) => appointment.attentionType,
   )
-  appointments: MedicalAppointment[];
-
-  @OneToMany(() => AvailabilitySlot, (slot) => slot.attentionType)
-  availabilitySlots: AvailabilitySlot[];
+  appointmentsRelacionadosConMedicalAppointment: MedicalAppointment[];
 }

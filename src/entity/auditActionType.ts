@@ -2,11 +2,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
-  Index,
-  CreateDateColumn,
-  UpdateDateColumn,
   BaseEntity,
+  OneToMany,
 } from 'typeorm';
 import { SystemAuditLog } from './systemAuditLog';
 
@@ -14,10 +11,7 @@ export type SeverityLevel = 'Bajo' | 'Medio' | 'Alto' | 'Crítico';
 
 @Entity({ name: 'TiposAccionAuditoriaCatalogo' })
 export class AuditActionType extends BaseEntity {
-  @PrimaryGeneratedColumn({
-    name: 'TipoAccionID',
-    type: 'int',
-  })
+  @PrimaryGeneratedColumn({ name: 'TipoAccionID', type: 'int' })
   id: number;
 
   @Column({
@@ -27,8 +21,7 @@ export class AuditActionType extends BaseEntity {
     unique: true,
     nullable: false,
   })
-  @Index('IDX_NombreTipoAccion', { unique: true })
-  name: string;
+  actionTypeName: string;
 
   @Column({
     name: 'NivelSeveridad',
@@ -36,19 +29,7 @@ export class AuditActionType extends BaseEntity {
     enum: ['Bajo', 'Medio', 'Alto', 'Crítico'],
     nullable: true,
   })
-  severityLevel: SeverityLevel | null;
-
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'FechaActualizacion',
-    type: 'timestamp',
-  })
-  updatedAt: Date;
+  severityLevel?: SeverityLevel | null;
 
   @OneToMany(() => SystemAuditLog, (log) => log.actionType)
   auditLogs: SystemAuditLog[];

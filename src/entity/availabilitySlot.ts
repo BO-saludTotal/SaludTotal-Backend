@@ -3,13 +3,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  OneToMany,
   JoinColumn,
   Index,
-  CreateDateColumn,
-  UpdateDateColumn,
+  BaseEntity,
+  OneToMany,
 } from 'typeorm';
-import { DoctorDetail } from './doctorDetail';
+
+import { User } from './user';
 import { HealthEntity } from './healthEntity';
 import { PhysicalAttentionSpace } from './physicalAttentionSpace';
 import { AttentionType } from './attentionType';
@@ -24,54 +24,34 @@ export type SlotStatus =
   | 'Bloqueado';
 
 @Entity({ name: 'SlotsDisponibilidadConcreta' })
-export class AvailabilitySlot {
-  @PrimaryGeneratedColumn({
-    name: 'SlotID',
-    type: 'int',
-  })
+@Index(['doctorUserId', 'startDateTime'], { unique: true })
+@Index(['attentionSpaceId', 'startDateTime'], { unique: true })
+export class AvailabilitySlot extends BaseEntity {
+  @PrimaryGeneratedColumn({ name: 'SlotID', type: 'int' })
   id: number;
 
   @Column({
     name: 'MedicoUsuarioID_Ref',
-    type: 'int',
+    type: 'varchar',
+    length: 36,
     nullable: false,
   })
-  doctorUserId: number;
+  doctorUserId: string;
 
-  @Column({
-    name: 'EntidadSaludID_Ref',
-    type: 'int',
-    nullable: false,
-  })
+  @Column({ name: 'EntidadSaludID_Ref', type: 'int', nullable: false })
   healthEntityId: number;
 
-  @Column({
-    name: 'EspacioID_Ref',
-    type: 'int',
-    nullable: false,
-  })
-  spaceId: number;
+  @Column({ name: 'EspacioID_Ref', type: 'int', nullable: false })
+  attentionSpaceId: number;
 
-  @Column({
-    name: 'FechaHoraInicioSlot',
-    type: 'datetime',
-    nullable: false,
-  })
+  @Column({ name: 'FechaHoraInicioSlot', type: 'datetime', nullable: false })
   startDateTime: Date;
 
-  @Column({
-    name: 'FechaHoraFinSlot',
-    type: 'datetime',
-    nullable: false,
-  })
+  @Column({ name: 'FechaHoraFinSlot', type: 'datetime', nullable: false })
   endDateTime: Date;
 
-  @Column({
-    name: 'TipoAtencionOfrecidaID_Ref',
-    type: 'int',
-    nullable: true,
-  })
-  attentionTypeId: number | null;
+  @Column({ name: 'TipoAtencionOfrecidaID_Ref', type: 'int', nullable: true })
+  offeredAttentionTypeId?: number | null;
 
   @Column({
     name: 'EstadoSlot',
@@ -89,53 +69,42 @@ export class AvailabilitySlot {
   })
   status: SlotStatus;
 
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'FechaActualizacion',
-    type: 'timestamp',
-  })
-  updatedAt: Date;
-
   @Index('IDX_DoctorSlotUnique', { unique: true })
   @Column()
   doctorSlotUnique: string;
 
-  @Index('IDX_SpaceSlotUnique', { unique: true })
-  @Column()
-  spaceSlotUnique: string;
-
-  @ManyToOne(() => DoctorDetail, (doctor) => doctor.availabilitySlots, {
+  @ManyToOne(() => User, (user) => user.availabilitySlotsAsDoctor, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'MedicoUsuarioID_Ref' })
-  doctor: DoctorDetail;
+  @JoinColumn({ name: 'MedicoUsuarioID_Ref', referencedColumnName: 'id' })
+  doctorUser: User;
 
-  @ManyToOne(() => HealthEntity, (entity) => entity.availabilitySlots, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'EntidadSaludID_Ref' })
+  @ManyToOne(
+    () => HealthEntity,
+    (healthEntity) => healthEntity.availabilitySlots,
+    { onDelete: 'CASCADE', onUpdate: 'CASCADE' },
+  )
+  @JoinColumn({ name: 'EntidadSaludID_Ref', referencedColumnName: 'id' })
   healthEntity: HealthEntity;
 
   @ManyToOne(() => PhysicalAttentionSpace, (space) => space.availabilitySlots, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'EspacioID_Ref' })
-  space: PhysicalAttentionSpace;
+  @JoinColumn({ name: 'EspacioID_Ref', referencedColumnName: 'id' })
+  attentionSpace: PhysicalAttentionSpace;
 
   @ManyToOne(() => AttentionType, (type) => type.availabilitySlots, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
+    nullable: true,
   })
-  @JoinColumn({ name: 'TipoAtencionOfrecidaID_Ref' })
-  attentionType: AttentionType | null;
+  @JoinColumn({
+    name: 'TipoAtencionOfrecidaID_Ref',
+    referencedColumnName: 'id',
+  })
+  offeredAttentionType?: AttentionType | null;
 
   @OneToMany(() => MedicalAppointment, (appointment) => appointment.slot)
   appointments: MedicalAppointment[];

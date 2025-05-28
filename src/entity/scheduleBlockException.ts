@@ -4,63 +4,37 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
+  BaseEntity,
 } from 'typeorm';
-import { DoctorDetail } from './doctorDetail';
+
+import { User } from './user';
 
 @Entity({ name: 'BloqueosExcepcionesHorario' })
-export class ScheduleBlockException {
-  @PrimaryGeneratedColumn({
-    name: 'BloqueoID',
-    type: 'int',
-  })
+export class ScheduleBlockException extends BaseEntity {
+  @PrimaryGeneratedColumn({ name: 'BloqueoID', type: 'int' })
   id: number;
 
   @Column({
     name: 'MedicoUsuarioID_Ref',
-    type: 'int',
+    type: 'varchar',
+    length: 36,
     nullable: false,
   })
-  doctorUserId: number;
+  doctorUserId: string;
 
-  @Column({
-    name: 'FechaHoraInicioBloqueo',
-    type: 'datetime',
-    nullable: false,
-  })
+  @Column({ name: 'FechaHoraInicioBloqueo', type: 'datetime', nullable: false })
   startDateTime: Date;
 
-  @Column({
-    name: 'FechaHoraFinBloqueo',
-    type: 'datetime',
-    nullable: false,
-  })
+  @Column({ name: 'FechaHoraFinBloqueo', type: 'datetime', nullable: false })
   endDateTime: Date;
 
-  @Column({
-    name: 'MotivoBloqueo',
-    type: 'text',
-    nullable: true,
-  })
-  blockReason: string | null;
+  @Column({ name: 'MotivoBloqueo', type: 'text', nullable: true })
+  reason?: string | null;
 
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'FechaActualizacion',
-    type: 'timestamp',
-  })
-  updatedAt: Date;
-
-  @ManyToOne(() => DoctorDetail, (doctor) => doctor.scheduleBlocks, {
+  @ManyToOne(() => User, (user) => user.scheduleBlocksAsDoctor, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'MedicoUsuarioID_Ref' })
-  doctor: DoctorDetail;
+  @JoinColumn({ name: 'MedicoUsuarioID_Ref', referencedColumnName: 'id' })
+  doctorUser: User;
 }

@@ -4,25 +4,17 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
+  BaseEntity,
 } from 'typeorm';
-import { ExamResult } from './examResult';
-import { ExamParameter } from './examParameter';
 import { Prescription } from './prescription';
+import { CommercialMedicationPresentation } from './commercialMedicationPresentation';
 
 @Entity({ name: 'PrescripcionDetalleMedicamentos' })
-export class PrescriptionMedicationDetail {
-  @PrimaryGeneratedColumn({
-    name: 'PrescripcionDetalleID',
-    type: 'int',
-  })
+export class PrescriptionMedicationDetail extends BaseEntity {
+  @PrimaryGeneratedColumn({ name: 'PrescripcionDetalleID', type: 'int' })
   id: number;
 
-  @Column({
-    name: 'PrescripcionID_Ref',
-    type: 'int',
-    nullable: false,
-  })
+  @Column({ name: 'PrescripcionID_Ref', type: 'int', nullable: false })
   prescriptionId: number;
 
   @Column({
@@ -30,7 +22,7 @@ export class PrescriptionMedicationDetail {
     type: 'int',
     nullable: false,
   })
-  medicationId: number;
+  medicationPresentationId: number;
 
   @Column({
     name: 'DosisIndicada',
@@ -38,7 +30,7 @@ export class PrescriptionMedicationDetail {
     length: 100,
     nullable: true,
   })
-  dosage: string | null;
+  indicatedDose?: string | null;
 
   @Column({
     name: 'FrecuenciaIndicada',
@@ -46,7 +38,7 @@ export class PrescriptionMedicationDetail {
     length: 100,
     nullable: true,
   })
-  frequency: string | null;
+  indicatedFrequency?: string | null;
 
   @Column({
     name: 'DuracionTratamientoIndicada',
@@ -54,32 +46,23 @@ export class PrescriptionMedicationDetail {
     length: 100,
     nullable: true,
   })
-  duration: string | null;
+  indicatedTreatmentDuration?: string | null;
 
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-  })
-  createdAt: Date;
-
-  @ManyToOne(() => ExamResult, (result) => result.medications, {
+  @ManyToOne(() => Prescription, (p) => p.medicationDetails, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'PrescripcionID_Ref' })
-  results: ExamResult;
-
-  @ManyToOne(() => ExamParameter, (parameter) => parameter.prescriptions, {
-    onDelete: 'RESTRICT',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'PresentacionMedicamentoID_Ref' })
-  parameter: ExamParameter;
-
-  @ManyToOne(() => Prescription, (prescription) => prescription.medications, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
-  @JoinColumn({ name: 'PrescripcionID_Ref' })
+  @JoinColumn({ name: 'PrescripcionID_Ref', referencedColumnName: 'id' })
   prescription: Prescription;
+
+  @ManyToOne(
+    () => CommercialMedicationPresentation,
+    (cmp) => cmp.prescriptionDetails,
+    { onDelete: 'RESTRICT', onUpdate: 'CASCADE' },
+  )
+  @JoinColumn({
+    name: 'PresentacionMedicamentoID_Ref',
+    referencedColumnName: 'id',
+  })
+  medicationPresentation: CommercialMedicationPresentation;
 }

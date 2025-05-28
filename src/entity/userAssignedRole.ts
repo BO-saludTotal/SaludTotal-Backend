@@ -5,43 +5,36 @@ import {
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
+  BaseEntity,
 } from 'typeorm';
 import { User } from './user';
 import { Role } from './role';
 
 @Entity({ name: 'UsuarioRolesAsignados' })
-export class UserAssignedRole {
-  @PrimaryColumn({ name: 'UsuarioID_Ref', type: 'int' })
-  userId: number;
+export class UserAssignedRole extends BaseEntity {
+  @PrimaryColumn({ name: 'UsuarioID_Ref', type: 'varchar', length: 36 })
+  userId: string;
 
   @PrimaryColumn({ name: 'RolID_Ref', type: 'int' })
   roleId: number;
 
-  @CreateDateColumn({
-    name: 'FechaAsignacion',
-    type: 'datetime',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @CreateDateColumn({ name: 'FechaAsignacion', type: 'datetime' })
   assignmentDate: Date;
 
-  @Column({
-    name: 'FechaFinAsignacion',
-    type: 'date',
-    nullable: true,
-  })
-  endDate: Date | null;
+  @Column({ name: 'FechaFinAsignacion', type: 'date', nullable: true })
+  assignmentEndDate?: Date | null;
 
   @ManyToOne(() => User, (user) => user.assignedRoles, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'UsuarioID_Ref' })
+  @JoinColumn({ name: 'UsuarioID_Ref', referencedColumnName: 'id' })
   user: User;
 
   @ManyToOne(() => Role, (role) => role.userAssignments, {
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'RolID_Ref' })
+  @JoinColumn({ name: 'RolID_Ref', referencedColumnName: 'id' })
   role: Role;
 }

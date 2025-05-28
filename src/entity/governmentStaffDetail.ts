@@ -4,18 +4,14 @@ import {
   Column,
   OneToOne,
   JoinColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
+  BaseEntity,
 } from 'typeorm';
 import { User } from './user';
 
 @Entity({ name: 'PersonalGubernamentalDetalles' })
-export class GovernmentStaffDetail {
-  @PrimaryColumn({
-    name: 'GobiernoUsuarioID_Ref',
-    type: 'int',
-  })
-  governmentUserId: number;
+export class GovernmentStaffDetail extends BaseEntity {
+  @PrimaryColumn({ name: 'GobiernoUsuarioID_Ref', type: 'varchar', length: 36 })
+  governmentUserId: string;
 
   @Column({
     name: 'NombreInstitucionGubernamental',
@@ -23,7 +19,7 @@ export class GovernmentStaffDetail {
     length: 255,
     nullable: false,
   })
-  governmentInstitution: string;
+  governmentalInstitutionName: string;
 
   @Column({
     name: 'CargoEnInstitucion',
@@ -31,27 +27,12 @@ export class GovernmentStaffDetail {
     length: 150,
     nullable: false,
   })
-  institutionPosition: string;
+  positionInInstitution: string;
 
-  @CreateDateColumn({
-    name: 'FechaCreacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'FechaActualizacion',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
-
-  @OneToOne(() => User, {
+  @OneToOne(() => User, (user) => user.governmentStaffDetail, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ name: 'GobiernoUsuarioID_Ref' })
+  @JoinColumn({ name: 'GobiernoUsuarioID_Ref', referencedColumnName: 'id' })
   user: User;
 }
