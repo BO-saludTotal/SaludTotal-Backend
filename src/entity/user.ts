@@ -20,7 +20,7 @@ import { ScheduleBlockException } from "./scheduleBlockException";
 import { SentNotificationLog } from "./sentNotificationLog";
 import { GeneratedReportHistory } from "./generatedReportHistory";
 import { SystemAuditLog } from "./systemAuditLog";
-
+import { Exclude } from 'class-transformer'; 
 
 export type AccountStatusType = 'Activo' | 'Inactivo' | 'Bloqueado' | 'PendienteVerificacion';
 
@@ -34,6 +34,7 @@ export class User extends BaseEntity {
     username: string;
 
     @Column({ name: 'ContrasenaHash', type: 'varchar', length: 255, nullable: false, select: false })
+    @Exclude()
     passwordHash: string;
 
     @Column({ name: 'NombreCompleto', type: 'varchar', length: 255, nullable: false })
