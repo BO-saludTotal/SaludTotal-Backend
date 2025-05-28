@@ -8,8 +8,8 @@ import { MedicalAppointmentModule } from './medical-appointment/medical-appointm
 
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
-import { UsuariosController } from './usuarios/usuarios.controller';
-import { UsuariosService } from './usuarios/usuarios.service';
+import { UserController } from './user/user.controller';
+import { UserService } from './user/user.service';
 import { DoctorDetailModule } from './doctor-detail/doctor-detail.module';
 import { HealthEntityModule } from './health-entity/health-entity.module';
 import { AdministrativeStaffDetailModule } from './administrative-staff-detail/administrative-staff-detail.module';
@@ -31,8 +31,8 @@ import { UserPhoneModule } from './user-phone/user-phone.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot(dataSourceOptions), MedicalAppointmentModule, DoctorDetailModule, HealthEntityModule, AdministrativeStaffDetailModule, DoctorHealthEntityAffiliationModule, DoctorSpecialtyCertificationModule, GeneralMedicationModule, GovernmentStaffDetailModule, HealthEntitySpecialtyModule, MedicalSpecialtyModule, PatientDetailsModule, PhysicalAttentionSpaceModule, PrescriptionModule, RoleModule, UserModule, UserAdressModule, UserAssignedRoleModule, UserPhoneModule],
-  controllers: [AppController, AuthController, UsuariosController],
-  providers: [AppService, AuthService, UsuariosService],
+  controllers: [AppController, AuthController, UserController],
+  providers: [AppService, AuthService, UserService],
 })
 export class AppModule {}
 
