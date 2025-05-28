@@ -1,21 +1,35 @@
-
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BaseEntity } from "typeorm";
-import { AvailabilitySlot } from "./availabilitySlot";
-import { MedicalAppointment } from "./medicalAppointment";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  BaseEntity,
+} from 'typeorm';
+import { AvailabilitySlot } from './availabilitySlot';
+import { MedicalAppointment } from './medicalAppointment';
 @Entity({ name: 'TiposAtencionCatalogo' })
 export class AttentionType extends BaseEntity {
-    @PrimaryGeneratedColumn({ name: 'TipoAtencionID', type: 'int' })
-    id: number;
+  @PrimaryGeneratedColumn({ name: 'TipoAtencionID', type: 'int' })
+  id: number;
 
-    @Column({ name: 'NombreTipoAtencion', type: 'varchar', length: 150, unique: true, nullable: false })
-    attentionTypeName: string;
+  @Column({
+    name: 'NombreTipoAtencion',
+    type: 'varchar',
+    length: 150,
+    unique: true,
+    nullable: false,
+  })
+  attentionTypeName: string;
 
-    @Column({ name: 'DuracionEstimadaMinutos', type: 'int', nullable: true })
-    estimatedDurationMinutes?: number | null;
+  @Column({ name: 'DuracionEstimadaMinutos', type: 'int', nullable: true })
+  estimatedDurationMinutes?: number | null;
 
-    @OneToMany(() => AvailabilitySlot, (slot) => slot.offeredAttentionType) 
-    availabilitySlots: AvailabilitySlot[];
+  @OneToMany(() => AvailabilitySlot, (slot) => slot.offeredAttentionType)
+  availabilitySlots: AvailabilitySlot[];
 
-    @OneToMany(() => MedicalAppointment, appointment => appointment.attentionType)
-    appointmentsRelacionadosConMedicalAppointment: MedicalAppointment[];
+  @OneToMany(
+    () => MedicalAppointment,
+    (appointment) => appointment.attentionType,
+  )
+  appointmentsRelacionadosConMedicalAppointment: MedicalAppointment[];
 }

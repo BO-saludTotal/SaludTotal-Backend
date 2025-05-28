@@ -1,6 +1,6 @@
-import { AccountStatusType } from "src/entity/user";
+import { AccountStatusType } from 'src/entity/user';
 export interface userModel {
-  id: number;
+  id: string;
   nombreUsuario: string;
   contrasenaHash: string;
   nombreCompleto: string;
