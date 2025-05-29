@@ -8,11 +8,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './JwtStrategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entity/user';
+import { DoctorHealthEntityAffiliation } from 'src/entity/doctorHealthEntityAffiliation';
+import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
+import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([
+      User,
+      DoctorHealthEntityAffiliation,
+      GovernmentStaffDetail,
+      AdministrativeStaffDetail,
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
