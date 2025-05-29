@@ -63,22 +63,19 @@ export class ClinicalRecordEntry extends BaseEntity {
   @Column({ name: 'ResumenNarrativoAtencion', type: 'text', nullable: true })
   narrativeSummary?: string | null;
 
-  @ManyToOne(() => User, (user) => user.clinicalEntriesAsPatient, {
+   @ManyToOne(() => User, (user) => user.clinicalEntriesAsPatient, { 
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'PacienteUsuarioID_Ref', referencedColumnName: 'id' })
   patientUser: User;
 
-  @ManyToOne(() => User, user => user.clinicalEntriesAsPatient, {
+  @ManyToOne(() => User, (user) => user.clinicalEntriesAsDoctor, { 
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({ 
-    name: 'PacienteUsuarioID_Ref', 
-    referencedColumnName: 'id' 
-  })
-  clinicalEntriesAsPatient: User;
+  @JoinColumn({ name: 'MedicoUsuarioID_Atendio_Ref', referencedColumnName: 'id' })
+  attendingDoctor: User; 
 
   @ManyToOne(() => HealthEntity, (entity) => entity.clinicalRecords, {
     onDelete: 'RESTRICT',
