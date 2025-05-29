@@ -14,6 +14,7 @@ import { User } from './user';
 import { AppointmentChangeHistory } from './appointmentChangeHistory';
 import { ClinicalRecordEntry } from './clinicalRecordEntry';
 import { AttentionType } from './attentionType';
+import { PatientDetail } from './patientDetail';
 
 export type AppointmentStatusType =
   | 'Solicitada'
@@ -72,6 +73,13 @@ export class MedicalAppointment extends BaseEntity {
   @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'PacienteUsuarioID_Ref', referencedColumnName: 'id' })
   patientUser: User;
+
+  @ManyToOne(() => PatientDetail, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @JoinColumn({ 
+    name: 'DetallePacienteID_Ref', 
+    referencedColumnName: 'patientUserId' 
+  })
+  patientDetail: PatientDetail;
 
   @OneToMany(() => AppointmentChangeHistory, (history) => history.appointment)
   changeHistory: AppointmentChangeHistory[];

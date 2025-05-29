@@ -1,50 +1,103 @@
+// src/auth/auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { User } from 'src/entity/user';
-import { LoginResponse } from './interfaces/login-response.interface';
+import { User } from '../entity/user'; // Ajusta la ruta
+// Importa tus interfaces si las tienes separadas
+export interface LoginResponsePayload {
+  accessToken: string;
+  user: {
+    id: string;
+    username: string;
+    fullName: string;
+    roles: string[];
+  };
+}
+export interface JwtAuthPayload {
+  sub: string;
+  username: string;
+  roles: string[];
+}
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
+    @InjectRepository(User) // <--- INYECTA EL REPOSITORIO DE USER
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {}
-  async validateUser(username: string, passwordHash: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { username } });
-    if (!user || !(await bcrypt.compare(passwordHash, user.passwordHash))) {
-      throw new UnauthorizedException('Credenciales Invalidas');
+
+  async validateUser(username: string, plainPassword: string): Promise<User> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash') // Asegura que passwordHash se seleccione
+      .leftJoinAndSelect('user.assignedRoles', 'assignedRoles')
+      .leftJoinAndSelect('assignedRoles.role', 'roleEntity')
+      .where('user.username = :username', { username })
+      .getOne();
+
+    if (!user) {
+      throw new UnauthorizedException('Credenciales inválidas (usuario)');
+    }
+
+    const isPasswordMatching = await bcrypt.compare(plainPassword, user.passwordHash);
+    if (!isPasswordMatching) {
+      throw new UnauthorizedException('Credenciales inválidas (contraseña)');
     }
     return user;
   }
-  async loginUser(loginDto: LoginDto): Promise<LoginResponse> {
+
+  async login(loginDto: LoginDto): Promise<LoginResponsePayload> {
     const user = await this.validateUser(
       loginDto.username,
-      loginDto.passwordHash,
+      loginDto.password,
     );
-    const payload = {
-      id: user.id,
-      accountStatus: user.accountStatus,
-      assignedRoles: user.assignedRoles,
+
+    const roleNames = user.assignedRoles ? user.assignedRoles.map(ar => ar.role.name) : [];
+
+    const jwtPayload: JwtAuthPayload = {
+      sub: user.id,
+      username: user.username,
+      roles: roleNames,
     };
-    const accessToken = await this.jwtService.signAsync(payload);
+
+    const accessToken = this.jwtService.sign(jwtPayload);
+
     return {
       accessToken,
-      success: true,
-      message: 'Login correcto',
       user: {
         id: user.id,
         username: user.username,
-        passwordHash: user.passwordHash,
         fullName: user.fullName,
-        registrationDate: user.registrationDate,
-        accountStatus: user.accountStatus,
-        lastAccess: user.lastAccess,
+        roles: roleNames,
       },
     };
   }
+
+  // Si el registro también se maneja en AuthService (lo cual es común)
+  // y no tienes un UsersService separado para la creación.
+  // async register(registerDto: RegisterDto): Promise<User> { // RegisterDto sería igual a CreateUserDto
+  //   const { username, password, fullName, roleId, /* phones, emails */ } = registerDto;
+
+  //   // Verificar si el rol existe (usando this.userRepository o inyectando RoleRepository)
+  //   // Verificar si el nombre de usuario ya existe (usando this.userRepository)
+  //   // Hashear contraseña
+  //   // Crear y guardar la instancia de User usando this.userRepository.create() y this.userRepository.save()
+  //   // Crear y guardar UserAssignedRole, UserPhone, UserEmail (probablemente dentro de una transacción)
+
+  //   // const salt = await bcrypt.genSalt();
+  //   // const hashedPassword = await bcrypt.hash(password, salt);
+  //   // const newUser = this.userRepository.create({
+  //   //   username,
+  //   //   passwordHash: hashedPassword,
+  //   //   fullName,
+  //   //   // ... y otros campos
+  //   // });
+  //   // const savedUser = await this.userRepository.save(newUser);
+  //   // // Aquí necesitarías la lógica para roles, teléfonos, emails
+  //   // return savedUser; // Recuerda manejar el @Exclude de passwordHash
+  // }
 }

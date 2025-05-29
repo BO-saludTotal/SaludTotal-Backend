@@ -28,13 +28,16 @@ export class PatientDetail extends BaseEntity {
     @Column({ name: 'NombresCompletosPadresOTutores', type: 'text', nullable: true })
     parentOrGuardianNames?: string | null;
 
-    @OneToOne(() => User, user => user.patientDetail, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-    @JoinColumn({ name: 'PacienteUsuarioID_Ref', referencedColumnName: 'id' })
+     @OneToOne(() => User, user => user.patientDetail)
+    @JoinColumn({ 
+        name: 'PacienteUsuarioID_Ref', 
+        referencedColumnName: 'id' 
+    })
     user: User;
 
-    @OneToMany(() => MedicalAppointment, appointment => appointment.patientUser)
+    @OneToMany(() => MedicalAppointment, appointment => appointment.patientDetail)
     appointments: MedicalAppointment[];
 
-    @OneToMany(() => ClinicalRecordEntry, entry => entry.patientUser)
+    @OneToMany(() => ClinicalRecordEntry, entry => entry.patientDetail)
     clinicalRecords: ClinicalRecordEntry[];
 }

@@ -1,19 +1,41 @@
+// src/auth/auth.module.ts
 import { Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/entity/user';
-import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './JwtStrategy';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../entity/user'; 
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
-    JwtModule.register({
-      secret: 'SECRET_KEY',
-      signOptions: { expiresIn: '3d' },
+    ConfigModule, 
+    TypeOrmModule.forFeature([User]), 
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET');
+        if (!secret) {
+          throw new Error('JWT_SECRET no está definido en las variables de entorno');
+        }
+        return {
+          secret: secret,
+          signOptions: {
+            expiresIn: configService.get<string>('JWT_EXPIRATION_TIME'),
+          },
+        };
+      },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+  ],
+  exports: [PassportModule, JwtModule, AuthService],
 })
 export class AuthModule {}

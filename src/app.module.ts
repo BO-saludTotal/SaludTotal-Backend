@@ -31,7 +31,13 @@ import { AuthModule } from './auth/auth.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions), MedicalAppointmentModule, DoctorDetailModule, HealthEntityModule, AdministrativeStaffDetailModule, DoctorHealthEntityAffiliationModule, DoctorSpecialtyCertificationModule, GeneralMedicationModule, GovernmentStaffDetailModule, HealthEntitySpecialtyModule, MedicalSpecialtyModule, PatientDetailsModule, PhysicalAttentionSpaceModule, PrescriptionModule, RoleModule, UsersModule, UserAdressModule, UserAssignedRoleModule, UserPhoneModule],
+  imports: [TypeOrmModule.forRoot(dataSourceOptions), ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env', 
+    }), MedicalAppointmentModule, DoctorDetailModule, HealthEntityModule, 
+    AdministrativeStaffDetailModule, DoctorHealthEntityAffiliationModule, DoctorSpecialtyCertificationModule, GeneralMedicationModule,
+     GovernmentStaffDetailModule, HealthEntitySpecialtyModule, MedicalSpecialtyModule, PatientDetailsModule, PhysicalAttentionSpaceModule,
+      PrescriptionModule, RoleModule, UsersModule, UserAdressModule, UserAssignedRoleModule, UserPhoneModule, AuthModule],
   controllers: [AppController, AuthController, UsersController],
   providers: [AppService, AuthService, UsersService],
 })

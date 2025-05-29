@@ -7,5 +7,5 @@ export class LoginDto {
 
   @IsNotEmpty({ message: 'La contraseña es requerida.' })
   @IsString()
-  passwordHash: string;
+  password: string;
 }

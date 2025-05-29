@@ -18,6 +18,7 @@ import { ClinicalRecordDiagnosis } from './clinicalRecordDiagnosis';
 import { ClinicalRecordAttachment } from './clinicalRecordAttachment';
 import { ExamResult } from './examResult';
 import { Prescription } from './prescription';
+import { PatientDetail } from './patientDetail';
 
 @Entity({ name: 'HistorialesClinicosEntradas' })
 export class ClinicalRecordEntry extends BaseEntity {
@@ -69,15 +70,15 @@ export class ClinicalRecordEntry extends BaseEntity {
   @JoinColumn({ name: 'PacienteUsuarioID_Ref', referencedColumnName: 'id' })
   patientUser: User;
 
-  @ManyToOne(() => User, (user) => user.clinicalEntriesAsDoctor, {
+  @ManyToOne(() => User, user => user.clinicalEntriesAsPatient, {
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn({
-    name: 'MedicoUsuarioID_Atendio_Ref',
-    referencedColumnName: 'id',
+  @JoinColumn({ 
+    name: 'PacienteUsuarioID_Ref', 
+    referencedColumnName: 'id' 
   })
-  attendingDoctor: User;
+  clinicalEntriesAsPatient: User;
 
   @ManyToOne(() => HealthEntity, (entity) => entity.clinicalRecords, {
     onDelete: 'RESTRICT',
@@ -88,6 +89,16 @@ export class ClinicalRecordEntry extends BaseEntity {
     referencedColumnName: 'id',
   })
   attentionHealthEntity: HealthEntity;
+
+  @ManyToOne(() => PatientDetail, detail => detail.clinicalRecords, {
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'DetallesPacienteID_Atencion_Ref',
+    referencedColumnName: 'patientUserId',
+  })
+  patientDetail: PatientDetail;
 
   @ManyToOne(() => PhysicalAttentionSpace, (space) => space.clinicalRecords, {
     onDelete: 'SET NULL',

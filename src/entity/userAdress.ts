@@ -57,7 +57,7 @@ export class UserAddress extends BaseEntity {
   })
   fechaActualizacion: Date;
 
-  @ManyToOne(() => User, (user) => user.correosElectronicos, {
+  @ManyToOne(() => User, (user) => user.emails, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
