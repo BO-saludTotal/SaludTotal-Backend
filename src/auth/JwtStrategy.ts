@@ -1,8 +1,6 @@
-
-
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -23,15 +21,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   ) {
     const secret = configService.get<string>('JWT_SECRET');
     if (!secret) {
-      throw new Error('FATAL ERROR: JWT_SECRET no está definido en las variables de entorno.');
+      throw new Error(
+        'FATAL ERROR: JWT_SECRET no está definido en las variables de entorno.',
+      );
     }
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: secret,
-      passReqToCallback: false, 
-    }); 
+      passReqToCallback: false,
+    });
   }
 
   // Este método validate NO espera 'request' como primer argumento

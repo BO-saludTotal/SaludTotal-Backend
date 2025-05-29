@@ -7,8 +7,16 @@ async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
 
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
-    app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector))); 
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
+    app.useGlobalInterceptors(
+      new ClassSerializerInterceptor(app.get(Reflector)),
+    );
 
     const port = process.env.PORT ?? 3000; // O tu puerto
     await app.listen(port);

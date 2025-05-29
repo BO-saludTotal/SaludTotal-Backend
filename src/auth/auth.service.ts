@@ -29,12 +29,13 @@ export interface JwtAuthPayload {
 export class AuthService {
   constructor(
     @InjectRepository(User) // <--- INYECTA EL REPOSITORIO DE USER
-    @InjectRepository(GovernmentStaffDetail)
-    @InjectRepository(AdministrativeStaffDetail)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    @InjectRepository(DoctorHealthEntityAffiliation)
     private readonly doctorAffliationRepository: Repository<DoctorHealthEntityAffiliation>,
+    @InjectRepository(AdministrativeStaffDetail)
     private readonly administrativeStaffRepository: Repository<AdministrativeStaffDetail>,
+    @InjectRepository(GovernmentStaffDetail)
     private readonly governmentStaffRepository: Repository<GovernmentStaffDetail>,
   ) {}
 
