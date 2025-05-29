@@ -6,6 +6,9 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { User } from '../entity/user'; // Ajusta la ruta
+import { DoctorHealthEntityAffiliation } from 'src/entity/doctorHealthEntityAffiliation';
+import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
+import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
 // Importa tus interfaces si las tienes separadas
 export interface LoginResponsePayload {
   accessToken: string;
@@ -26,8 +29,13 @@ export interface JwtAuthPayload {
 export class AuthService {
   constructor(
     @InjectRepository(User) // <--- INYECTA EL REPOSITORIO DE USER
+    @InjectRepository(GovernmentStaffDetail)
+    @InjectRepository(AdministrativeStaffDetail)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly doctorAffliationRepository: Repository<DoctorHealthEntityAffiliation>,
+    private readonly administrativeStaffRepository: Repository<AdministrativeStaffDetail>,
+    private readonly governmentStaffRepository: Repository<GovernmentStaffDetail>,
   ) {}
 
   async validateUser(username: string, plainPassword: string): Promise<User> {
@@ -43,7 +51,10 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas (usuario)');
     }
 
-    const isPasswordMatching = await bcrypt.compare(plainPassword, user.passwordHash);
+    const isPasswordMatching = await bcrypt.compare(
+      plainPassword,
+      user.passwordHash,
+    );
     if (!isPasswordMatching) {
       throw new UnauthorizedException('Credenciales inválidas (contraseña)');
     }
@@ -51,13 +62,57 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponsePayload> {
-    const user = await this.validateUser(
-      loginDto.username,
-      loginDto.password,
-    );
+    const user = await this.validateUser(loginDto.username, loginDto.password);
 
-    const roleNames = user.assignedRoles ? user.assignedRoles.map(ar => ar.role.name) : [];
-
+    const roleNames = user.assignedRoles
+      ? user.assignedRoles.map((ar) => ar.role.name)
+      : [];
+    if (roleNames.includes('Doctor')) {
+      if (!loginDto.affiliationCode) {
+        throw new UnauthorizedException(
+          'Se requiere codigo de afiliacion para el doctor',
+        );
+      }
+      const [doctorId, healthEntityId] = loginDto.affiliationCode.split('-');
+      const doctorHealthEntityAffiliation =
+        await this.doctorAffliationRepository.findOne({
+          where: {
+            doctorUserId: doctorId,
+            healthEntityId: Number(healthEntityId),
+          },
+        });
+      if (!doctorHealthEntityAffiliation) {
+        throw new UnauthorizedException('Doctor no encontrado.');
+      }
+    }
+    if (roleNames.includes('GovernmentStaff')) {
+      if (!loginDto.credentialId) {
+        throw new UnauthorizedException('credencial necesaria');
+      }
+      const governmentStaffDetail =
+        await this.governmentStaffRepository.findOne({
+          where: {
+            governmentUserId: loginDto.credentialId,
+          },
+        });
+      if (!governmentStaffDetail) {
+        throw new UnauthorizedException('Doctor no encontrado.');
+      }
+    }
+    if (roleNames.includes('AdministrativeStaff')) {
+      if (!loginDto.credentialId) {
+        throw new UnauthorizedException('credencial necesaria');
+      }
+      const administrativeStaffDetail =
+        await this.administrativeStaffRepository.findOne({
+          where: {
+            adminUserId: loginDto.credentialId,
+          },
+        });
+      if (!administrativeStaffDetail) {
+        throw new UnauthorizedException('Doctor no encontrado.');
+      }
+    }
     const jwtPayload: JwtAuthPayload = {
       sub: user.id,
       username: user.username,

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class LoginDto {
   @IsNotEmpty({ message: 'El nombre de usuario es requerido.' })
@@ -8,4 +8,10 @@ export class LoginDto {
   @IsNotEmpty({ message: 'La contraseña es requerida.' })
   @IsString()
   password: string;
+  @IsOptional()
+  @IsString()
+  credentialId?: string;
+  @IsOptional()
+  @IsString()
+  affiliationCode?: string;
 }
