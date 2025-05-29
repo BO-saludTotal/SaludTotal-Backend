@@ -1,52 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { pool } from '../db';
-import { FieldPacket } from 'mysql2';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { LoginResponse } from './interfaces/login-response.interface';
 import { User } from 'src/entity/user';
+import { LoginResponse } from './interfaces/login-response.interface';
 
 @Injectable()
 export class AuthService {
-  async login(credentials: LoginDto): Promise<LoginResponse> {
-    try {
-      const { username, passwordHash } = credentials;
-
-      const result = await pool.query(
-        'SELECT * FROM Usuarios WHERE NombreUsuario = ?',
-        [username],
-      );
-
-      const [rows] = result as unknown as [User[], FieldPacket[]];
-      const user = rows[0];
-
-      if (!user) {
-        return { success: false, message: 'Usuario no encontrado' };
-      }
-
-      if (user.passwordHash !== passwordHash) {
-        return { success: false, message: 'Contraseña incorrecta' };
-      }
-
-      return {
-        accessToken: 'nada de momento xd',
-        success: true,
-        message: `Bienvenido`,
-        user: {
-          id: user.id,
-          username: user.username,
-          passwordHash: user.passwordHash,
-          fullName: user.fullName,
-          registrationDate: user.registrationDate,
-          accountStatus: user.accountStatus,
-          lastAccess: user.lastAccess,
-        },
-      };
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Error en login: ', error);
-        return { success: false, message: error.message };
-      }
-      return { success: false, message: 'Error desconocido en login' };
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
+  ) {}
+  async validateUser(username: string, passwordHash: string): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { username } });
+    if (!user || !(await bcrypt.compare(passwordHash, user.passwordHash))) {
+      throw new UnauthorizedException('Credenciales Invalidas');
     }
+    return user;
+  }
+  async loginUser(loginDto: LoginDto): Promise<LoginResponse> {
+    const user = await this.validateUser(
+      loginDto.username,
+      loginDto.passwordHash,
+    );
+    const payload = {
+      id: user.id,
+      accountStatus: user.accountStatus,
+      assignedRoles: user.assignedRoles,
+    };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return {
+      accessToken,
+      success: true,
+      message: 'Login correcto',
+      user: {
+        id: user.id,
+        username: user.username,
+        passwordHash: user.passwordHash,
+        fullName: user.fullName,
+        registrationDate: user.registrationDate,
+        accountStatus: user.accountStatus,
+        lastAccess: user.lastAccess,
+      },
+    };
   }
 }

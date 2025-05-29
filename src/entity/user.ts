@@ -10,28 +10,6 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-<<<<<<< HEAD
-import { UserPhone } from "./userPhone";
-import { UserEmail } from "./userEmail";
-import { UserAssignedRole } from "./userAssignedRole";
-import { PatientDetail } from "./patientDetail";
-import { DoctorDetail } from "./doctorDetail";
-import { AdministrativeStaffDetail } from "./administrativeStaffDetail";
-import { GovernmentStaffDetail } from "./governmentStaffDetail";
-import { MedicalAppointment } from "./medicalAppointment"; 
-import { AppointmentChangeHistory } from "./appointmentChangeHistory"; 
-import { ClinicalRecordEntry } from "./clinicalRecordEntry"; 
-import { DoctorHealthEntityAffiliation } from "./doctorHealthEntityAffiliation"; 
-import { DoctorScheduleTemplate } from "./doctorScheduleTemplate";
-import { AvailabilitySlot } from "./availabilitySlot";
-import { ScheduleBlockException } from "./scheduleBlockException";
-import { SentNotificationLog } from "./sentNotificationLog";
-import { GeneratedReportHistory } from "./generatedReportHistory";
-import { SystemAuditLog } from "./systemAuditLog";
-import { Exclude } from 'class-transformer'; 
-
-export type AccountStatusType = 'Activo' | 'Inactivo' | 'Bloqueado' | 'PendienteVerificacion';
-=======
 import { UserPhone } from './userPhone';
 import { UserEmail } from './userEmail';
 import { UserAssignedRole } from './userAssignedRole';
@@ -55,7 +33,6 @@ export type AccountStatusType =
   | 'Inactivo'
   | 'Bloqueado'
   | 'PendienteVerificacion';
->>>>>>> c2319a324d0f0a31df742120c6e14ecc3b73ef6c
 
 @Entity({ name: 'Usuarios' })
 export class User extends BaseEntity {
@@ -72,11 +49,6 @@ export class User extends BaseEntity {
   @Index('IDX_Usuarios_NombreUsuarioUnico', { unique: true })
   username: string;
 
-<<<<<<< HEAD
-    @Column({ name: 'ContrasenaHash', type: 'varchar', length: 255, nullable: false, select: false })
-    @Exclude()
-    passwordHash: string;
-=======
   @Column({
     name: 'ContrasenaHash',
     type: 'varchar',
@@ -85,7 +57,6 @@ export class User extends BaseEntity {
     select: false,
   })
   passwordHash: string;
->>>>>>> c2319a324d0f0a31df742120c6e14ecc3b73ef6c
 
   @Column({
     name: 'NombreCompleto',

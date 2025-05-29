@@ -9,9 +9,17 @@ import { UserPhone } from '../entity/userPhone';
 import { UserEmail } from '../entity/userEmail';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Role, UserAssignedRole, UserPhone, UserEmail])],
+  imports: [
+    TypeOrmModule.forFeature([
+      User,
+      Role,
+      UserAssignedRole,
+      UserPhone,
+      UserEmail,
+    ]),
+  ],
   providers: [UsersService],
-  controllers: [UsersController], 
-  exports: [UsersService], 
+  controllers: [UsersController],
+  exports: [UsersService],
 })
 export class UsersModule {}

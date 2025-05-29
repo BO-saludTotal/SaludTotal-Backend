@@ -1,11 +1,19 @@
-
-import { IsString, IsEmail, MinLength, IsEnum, IsOptional, IsArray, ValidateNested, IsBoolean, IsInt } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  MinLength,
+  IsEnum,
+  IsOptional,
+  IsArray,
+  ValidateNested,
+  IsBoolean,
+  //IsInt,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { AccountStatusType } from 'src/entity/user';
 
-
 class UpdateUserPhoneDto {
-  @IsOptional() 
+  @IsOptional()
   @IsString()
   phoneNumber?: string;
 
@@ -27,11 +35,10 @@ class UpdateUserEmailDto {
   @IsBoolean()
   isPrimary?: boolean;
 
-  @IsOptional() 
+  @IsOptional()
   @IsBoolean()
   isVerified?: boolean;
 }
-
 
 export class UpdateUserDto {
   @IsOptional()
@@ -50,8 +57,6 @@ export class UpdateUserDto {
   @IsOptional()
   @IsEnum(['Activo', 'Inactivo', 'Bloqueado', 'PendienteVerificacion'])
   accountStatus?: AccountStatusType;
-
-
 
   @IsOptional()
   @IsArray()
