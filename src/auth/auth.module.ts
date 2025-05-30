@@ -1,4 +1,4 @@
-// src/auth/auth.module.ts
+
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -7,7 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './JwtStrategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../entity/user';
+import { User } from 'src/entity/user';
 import { DoctorHealthEntityAffiliation } from 'src/entity/doctorHealthEntityAffiliation';
 import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
 import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
@@ -43,6 +43,6 @@ import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail'
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [PassportModule, JwtModule, AuthService],
+  exports: [PassportModule, JwtModule, AuthService,TypeOrmModule],
 })
 export class AuthModule {}

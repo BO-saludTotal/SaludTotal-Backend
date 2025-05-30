@@ -5,11 +5,11 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { User } from '../entity/user'; // Ajusta la ruta
+import { User } from '../entity/user'; 
 import { DoctorHealthEntityAffiliation } from 'src/entity/doctorHealthEntityAffiliation';
 import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
 import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
-// Importa tus interfaces si las tienes separadas
+
 export interface LoginResponsePayload {
   accessToken: string;
   user: {
