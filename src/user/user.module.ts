@@ -7,6 +7,10 @@ import { Role } from '../entity/role';
 import { UserAssignedRole } from '../entity/userAssignedRole';
 import { UserPhone } from '../entity/userPhone';
 import { UserEmail } from '../entity/userEmail';
+import { inheritPropertyInitializers } from '@nestjs/mapped-types';
+import { PatientDetail } from 'src/entity/patientDetail';
+
+
 
 @Module({
   imports: [
@@ -16,6 +20,7 @@ import { UserEmail } from '../entity/userEmail';
       UserAssignedRole,
       UserPhone,
       UserEmail,
+      PatientDetail,
     ]),
   ],
   providers: [UsersService],

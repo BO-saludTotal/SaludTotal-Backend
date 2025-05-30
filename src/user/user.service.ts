@@ -4,9 +4,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
   BadRequestException,
+  
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, ILike, Or, Brackets } from 'typeorm';
 import { User, AccountStatusType } from '../entity/user';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,12 +16,16 @@ import { UserAssignedRole } from '../entity/userAssignedRole';
 import { Role } from 'src/entity/role';
 import { UserPhone } from 'src/entity/userPhone';
 import { UserEmail } from 'src/entity/userEmail';
+import { PatientDetail } from 'src/entity/patientDetail';
+import { SearchUserQueryDto } from './dto/search-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(PatientDetail) 
+    private readonly patientDetailRepository: Repository<PatientDetail>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
     private readonly dataSource: DataSource,
@@ -75,7 +80,7 @@ export class UsersService {
         await queryRunner.manager.save(UserPhone, newUserPhone);
       }
       for (const emailDto of emails) {
-        /* ... lógica de emails ... */
+
         const newUserEmail = queryRunner.manager.create(UserEmail, {
           userId: savedUser.id,
           emailAddress: emailDto.emailAddress,
@@ -87,7 +92,6 @@ export class UsersService {
       await queryRunner.commitTransaction();
       return savedUser;
     } catch (error) {
-      /* ... manejo de error ... */
       await queryRunner.rollbackTransaction();
       console.error('Error creando usuario en UsersService:', error);
       if (
@@ -113,16 +117,85 @@ export class UsersService {
       },
     });
   }
+  
+  async search(queryDto: SearchUserQueryDto): Promise<User[]> {
+  const { query, ci, phoneNumber, email } = queryDto;
 
+  const queryBuilder = this.userRepository.createQueryBuilder('user')
+    .leftJoinAndSelect('user.patientDetail', 'patientDetail')
+    .leftJoinAndSelect('user.assignedRoles', 'assignedRoles')
+    .leftJoinAndSelect('assignedRoles.role', 'role')
+    .leftJoin('user.phones', 'userPhone')
+    .leftJoin('user.emails', 'userEmail');
+
+  queryBuilder.where('role.name = :roleName', { roleName: 'Paciente' });
+
+    if (query || ci || phoneNumber || email) {
+      queryBuilder.andWhere(new Brackets(qb => { 
+        let isFirstOrCondition = true;
+
+        const applyOr = (condition: Brackets | string, params?: object) => {
+          if (condition instanceof Brackets) {
+            if (isFirstOrCondition) {
+              qb.where(condition);
+              isFirstOrCondition = false;
+            } else {
+              qb.orWhere(condition);
+            }
+          } else {
+            if (isFirstOrCondition) {
+              qb.where(condition, params);
+              isFirstOrCondition = false;
+            } else {
+              qb.orWhere(condition, params);
+            }
+          }
+        };
+
+        if (query) {
+          const queryConditions = new Brackets(innerQb => {
+            innerQb.where('user.fullName ILIKE :query', { query: `%${query}%` })
+                  .orWhere('user.username ILIKE :query', { query: `%${query}%` });
+          });
+          applyOr(queryConditions);
+        }
+
+        if (ci) {
+          applyOr('patientDetail.ci = :ci', { ci });
+        }
+
+        if (phoneNumber) {
+          applyOr('userPhone.phoneNumber = :phoneNumber', { phoneNumber });
+        }
+
+        if (email) {
+          applyOr('userEmail.emailAddress = :email', { email });
+        }
+      }));
+    }
+
+    queryBuilder.distinct(true);
+
+    queryBuilder.select([
+      'user.id',
+      'user.fullName',
+      'user.username',
+      'patientDetail.birthDate',
+      'patientDetail.gender',
+    ]);
+
+    return queryBuilder.getMany();
+  }
+
+   
   async findOne(id: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: {
-        assignedRoles: {
-          role: true,
-        },
-        phones: true, // Ejemplo para cargar teléfonos
-        emails: true, // Ejemplo para cargar emails
+        assignedRoles: { role: true },
+        patientDetail: true, 
+        phones: true,
+        emails: true,
       },
     });
     if (!user) {
@@ -130,6 +203,7 @@ export class UsersService {
     }
     return user;
   }
+
 
   async findOneByUsername(username: string): Promise<User | undefined> {
     const user = await this.userRepository
@@ -165,22 +239,16 @@ export class UsersService {
 
     Object.assign(user, updateData);
 
-    //const updateData: Partial<User> = { ...updateUserDto };
-    //if ((updateData as any).passwordHash) { // Si hasheamos la contraseña
-    //  user.passwordHash = (updateData as any).passwordHash;
-    //}
-    //if (updateData.username) user.username = updateData.username;
-    //if (updateData.fullName) user.fullName = updateData.fullName;
-    //if (updateData.accountStatus) user.accountStatus = updateData.accountStatus;
+
 
     try {
-      await this.userRepository.save(user); // Guardar la entidad 'user' modificada
-      return this.findOne(id); // Devolver la entidad actualizada con sus relaciones
+      await this.userRepository.save(user); 
+      return this.findOne(id); 
     } catch (error: any) {
       if (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+   
         error?.code === 'ER_DUP_ENTRY' ||
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+   
         error?.message?.includes?.('unique constraint')
       ) {
         throw new ConflictException('El nombre de usuario ya está en uso.');
@@ -190,15 +258,16 @@ export class UsersService {
     }
   }
 
-  // --- MÉTODO REMOVE ---
+
   async remove(id: string): Promise<{ message: string; id: string }> {
-    const user = await this.findOne(id); // Asegura que el usuario exista antes de intentar eliminar
+    const user = await this.findOne(id); 
     try {
-      await this.userRepository.remove(user); // O .delete(id) si no necesitas la entidad antes
+      await this.userRepository.remove(user); 
       return { message: `Usuario con ID "${id}" eliminado correctamente.`, id };
     } catch (error) {
       console.error('Error eliminando usuario:', error);
       throw new InternalServerErrorException('Error al eliminar el usuario.');
     }
   }
+   
 }

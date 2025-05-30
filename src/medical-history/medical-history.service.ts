@@ -15,6 +15,16 @@ import { MedicalEventType } from '../entity/medicalEventType';
 import { HealthEntity } from '../entity/healthEntity'; 
 import { PhysicalAttentionSpace } from '../entity/physicalAttentionSpace'; 
 import { MedicalAppointment } from '../entity/medicalAppointment'; 
+import { ClinicalRecordDiagnosis } from '../entity/clinicalRecordDiagnosis';
+import { DiagnosisCode } from '../entity/diagnosisCode';
+import { Prescription } from '../entity/prescription';
+import { PrescriptionMedicationDetail } from '../entity/prescriptionMedicationDetail';
+import { CommercialMedicationPresentation } from '../entity/commercialMedicationPresentation';
+import { GeneralMedication } from '../entity/generalMedication';
+import { ExamResult } from '../entity/examResult';
+import { ExamResultDetail } from '../entity/examResultDetail';
+import { ExamParameter } from '../entity/examParameter';
+import { ClinicalRecordAttachment } from '../entity/clinicalRecordAttachment';
 
 @Injectable()
 export class MedicalHistoryService {
@@ -128,7 +138,24 @@ export class MedicalHistoryService {
         attentionHealthEntity: true, 
         associatedAppointment: true, 
         attentionSpace: true, 
+        diagnoses:{
+          diagnosisCode:true
+        },
+        prescriptions: {
+          medicationDetails: {
+            medicationPresentation:{
+              generalMedication:true,
+            },
+          },
+        },
+        examResults: {
+          parameterDetails:{
+            examParameter:true,
+          },
+        },
+        attachments:true
       },
+      
     });
   }
 }
