@@ -34,10 +34,11 @@ export class PatientDetail extends BaseEntity {
         referencedColumnName: 'id' 
     })
     user: User;
-
+    /*
     @OneToMany(() => MedicalAppointment, appointment => appointment.patientDetail)
     appointments: MedicalAppointment[];
-
+    /*
     @OneToMany(() => ClinicalRecordEntry, entry => entry.patientDetail)
     clinicalRecords: ClinicalRecordEntry[];
+    */
 }

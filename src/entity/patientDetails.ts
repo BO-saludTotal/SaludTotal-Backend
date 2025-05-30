@@ -56,10 +56,11 @@ export class PatientDetail {
   })
   @JoinColumn({ name: 'PacienteUsuarioID_Ref' })
   user: User;
-
+  /*
   @OneToMany(() => MedicalAppointment, (appointment) => appointment.patientDetail)
   appointments: MedicalAppointment[];
-
+  /*
   @OneToMany(() => ClinicalRecordEntry, (record) => record.patientDetail)
   clinicalRecords: ClinicalRecordEntry[];
+  */
 }

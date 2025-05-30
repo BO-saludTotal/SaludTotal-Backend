@@ -1,6 +1,6 @@
 export enum AllowedRoles {
   Paciente = 'Paciente', 
-  Medico = 'Médico',     
+  Medico = 'Medico',     
   Administrativo = 'Administrativo',
   Gubernamental = 'Gubernamental',
 

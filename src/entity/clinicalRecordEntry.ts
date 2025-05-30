@@ -86,7 +86,7 @@ export class ClinicalRecordEntry extends BaseEntity {
     referencedColumnName: 'id',
   })
   attentionHealthEntity: HealthEntity;
-
+  /*
   @ManyToOne(() => PatientDetail, detail => detail.clinicalRecords, {
     onDelete: 'RESTRICT',
     onUpdate: 'CASCADE',
@@ -96,7 +96,7 @@ export class ClinicalRecordEntry extends BaseEntity {
     referencedColumnName: 'patientUserId',
   })
   patientDetail: PatientDetail;
-
+  */
   @ManyToOne(() => PhysicalAttentionSpace, (space) => space.clinicalRecords, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
