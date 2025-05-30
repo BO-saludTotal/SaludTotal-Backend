@@ -7,20 +7,30 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './JwtStrategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../entity/user'; 
+import { User } from '../entity/user';
+import { DoctorHealthEntityAffiliation } from 'src/entity/doctorHealthEntityAffiliation';
+import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
+import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
 
 @Module({
   imports: [
-    ConfigModule, 
-    TypeOrmModule.forFeature([User]), 
+    ConfigModule,
+    TypeOrmModule.forFeature([
+      User,
+      DoctorHealthEntityAffiliation,
+      GovernmentStaffDetail,
+      AdministrativeStaffDetail,
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: (configService: ConfigService) => {
         const secret = configService.get<string>('JWT_SECRET');
         if (!secret) {
-          throw new Error('JWT_SECRET no está definido en las variables de entorno');
+          throw new Error(
+            'JWT_SECRET no está definido en las variables de entorno',
+          );
         }
         return {
           secret: secret,
@@ -32,10 +42,7 @@ import { User } from '../entity/user';
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-  ],
+  providers: [AuthService, JwtStrategy],
   exports: [PassportModule, JwtModule, AuthService],
 })
 export class AuthModule {}

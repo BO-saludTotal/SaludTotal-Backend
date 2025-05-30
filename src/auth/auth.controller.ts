@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import {
   Controller,
@@ -24,6 +25,20 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
+=======
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { AuthService, LoginResponsePayload } from './auth.service';
+import { LoginDto } from './dto/login.dto';
+
+>>>>>>> 24ec6da0b197be509d945156f49c5045df8d6ac6
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -34,6 +49,7 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto): Promise<LoginResponsePayload> {
     return this.authService.login(loginDto);
   }
+<<<<<<< HEAD
 
 
   @Get('profile')
@@ -48,3 +64,6 @@ export class AuthController {
   // @Post('register')
 
 }
+=======
+}
+>>>>>>> 24ec6da0b197be509d945156f49c5045df8d6ac6

@@ -1,7 +1,7 @@
 import {
   Controller,
   Get,
-  //Post,
+  Post,
   Body,
   Patch,
   Param,
@@ -14,7 +14,7 @@ import {
   //UseGuards, // Para proteger rutas
 } from '@nestjs/common';
 import { UsersService } from './user.service'; // Ajusta la ruta
-//import { CreateUserDto } from './dto/create-user.dto'; // Ajusta la ruta
+import { CreateUserDto } from './dto/create-user.dto'; // Ajusta la ruta
 import { UpdateUserDto } from './dto/update-user.dto'; // Ajusta la ruta
 // import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'; // Cuando tengas auth
 // import { RolesGuard } from '../auth/guards/roles.guard';
@@ -25,10 +25,10 @@ import { UpdateUserDto } from './dto/update-user.dto'; // Ajusta la ruta
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  /*@Post('register')
+  @Post('register')
   async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
-  }*/
+  }
 
   @Get()
   findAll() {
