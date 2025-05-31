@@ -18,7 +18,7 @@ async function bootstrap() {
       new ClassSerializerInterceptor(app.get(Reflector)),
     );
 
-    const port = process.env.PORT ?? 3000; // O tu puerto
+    const port = process.env.PORT ?? 5000; // O tu puerto
     await app.listen(port);
     console.log(`Application is running on: http://localhost:${port}`);
   } catch (error) {
