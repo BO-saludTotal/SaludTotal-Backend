@@ -1,36 +1,54 @@
+
 import {
   Controller,
+  Get, 
   Post,
   Body,
-  HttpException,
+  HttpCode,
   HttpStatus,
+  UsePipes,
+  ValidationPipe,
+  UseGuards, 
+  Req,     
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Request as ExpressRequest } from 'express';
+import { AuthService, LoginResponsePayload } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { LoginResponse } from './interfaces/login-response.interface';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+export interface AuthenticatedUserPayload { 
+  userId: string;
+  username: string;
+  roles: string[];
+}
+
+interface AuthenticatedRequest extends ExpressRequest { 
+  user: AuthenticatedUserPayload; 
+}
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+  @Post('register') 
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }))
+  async register(@Body() createUserDto: CreateUserDto) { 
+    const user = await this.authService.register(createUserDto);
+    return {
+      message: 'Usuario registrado exitosamente.',
+      user, 
+    };
+  }
 
   @Post('login')
-  async login(@Body() credentials: LoginDto): Promise<LoginResponse> {
-    try {
-      const result = await this.authService.login(credentials);
-      return result;
-    } catch (error: unknown) {
-      const message =
-        typeof error === 'object' && error !== null && 'message' in error
-          ? (error as { message: string }).message
-          : 'Credenciales inválidas';
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  async login(@Body() loginDto: LoginDto): Promise<LoginResponsePayload> {
+    return this.authService.login(loginDto);
+  }
 
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.UNAUTHORIZED,
-          message,
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+  @Get('profile') 
+  @UseGuards(JwtAuthGuard)
+  getProfile(@Req() req: AuthenticatedRequest) {
+    return req.user;
   }
 }

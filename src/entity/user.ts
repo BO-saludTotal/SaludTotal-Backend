@@ -97,10 +97,11 @@ export class User extends BaseEntity {
   @OneToMany(() => UserAssignedRole, (assignment) => assignment.user)
   assignedRoles: UserAssignedRole[];
 
-  @OneToOne(() => PatientDetail, (detail) => detail.user, {
-    cascade: ['insert', 'update'],
-  })
+  @OneToOne(() => PatientDetail, detail => detail.user, {
+        cascade: ['insert', 'update']
+    })
   patientDetail: PatientDetail;
+
 
   @OneToOne(() => DoctorDetail, (detail) => detail.user, {
     cascade: ['insert', 'update'],
@@ -126,8 +127,11 @@ export class User extends BaseEntity {
   @OneToMany(() => ClinicalRecordEntry, (entry) => entry.patientUser)
   clinicalEntriesAsPatient: ClinicalRecordEntry[];
 
-  @OneToMany(() => ClinicalRecordEntry, (entry) => entry.attendingDoctor)
+  @OneToMany(() => ClinicalRecordEntry, (entry) => entry.patientUser)
   clinicalEntriesAsDoctor: ClinicalRecordEntry[];
+
+  @OneToMany(() => UserPhone, (entry) => entry.phoneNumber)
+  telefonos: UserPhone[];
 
   @OneToMany(
     () => DoctorHealthEntityAffiliation,

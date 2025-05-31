@@ -1,69 +1,102 @@
 import {
+  IsString,
   IsEmail,
+  MinLength,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsString,
-  IsEnum,
   IsArray,
   ValidateNested,
-  Length,
+  IsBoolean,
+  IsInt,
+  IsDateString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { AccountStatusType } from 'src/entity/user';
 
-export class CreatePhoneDto {
-  @IsString()
+
+class CreateUserPhoneDto {
   @IsNotEmpty()
-  NumeroTelefono: string;
-
-  @IsOptional()
   @IsString()
-  TipoTelefono?: string;
+  phoneNumber: string;
 
   @IsOptional()
-  EsPrincipal?: boolean;
+  @IsEnum(['Móvil', 'Casa', 'Trabajo'])
+  phoneType?: 'Móvil' | 'Casa' | 'Trabajo';
+
+  @IsOptional()
+  @IsBoolean()
+  isPrimary?: boolean;
 }
 
-export class CreateAddressDto {
+class CreateUserEmailDto {
+  @IsNotEmpty()
   @IsEmail()
-  CorreoElectronico: string;
+  emailAddress: string;
 
   @IsOptional()
-  EsPrincipal?: boolean;
+  @IsBoolean()
+  isPrimary?: boolean;
 }
 
 export class CreateUserDto {
+  @IsNotEmpty({ message: 'El nombre de usuario es requerido.' })
   @IsString()
-  @IsNotEmpty()
-  @Length(3, 255)
-  NombreUsuario: string;
+  username: string;
 
+  @IsNotEmpty({ message: 'La contraseña es requerida.' })
   @IsString()
-  @IsNotEmpty()
-  @Length(8, 255)
-  Contrasena: string;
+  @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres.' })
+  password: string;
 
+  @IsNotEmpty({ message: 'El nombre completo es requerido.' })
   @IsString()
-  @IsNotEmpty()
-  NombreCompleto: string;
+  fullName: string;
 
-  @IsString()
-  @IsNotEmpty()
-  RolID: string;
+  @IsNotEmpty({ message: 'Se debe asignar al menos un rol.' })
+  @IsInt({ message: 'El ID del rol debe ser un número válido.' })
+  roleId: number;
 
   @IsOptional()
-  @IsEnum(['Activo', 'Inactivo', 'Bloqueado', 'PendienteVerificacion'])
-  EstadoCuenta?: AccountStatusType;
+  @IsDateString({}, { message: 'La fecha de nacimiento debe ser una fecha válida.'})
+  fechaNacimiento?: string; 
+
+  @IsOptional()
+  @IsEnum(['Masculino', 'Femenino', 'Otro', 'PrefieroNoDecir'], { message: 'Género inválido.'})
+  genero?: 'Masculino' | 'Femenino' | 'Otro' | 'PrefieroNoDecir';
+
+  @IsOptional()
+  @IsString()
+  direccionResidencia?: string;
+
+  @IsOptional()
+  @IsString()
+  nombresPadresTutores?: string;
+
+  @IsOptional()
+  @IsString()
+  numeroColegiado?: string;
+
+  @IsOptional() @IsString()
+  cargoAdministrativo?: string;
+  @IsOptional() @IsInt()
+  entidadSaludIdAsignada?: number; 
+
+
+  @IsOptional() @IsString()
+  nombreInstitucionGubernamental?: string;
+  @IsOptional() @IsString()
+  cargoEnInstitucion?: string;
+
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreatePhoneDto)
-  Telefonos?: CreatePhoneDto[];
+  @Type(() => CreateUserPhoneDto)
+  phones?: CreateUserPhoneDto[];
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateAddressDto)
-  Correos?: CreateAddressDto[];
+  @Type(() => CreateUserEmailDto)
+  emails?: CreateUserEmailDto[];
 }

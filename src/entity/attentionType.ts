@@ -6,7 +6,7 @@ import {
   BaseEntity,
 } from 'typeorm';
 import { AvailabilitySlot } from './availabilitySlot';
-import { MedicalAppointment } from './medicalAppointment';
+
 @Entity({ name: 'TiposAtencionCatalogo' })
 export class AttentionType extends BaseEntity {
   @PrimaryGeneratedColumn({ name: 'TipoAtencionID', type: 'int' })
@@ -27,9 +27,5 @@ export class AttentionType extends BaseEntity {
   @OneToMany(() => AvailabilitySlot, (slot) => slot.offeredAttentionType)
   availabilitySlots: AvailabilitySlot[];
 
-  @OneToMany(
-    () => MedicalAppointment,
-    (appointment) => appointment.attentionType,
-  )
-  appointmentsRelacionadosConMedicalAppointment: MedicalAppointment[];
+
 }

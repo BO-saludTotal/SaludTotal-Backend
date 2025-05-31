@@ -13,7 +13,7 @@ import { AvailabilitySlot } from './availabilitySlot';
 import { User } from './user';
 import { AppointmentChangeHistory } from './appointmentChangeHistory';
 import { ClinicalRecordEntry } from './clinicalRecordEntry';
-import { AttentionType } from './attentionType';
+
 
 export type AppointmentStatusType =
   | 'Solicitada'
@@ -79,10 +79,5 @@ export class MedicalAppointment extends BaseEntity {
   @OneToMany(() => ClinicalRecordEntry, (entry) => entry.associatedAppointment)
   clinicalRecords: ClinicalRecordEntry[];
 
-  @ManyToOne(
-    () => AttentionType,
-    (at) => at.appointmentsRelacionadosConMedicalAppointment,
-  )
-  @JoinColumn({ name: 'TipoAtencionID_Ref' })
-  attentionType: AttentionType;
+
 }
