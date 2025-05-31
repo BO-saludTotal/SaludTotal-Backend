@@ -9,11 +9,10 @@ import {
   ValidateNested,
   IsBoolean,
   IsInt,
+  IsDateString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-// import { UserPhoneDto } from './user-phone.dto'; // Si tienes DTOs específicos
-// import { UserEmailDto } from './user-email.dto';
 
 class CreateUserPhoneDto {
   @IsNotEmpty()
@@ -56,6 +55,38 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Se debe asignar al menos un rol.' })
   @IsInt({ message: 'El ID del rol debe ser un número válido.' })
   roleId: number;
+
+  @IsOptional()
+  @IsDateString({}, { message: 'La fecha de nacimiento debe ser una fecha válida.'})
+  fechaNacimiento?: string; 
+
+  @IsOptional()
+  @IsEnum(['Masculino', 'Femenino', 'Otro', 'PrefieroNoDecir'], { message: 'Género inválido.'})
+  genero?: 'Masculino' | 'Femenino' | 'Otro' | 'PrefieroNoDecir';
+
+  @IsOptional()
+  @IsString()
+  direccionResidencia?: string;
+
+  @IsOptional()
+  @IsString()
+  nombresPadresTutores?: string;
+
+  @IsOptional()
+  @IsString()
+  numeroColegiado?: string;
+
+  @IsOptional() @IsString()
+  cargoAdministrativo?: string;
+  @IsOptional() @IsInt()
+  entidadSaludIdAsignada?: number; 
+
+
+  @IsOptional() @IsString()
+  nombreInstitucionGubernamental?: string;
+  @IsOptional() @IsString()
+  cargoEnInstitucion?: string;
+
 
   @IsOptional()
   @IsArray()

@@ -1,4 +1,4 @@
-import { GenderType } from '../entity/patientDetails';
+import { GenderType } from '../entity/patientDetail';
 
 export interface roleModel {
   patientUserId: number;

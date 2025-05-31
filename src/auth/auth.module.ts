@@ -11,6 +11,7 @@ import { User } from 'src/entity/user';
 import { DoctorHealthEntityAffiliation } from 'src/entity/doctorHealthEntityAffiliation';
 import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
 import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
+import { UsersModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail'
       GovernmentStaffDetail,
       AdministrativeStaffDetail,
     ]),
+    UsersModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

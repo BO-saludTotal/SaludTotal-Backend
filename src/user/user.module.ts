@@ -9,6 +9,9 @@ import { UserPhone } from '../entity/userPhone';
 import { UserEmail } from '../entity/userEmail';
 import { inheritPropertyInitializers } from '@nestjs/mapped-types';
 import { PatientDetail } from 'src/entity/patientDetail';
+import { DoctorDetail } from 'src/entity/doctorDetail';
+import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
+import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
 
 
 
@@ -21,6 +24,9 @@ import { PatientDetail } from 'src/entity/patientDetail';
       UserPhone,
       UserEmail,
       PatientDetail,
+      DoctorDetail,
+      GovernmentStaffDetail,
+      AdministrativeStaffDetail
     ]),
   ],
   providers: [UsersService],

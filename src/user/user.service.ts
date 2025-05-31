@@ -17,8 +17,20 @@ import { Role } from 'src/entity/role';
 import { UserPhone } from 'src/entity/userPhone';
 import { UserEmail } from 'src/entity/userEmail';
 import { PatientDetail } from 'src/entity/patientDetail';
+import { DoctorDetail } from 'src/entity/doctorDetail';
 import { SearchUserQueryDto } from './dto/search-user.dto';
+import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
+import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
 
+
+
+function isUuid(value: string): boolean {
+  if (!value || typeof value !== 'string') {
+    return false;
+  }
+  const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidV4Regex.test(value);
+}
 @Injectable()
 export class UsersService {
   constructor(
@@ -28,84 +40,121 @@ export class UsersService {
     private readonly patientDetailRepository: Repository<PatientDetail>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
+    @InjectRepository(DoctorDetail)   
+    private readonly doctorDetailRepository: Repository<DoctorDetail>,
+    @InjectRepository(GovernmentStaffDetail)
+    private readonly governmentStaffDetail: Repository<GovernmentStaffDetail>,
+    @InjectRepository(AdministrativeStaffDetail)
+    private readonly administrativeStaffDetailRepository: Repository<AdministrativeStaffDetail>,
     private readonly dataSource: DataSource,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const {
-      username,
-      password,
-      fullName,
-      roleId,
-      phones = [],
-      emails = [],
+      username, password, fullName, roleId, phones = [], emails = [],
+
+      fechaNacimiento, genero, direccionResidencia, nombresPadresTutores, 
+ 
+      numeroColegiado,
+
+      cargoAdministrativo, entidadSaludIdAsignada,
+
+      nombreInstitucionGubernamental, cargoEnInstitucion,
     } = createUserDto;
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
     try {
       const role = await queryRunner.manager.findOneBy(Role, { id: roleId });
-      if (!role) {
-        await queryRunner.rollbackTransaction();
-        throw new BadRequestException(`Rol con ID ${roleId} no encontrado.`);
-      }
-      const existingUserByUsername = await queryRunner.manager.findOne(User, {
-        where: { username },
-      });
-      if (existingUserByUsername) {
-        await queryRunner.rollbackTransaction();
-        throw new ConflictException('El nombre de usuario ya está en uso.');
-      }
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      if (!role) { await queryRunner.rollbackTransaction(); throw new BadRequestException(`Rol con ID ${roleId} no encontrado.`); }
+
+      const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt(10));
+
       const newUserEntity = queryRunner.manager.create(User, {
         username,
         passwordHash: hashedPassword,
         fullName,
         accountStatus: 'PendienteVerificacion' as AccountStatusType,
+
       });
       const savedUser = await queryRunner.manager.save(User, newUserEntity);
-      const userRoleAssignment = queryRunner.manager.create(UserAssignedRole, {
-        userId: savedUser.id,
-        roleId: role.id,
-      });
-      await queryRunner.manager.save(UserAssignedRole, userRoleAssignment);
-      for (const phoneDto of phones) {
-        const newUserPhone = queryRunner.manager.create(UserPhone, {
-          userId: savedUser.id,
-          phoneNumber: phoneDto.phoneNumber,
-          phoneType: phoneDto.phoneType,
-          isPrimary: phoneDto.isPrimary ?? false,
-        });
-        await queryRunner.manager.save(UserPhone, newUserPhone);
-      }
-      for (const emailDto of emails) {
 
-        const newUserEmail = queryRunner.manager.create(UserEmail, {
-          userId: savedUser.id,
-          emailAddress: emailDto.emailAddress,
-          isPrimary: emailDto.isPrimary ?? false,
-          isVerified: false,
-        });
-        await queryRunner.manager.save(UserEmail, newUserEmail);
+      const userRoleAssignment = queryRunner.manager.create(UserAssignedRole, { userId: savedUser.id, roleId: role.id });
+      await queryRunner.manager.save(UserAssignedRole, userRoleAssignment);
+
+
+      if (role.id === 2) { 
+        const patientDetailData: Partial<PatientDetail> = { patientUserId: savedUser.id };
+        if (fechaNacimiento) patientDetailData.birthDate = new Date(fechaNacimiento);
+        if (genero) patientDetailData.gender = genero as any;
+        if (direccionResidencia) patientDetailData.residentialAddress = direccionResidencia;
+        if (nombresPadresTutores) patientDetailData.parentOrGuardianNames = nombresPadresTutores;
+
+
+        const newPatientDetail = queryRunner.manager.create(PatientDetail, patientDetailData);
+        await queryRunner.manager.save(PatientDetail, newPatientDetail);
+
+      } else if (role.id === 3) { 
+        if (!numeroColegiado) { await queryRunner.rollbackTransaction(); throw new BadRequestException('Número de colegiado es requerido para Médico.'); }
+        const doctorDetailData: Partial<DoctorDetail> = {
+          doctorUserId: savedUser.id,
+          medicalLicenseNumber: numeroColegiado,
+        };
+        const newDoctorDetail = queryRunner.manager.create(DoctorDetail, doctorDetailData);
+        await queryRunner.manager.save(DoctorDetail, newDoctorDetail);
+
+      } else if (role.id === 1) { 
+        if (!nombreInstitucionGubernamental || !cargoEnInstitucion) {
+          await queryRunner.rollbackTransaction();
+          throw new BadRequestException('Nombre de institución y cargo son requeridos para personal gubernamental.');
+        }
+        const govDetailData: Partial<GovernmentStaffDetail> = {
+          governmentUserId: savedUser.id,
+          governmentalInstitutionName: nombreInstitucionGubernamental,
+          positionInInstitution: cargoEnInstitucion,
+        };
+        const newGovDetail = queryRunner.manager.create(GovernmentStaffDetail, govDetailData);
+        await queryRunner.manager.save(GovernmentStaffDetail, newGovDetail);
+
+        } else if (role.id === 4) { 
+        if (!cargoAdministrativo) { 
+          await queryRunner.rollbackTransaction();
+          throw new BadRequestException('El cargo administrativo es requerido para este rol.');
+        }
+        const adminDetailData: Partial<AdministrativeStaffDetail> = {
+          adminUserId: savedUser.id,
+          administrativePosition: cargoAdministrativo,
+        };
+        if (entidadSaludIdAsignada !== undefined) { 
+
+          adminDetailData.assignedHealthEntityId = entidadSaludIdAsignada;
+        }
+        const newAdminDetail = queryRunner.manager.create(AdministrativeStaffDetail, adminDetailData);
+        await queryRunner.manager.save(AdministrativeStaffDetail, newAdminDetail);
       }
+
+
+
       await queryRunner.commitTransaction();
-      return savedUser;
-    } catch (error) {
-      await queryRunner.rollbackTransaction();
-      console.error('Error creando usuario en UsersService:', error);
-      if (
-        error instanceof ConflictException ||
-        error instanceof BadRequestException
-      ) {
-        throw error;
-      }
-      throw new InternalServerErrorException(
-        'Ocurrió un error inesperado al crear el usuario.',
-      );
-    } finally {
-      await queryRunner.release();
-    }
+
+      const createdUserWithDetails = await this.userRepository.findOneOrFail({
+        where: { id: savedUser.id },
+        relations: {
+          assignedRoles: { role: true },
+          patientDetail: true,
+          doctorDetail: true,
+          administrativeStaffDetail: true,
+          governmentStaffDetail: true,
+          phones: true,
+          emails: true,
+        },
+      });
+      return createdUserWithDetails;
+
+    } catch (error) { throw new InternalServerErrorException('Error al crear usuario'); }
+    finally { await queryRunner.release(); }
   }
 
   async findAll(): Promise<User[]> {
@@ -119,69 +168,40 @@ export class UsersService {
   }
   
   async search(queryDto: SearchUserQueryDto): Promise<User[]> {
-  const { query, ci, phoneNumber, email } = queryDto;
+    const { query } = queryDto; 
 
-  const queryBuilder = this.userRepository.createQueryBuilder('user')
-    .leftJoinAndSelect('user.patientDetail', 'patientDetail')
-    .leftJoinAndSelect('user.assignedRoles', 'assignedRoles')
-    .leftJoinAndSelect('assignedRoles.role', 'role')
-    .leftJoin('user.phones', 'userPhone')
-    .leftJoin('user.emails', 'userEmail');
+    const queryBuilder = this.userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.patientDetail', 'patientDetail')
+      .leftJoinAndSelect('user.assignedRoles', 'assignedRoles')
+      .leftJoinAndSelect('assignedRoles.role', 'role');
+    
 
-  queryBuilder.where('role.name = :roleName', { roleName: 'Paciente' });
+    queryBuilder.where('role.name = :roleName', { roleName: 'Paciente' }); 
 
-    if (query || ci || phoneNumber || email) {
-      queryBuilder.andWhere(new Brackets(qb => { 
-        let isFirstOrCondition = true;
+    if (query) {
+      if (isUuid(query)) {
+ 
+        queryBuilder.andWhere('user.id = :userIdQuery', { userIdQuery: query });
+      } else {
 
-        const applyOr = (condition: Brackets | string, params?: object) => {
-          if (condition instanceof Brackets) {
-            if (isFirstOrCondition) {
-              qb.where(condition);
-              isFirstOrCondition = false;
-            } else {
-              qb.orWhere(condition);
-            }
-          } else {
-            if (isFirstOrCondition) {
-              qb.where(condition, params);
-              isFirstOrCondition = false;
-            } else {
-              qb.orWhere(condition, params);
-            }
-          }
-        };
-
-        if (query) {
-          const queryConditions = new Brackets(innerQb => {
-            innerQb.where('user.fullName ILIKE :query', { query: `%${query}%` })
-                  .orWhere('user.username ILIKE :query', { query: `%${query}%` });
-          });
-          applyOr(queryConditions);
-        }
-
-        if (ci) {
-          applyOr('patientDetail.ci = :ci', { ci });
-        }
-
-        if (phoneNumber) {
-          applyOr('userPhone.phoneNumber = :phoneNumber', { phoneNumber });
-        }
-
-        if (email) {
-          applyOr('userEmail.emailAddress = :email', { email });
-        }
-      }));
+        queryBuilder.andWhere(new Brackets(qb => {
+          qb.where('user.fullName ILIKE :textQuery', { textQuery: `%${query}%` })
+            .orWhere('user.username ILIKE :textQuery', { textQuery: `%${query}%` });
+        }));
+      }
     }
 
-    queryBuilder.distinct(true);
+
+    queryBuilder.distinct(true); 
+
 
     queryBuilder.select([
-      'user.id',
+      'user.id', 
       'user.fullName',
       'user.username',
       'patientDetail.birthDate',
       'patientDetail.gender',
+      'role.name' 
     ]);
 
     return queryBuilder.getMany();

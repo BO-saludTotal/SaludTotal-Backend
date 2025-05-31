@@ -7,11 +7,6 @@ export class SearchUserQueryDto {
   @MinLength(1) 
   query?: string; 
 
-  
-  @IsOptional()
-  @IsString()
-  @MinLength(3) 
-  ci?: string;
 
   @IsOptional()
   @IsString()
