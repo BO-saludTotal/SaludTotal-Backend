@@ -2,8 +2,9 @@ name: build_in_backend
 
 on:
   push:
-    branches: ["develop"]
-  workflow_dispatch:
+    branches:
+      - main
+      - develop
 
 jobs:
   build:
