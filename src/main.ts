@@ -22,7 +22,7 @@ async function bootstrap() {
     
     //cors
     app.enableCors({
-		origin: ['https://saludtotal-frontend.pages.dev'],
+		origin: process.env.FRONTEND_URL,
 		methods:['GET','POST','PUT','DELETE'],
 		credentials: true,
 		});
