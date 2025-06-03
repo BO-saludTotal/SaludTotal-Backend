@@ -1,26 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { HealthEntity } from '../entity/healthEntity';
 import { CreateHealthEntityDto } from './dto/create-health-entity.dto';
-import { UpdateHealthEntityDto } from './dto/update-health-entity.dto';
 
 @Injectable()
 export class HealthEntityService {
-  create(createHealthEntityDto: CreateHealthEntityDto) {
-    return 'This action adds a new healthEntity';
+  constructor(
+    @InjectRepository(HealthEntity)
+    private readonly healthEntityRepository: Repository<HealthEntity>,
+  ) {}
+
+  async create(createDto: CreateHealthEntityDto): Promise<HealthEntity> {
+    const existing = await this.healthEntityRepository.findOneBy({ officialName: createDto.officialName });
+    if (existing) {
+      throw new ConflictException(`La entidad de salud con nombre "${createDto.officialName}" ya existe.`);
+    }
+    const newEntity = this.healthEntityRepository.create(createDto);
+    return this.healthEntityRepository.save(newEntity);
   }
 
-  findAll() {
-    return `This action returns all healthEntity`;
+  async findAll(): Promise<HealthEntity[]> {
+    return this.healthEntityRepository.find();
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} healthEntity`;
-  }
-
-  update(id: number, updateHealthEntityDto: UpdateHealthEntityDto) {
-    return `This action updates a #${id} healthEntity`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} healthEntity`;
-  }
+  
 }

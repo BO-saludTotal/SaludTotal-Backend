@@ -1,34 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, UsePipes, ValidationPipe, HttpStatus } from '@nestjs/common';
 import { MedicalEventTypeService } from './medical-event-type.service';
 import { CreateMedicalEventTypeDto } from './dto/create-medical-event-type.dto';
-import { UpdateMedicalEventTypeDto } from './dto/update-medical-event-type.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { AllowedRoles } from '../auth/enums/allowed-roles.enum';
 
-@Controller('medical-event-type')
+@Controller('medical-event-types')
+
 export class MedicalEventTypeController {
-  constructor(private readonly medicalEventTypeService: MedicalEventTypeService) {}
+  constructor(private readonly eventTypeService: MedicalEventTypeService) {}
 
   @Post()
-  create(@Body() createMedicalEventTypeDto: CreateMedicalEventTypeDto) {
-    return this.medicalEventTypeService.create(createMedicalEventTypeDto);
+  @Roles(AllowedRoles.Administrativo) 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }))
+  async create(@Body() createDto: CreateMedicalEventTypeDto) {
+    const eventType = await this.eventTypeService.create(createDto);
+    return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Tipo de evento médico creado exitosamente.',
+        data: eventType
+    };
   }
 
   @Get()
-  findAll() {
-    return this.medicalEventTypeService.findAll();
-  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.medicalEventTypeService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMedicalEventTypeDto: UpdateMedicalEventTypeDto) {
-    return this.medicalEventTypeService.update(+id, updateMedicalEventTypeDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.medicalEventTypeService.remove(+id);
+  async findAll() {
+    const eventTypes = await this.eventTypeService.findAll();
+    return {
+        statusCode: HttpStatus.OK,
+        data: eventTypes
+    };
   }
 }

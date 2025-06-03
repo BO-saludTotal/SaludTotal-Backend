@@ -1,26 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { MedicalEventType } from '../entity/medicalEventType';
 import { CreateMedicalEventTypeDto } from './dto/create-medical-event-type.dto';
-import { UpdateMedicalEventTypeDto } from './dto/update-medical-event-type.dto';
 
 @Injectable()
 export class MedicalEventTypeService {
-  create(createMedicalEventTypeDto: CreateMedicalEventTypeDto) {
-    return 'This action adds a new medicalEventType';
+  constructor(
+    @InjectRepository(MedicalEventType)
+    private readonly eventTypeRepository: Repository<MedicalEventType>,
+  ) {}
+
+  async create(createDto: CreateMedicalEventTypeDto): Promise<MedicalEventType> {
+    const existing = await this.eventTypeRepository.findOneBy({ eventTypeName: createDto.eventTypeName });
+    if (existing) {
+      throw new ConflictException(`El tipo de evento médico "${createDto.eventTypeName}" ya existe.`);
+    }
+    const newEventType = this.eventTypeRepository.create(createDto);
+    return this.eventTypeRepository.save(newEventType);
   }
 
-  findAll() {
-    return `This action returns all medicalEventType`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} medicalEventType`;
-  }
-
-  update(id: number, updateMedicalEventTypeDto: UpdateMedicalEventTypeDto) {
-    return `This action updates a #${id} medicalEventType`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} medicalEventType`;
+  async findAll(): Promise<MedicalEventType[]> {
+    return this.eventTypeRepository.find();
   }
 }
