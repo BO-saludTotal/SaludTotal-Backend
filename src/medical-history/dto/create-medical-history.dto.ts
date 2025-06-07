@@ -8,31 +8,116 @@ import {
   IsOptional,
   IsInt,
   MaxLength,
+  IsArray, ValidateNested, IsNumber, IsEnum
 } from 'class-validator';
 
-export class CreateClinicalRecordEntryDto { 
-  @IsNotEmpty({ message: 'El ID de la entidad de salud donde ocurrió la atención es requerido.' })
-  @IsInt({ message: 'El ID de la entidad de salud debe ser un número entero.' })
-  attentionHealthEntityId: number;
+import { Type } from 'class-transformer';
+
+export class CreateDiagnosisDetailDto {
+  @IsNotEmpty()
+  @IsString()
+  cieCode: string; // FK a DiagnosticosCIE_Catalogo
+
+  @IsNotEmpty()
+  @IsEnum(['Principal', 'Secundario', 'Presuntivo', 'Confirmado'])
+  diagnosisType: 'Principal' | 'Secundario' | 'Presuntivo' | 'Confirmado';
+}
+
+export class CreatePrescriptionMedicationDto {
+  @IsNotEmpty()
+  @IsInt()
+  medicationPresentationId: number; // FK a PresentacionesComercialesMedicamentos
+
+  @IsOptional() @IsString() @MaxLength(100)
+  indicatedDose?: string;
+
+  @IsOptional() @IsString() @MaxLength(100)
+  indicatedFrequency?: string;
+
+  @IsOptional() @IsString() @MaxLength(100)
+  indicatedTreatmentDuration?: string;
+}
+
+export class CreatePrescriptionDetailDto {
+  @IsNotEmpty()
+  @IsDateString() // Opcional, o puede tomar la fecha de la entrada principal
+  prescriptionDate: string; // Fecha de la prescripción
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreatePrescriptionMedicationDto)
+  medications: CreatePrescriptionMedicationDto[];
+}
+
+export class CreateExamResultParameterDto {
+     @IsNotEmpty()
+     @IsInt()
+     examParameterId: number; // FK a ParametrosExamenCatalogo
+
+     @IsNotEmpty()
+     @IsString() @MaxLength(255)
+     obtainedValue: string;
+}
+
+export class CreateExamResultDetailDto {
+     @IsNotEmpty()
+     @IsString() @MaxLength(255)
+     generalExamName: string;
+
+     @IsOptional()
+     @IsDateString()
+     resultIssueDate?: string;
+
+     @IsArray()
+     @ValidateNested({ each: true })
+     @Type(() => CreateExamResultParameterDto)
+     parameters: CreateExamResultParameterDto[];
+}
+
+export class CreateAttachmentDetailDto {
+     @IsOptional() @IsString() @MaxLength(255)
+     originalFileName?: string;
+
+     @IsOptional() @IsString() @MaxLength(100)
+     mimeType?: string;
+
+     @IsNotEmpty() @IsString() // La ruta o el identificador del archivo guardado
+     storagePath: string; // Esto requerirá lógica de subida de archivos separada
+}
+
+
+// --- DTO Principal ---
+export class CreateClinicalRecordEntryDto {
+  // ... (campos existentes: attentionHealthEntityId, eventTypeId, etc.) ...
+  @IsNotEmpty() @IsInt() attentionHealthEntityId: number;
+  @IsOptional() @IsInt() attentionSpaceId?: number;
+  @IsOptional() @IsInt() associatedAppointmentId?: number;
+  @IsNotEmpty() @IsInt() eventTypeId: number;
+  @IsNotEmpty() @IsDateString() attentionStartDateTime: string;
+  @IsOptional() @IsString() @MaxLength(5000) narrativeSummary?: string;
+
+  // Nuevos campos para los detalles
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true }) // Valida cada objeto en el array
+  @Type(() => CreateDiagnosisDetailDto) // Ayuda a class-transformer a instanciar la clase correcta
+  diagnoses?: CreateDiagnosisDetailDto[];
 
   @IsOptional()
-  @IsInt({ message: 'El ID del espacio físico de atención debe ser un número entero.' })
-  attentionSpaceId?: number;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreatePrescriptionDetailDto)
+  prescriptions?: CreatePrescriptionDetailDto[];
 
   @IsOptional()
-  @IsInt({ message: 'El ID de la cita médica asociada debe ser un número entero.' })
-  associatedAppointmentId?: number;
-
-  @IsNotEmpty({ message: 'El ID del tipo de evento médico es requerido.' })
-  @IsInt({ message: 'El ID del tipo de evento médico debe ser un número entero.' })
-  eventTypeId: number;
-
-  @IsNotEmpty({ message: 'La fecha y hora de inicio de atención es requerida.' })
-  @IsDateString({}, { message: 'La fecha y hora de inicio de atención debe ser una fecha válida en formato ISO8601 (YYYY-MM-DDTHH:MM:SSZ).' })
-  attentionStartDateTime: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateExamResultDetailDto)
+  examResults?: CreateExamResultDetailDto[];
 
   @IsOptional()
-  @IsString({ message: 'El resumen narrativo debe ser una cadena de texto.' })
-  @MaxLength(5000, { message: 'El resumen narrativo no puede exceder los 5000 caracteres.' })
-  narrativeSummary?: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateAttachmentDetailDto)
+  attachments?: CreateAttachmentDetailDto[];
 }
