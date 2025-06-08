@@ -74,6 +74,8 @@ export class UsersService {
       cargoEnInstitucion,
     } = createUserDto;
 
+
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
