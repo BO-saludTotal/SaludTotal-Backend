@@ -12,6 +12,7 @@ import {
   ParseUUIDPipe,
   Get,
   ForbiddenException,
+  Patch, ParseIntPipe
 } from '@nestjs/common';
 import { MedicalHistoryService } from './medical-history.service';
 import { CreateClinicalRecordEntryDto } from 'src/clinical-record-entry/dto/create-clinical-record-entry.dto';
@@ -20,6 +21,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { AllowedRoles } from 'src/auth/enums/allowed-roles.enum';
 import { Request } from 'express';
+import { UpdateMedicalHistoryDto } from './dto/update-medical-history.dto';
 
 interface AuthenticatedRequest extends Request {
   user: { userId: string; username: string; roles: string[] };
@@ -115,6 +117,39 @@ export class MedicalHistoryController {
       );
       throw new HttpException(
         'Error interno del servidor al obtener el historial clínico.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  @Patch('entries/:entryId') // Endpoint: PATCH /patients/{patientId}/medical-history/entries/{entryId}
+  @Roles(AllowedRoles.Medico) 
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true, skipMissingProperties: true }))
+  async updateMedicalEntry(
+    @Param('patientId', ParseUUIDPipe) patientId: string,
+    @Param('entryId', ParseIntPipe) entryId: number,
+    @Body() updateDto: UpdateMedicalHistoryDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    const attendingDoctorId = request.user.userId;
+    try {
+      const updatedEntry = await this.medicalHistoryService.updateEntry(
+        entryId,
+        patientId,
+        attendingDoctorId,
+        updateDto,
+      );
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Entrada de historial clínico actualizada exitosamente.',
+        data: updatedEntry,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.error(`Error en PATCH /patients/${patientId}/medical-history/entries/${entryId}:`, error);
+      throw new HttpException(
+        'Error interno al actualizar la entrada del historial.',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

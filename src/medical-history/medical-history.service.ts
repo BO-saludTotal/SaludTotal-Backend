@@ -27,6 +27,8 @@ import { ExamParameter } from '../entity/examParameter';
 import { ClinicalRecordAttachment } from '../entity/clinicalRecordAttachment';
 import { PrescriptionService } from 'src/prescription/prescription.service';
 import { ClinicalRecordAttachmentService } from 'src/clinical-record-attachment/clinical-record-attachment.service';
+import { UpdateMedicalHistoryDto } from './dto/update-medical-history.dto';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class MedicalHistoryService {
@@ -249,5 +251,154 @@ export class MedicalHistoryService {
         attachments: true,
       },
     });
+  }
+  async updateEntry(
+    entryId: number,
+    patientId: string,
+    attendingDoctorId: string, 
+    updateDto: UpdateMedicalHistoryDto,
+  ): Promise<ClinicalRecordEntry> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const recordEntry = await queryRunner.manager.findOne(ClinicalRecordEntry, {
+        where: { id: entryId, patientUserId: patientId },
+        relations: ['diagnoses', 'prescriptions', 'prescriptions.medicationDetails', 'examResults', 'examResults.parameterDetails', 'attachments'],
+      });
+
+      if (!recordEntry) {
+        throw new NotFoundException(`Entrada de historial con ID ${entryId} para el paciente ${patientId} no encontrada.`);
+      }
+
+     
+      const updatedEntryData = await queryRunner.manager.preload(ClinicalRecordEntry, {
+        id: entryId, 
+        ...updateDto,
+        attentionStartDateTime: updateDto.attentionStartDateTime
+          ? new Date(updateDto.attentionStartDateTime)
+          : recordEntry.attentionStartDateTime, 
+
+      });
+      if (!updatedEntryData) {
+        throw new NotFoundException(`No se pudo cargar la entrada clínica con ID ${entryId} para su actualización.`);
+      }
+      delete (updatedEntryData as any).diagnoses;
+      delete (updatedEntryData as any).prescriptions;
+      delete (updatedEntryData as any).examResults;
+      delete (updatedEntryData as any).attachments;
+
+      await queryRunner.manager.save(ClinicalRecordEntry, updatedEntryData);
+
+
+
+      if (updateDto.diagnoses !== undefined) { 
+     
+        if (recordEntry.diagnoses && recordEntry.diagnoses.length > 0) {
+          await queryRunner.manager.remove(ClinicalRecordDiagnosis, recordEntry.diagnoses);
+        }
+     
+        for (const diagDto of updateDto.diagnoses) { 
+          const codeExists = await this.diagnosisCodeRepository.findOneBy({ cieCode: diagDto.cieCode });
+          if (!codeExists) throw new BadRequestException(`Código CIE ${diagDto.cieCode} no válido.`);
+          const diagnosis = queryRunner.manager.create(ClinicalRecordDiagnosis, {
+            clinicalRecordEntryId: entryId, ...diagDto });
+          await queryRunner.manager.save(ClinicalRecordDiagnosis, diagnosis);
+        }
+      }
+
+      // 3. Manejar Prescripciones
+      if (updateDto.prescriptions !== undefined) {
+        if (recordEntry.prescriptions && recordEntry.prescriptions.length > 0) {
+          for (const pres of recordEntry.prescriptions) {
+            // Eliminar detalles de medicamentos primero
+            if (pres.medicationDetails && pres.medicationDetails.length > 0) {
+              await queryRunner.manager.remove(PrescriptionMedicationDetail, pres.medicationDetails);
+            }
+            // Luego eliminar la prescripción
+            await queryRunner.manager.remove(Prescription, pres);
+          }
+        }
+        for (const presDto of updateDto.prescriptions) {
+          const prescriptionEntity = queryRunner.manager.create(Prescription, {
+            clinicalRecordEntryId: entryId,
+            prescriptionDate: new Date(presDto.prescriptionDate),
+          });
+          const savedPrescription = await queryRunner.manager.save(Prescription, prescriptionEntity);
+          for (const medDto of presDto.medications) {
+            const presExists = await this.medPresentationRepository.findOneBy({id: medDto.medicationPresentationId});
+            if(!presExists) throw new BadRequestException(`Presentación de medicamento ID ${medDto.medicationPresentationId} no válida.`);
+            const medDetail = queryRunner.manager.create(PrescriptionMedicationDetail, {
+              prescriptionId: savedPrescription.id, ...medDto });
+            await queryRunner.manager.save(PrescriptionMedicationDetail, medDetail);
+          }
+        }
+      }
+
+      // 4. Manejar Resultados de Exámenes
+      if (updateDto.examResults !== undefined) {
+        if (recordEntry.examResults && recordEntry.examResults.length > 0) {
+            for (const examRes of recordEntry.examResults) {
+                if (examRes.parameterDetails && examRes.parameterDetails.length > 0) {
+                    await queryRunner.manager.remove(ExamResultDetail, examRes.parameterDetails);
+                }
+                await queryRunner.manager.remove(ExamResult, examRes);
+            }
+        }
+        for (const examDto of updateDto.examResults) {
+            const examResultEntity = queryRunner.manager.create(ExamResult, {
+                clinicalRecordEntryId: entryId,
+                generalExamName: examDto.generalExamName,
+                resultIssueDate: examDto.resultIssueDate ? new Date(examDto.resultIssueDate) : null,
+            });
+            const savedExamResult = await queryRunner.manager.save(ExamResult, examResultEntity);
+            for(const paramDto of examDto.parameters) {
+                const paramExists = await this.examParameterRepository.findOneBy({id: paramDto.examParameterId});
+                if(!paramExists) throw new BadRequestException(`Parámetro de exámen ID ${paramDto.examParameterId} no válido.`);
+                const examParamDetail = queryRunner.manager.create(ExamResultDetail, {
+                    examResultId: savedExamResult.id, ...paramDto });
+                await queryRunner.manager.save(ExamResultDetail, examParamDetail);
+            }
+        }
+      }
+
+ 
+      if (updateDto.attachments !== undefined) {
+
+        if (recordEntry.attachments && recordEntry.attachments.length > 0) {
+          await queryRunner.manager.remove(ClinicalRecordAttachment, recordEntry.attachments);
+        }
+        for (const attachDto of updateDto.attachments) {
+          const attachment = queryRunner.manager.create(ClinicalRecordAttachment, {
+            clinicalRecordEntryId: entryId, ...attachDto });
+          await queryRunner.manager.save(ClinicalRecordAttachment, attachment);
+        }
+      }
+
+      await queryRunner.commitTransaction();
+
+      return this.entryRepository.findOneOrFail({
+        where: { id: entryId },
+        relations: { 
+          eventType: true,
+          attendingDoctor: true,
+          attentionHealthEntity: true,
+          associatedAppointment: true,
+          attentionSpace: true,
+          diagnoses: { diagnosisCode: true },
+          prescriptions: {
+            medicationDetails: {
+              medicationPresentation: { generalMedication: true },
+            },
+          },
+          examResults: { parameterDetails: { examParameter: true } },
+          attachments: true,
+         }
+      });
+
+    } catch (error) { NotFoundException }
+    finally { await queryRunner.release(); }
+    throw new InternalServerErrorException('Flujo inesperado alcanzado en updateEntry.'); 
   }
 }
