@@ -20,6 +20,6 @@ import { AuthModule } from 'src/auth/auth.module';
   ],
   controllers: [PrescriptionController],
   providers: [PrescriptionService],
-  exports: [PrescriptionService] 
+  exports: [PrescriptionService], 
 })
 export class PrescriptionModule {}
