@@ -1,18 +1,17 @@
 import { Controller, Post, Body, Get, UseGuards, UsePipes, ValidationPipe, HttpStatus } from '@nestjs/common';
 import { MedicalEventTypeService } from './medical-event-type.service';
-import { CreateMedicalEventTypeDto } from './dto/create-medical-event-type.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { AllowedRoles } from '../auth/enums/allowed-roles.enum';
+import { CreateMedicalEventTypeDto } from './dto/create-medical-event-type.dto'; // Asegúrate que este DTO exista
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { AllowedRoles } from 'src/auth/enums/allowed-roles.enum';
 
-@Controller('medical-event-types')
-
+@Controller('medical-event-types') // <--- RUTA BASE DEL CONTROLADOR
 export class MedicalEventTypeController {
   constructor(private readonly eventTypeService: MedicalEventTypeService) {}
 
-  @Post()
-  @Roles(AllowedRoles.Administrativo) 
+  @Post() // <--- MÉTODO POST EN LA RUTA BASE (/medical-event-types)
+  @Roles(AllowedRoles.Administrativo) // O el rol que deba tener permiso
   @UseGuards(JwtAuthGuard, RolesGuard)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }))
   async create(@Body() createDto: CreateMedicalEventTypeDto) {
@@ -25,7 +24,7 @@ export class MedicalEventTypeController {
   }
 
   @Get()
-
+  // @UseGuards(JwtAuthGuard) // Podrías protegerlo si quieres
   async findAll() {
     const eventTypes = await this.eventTypeService.findAll();
     return {

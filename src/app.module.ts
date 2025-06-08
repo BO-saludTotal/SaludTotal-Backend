@@ -29,6 +29,7 @@ import { UserAssignedRoleModule } from './user-assigned-role/user-assigned-role.
 import { UserPhoneModule } from './user-phone/user-phone.module';
 import { AuthModule } from './auth/auth.module';
 import { MedicalHistoryModule } from './medical-history/medical-history.module';
+import { MedicalEventTypeModule } from './medical-event-type/medical-event-type.module';
 
 
 @Module({
@@ -38,7 +39,8 @@ import { MedicalHistoryModule } from './medical-history/medical-history.module';
     }), MedicalAppointmentModule, DoctorDetailModule, HealthEntityModule, 
     AdministrativeStaffDetailModule, DoctorHealthEntityAffiliationModule, DoctorSpecialtyCertificationModule, GeneralMedicationModule,
      GovernmentStaffDetailModule, HealthEntitySpecialtyModule, MedicalSpecialtyModule, PatientDetailsModule, PhysicalAttentionSpaceModule,
-      PrescriptionModule, RoleModule, UsersModule, UserAdressModule, UserAssignedRoleModule, UserPhoneModule, AuthModule, MedicalHistoryModule],
+      PrescriptionModule, RoleModule, UsersModule, UserAdressModule, UserAssignedRoleModule, UserPhoneModule, AuthModule, MedicalHistoryModule,
+      MedicalEventTypeModule, HealthEntityModule],
   controllers: [AppController, AuthController, UsersController],
   providers: [AppService, AuthService, UsersService],
 })

@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, InternalServerErrorException } from '@nestjs/common'; 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MedicalEventType } from '../entity/medicalEventType';
@@ -16,11 +16,30 @@ export class MedicalEventTypeService {
     if (existing) {
       throw new ConflictException(`El tipo de evento médico "${createDto.eventTypeName}" ya existe.`);
     }
-    const newEventType = this.eventTypeRepository.create(createDto);
-    return this.eventTypeRepository.save(newEventType);
+    try { // Añadir try-catch para errores de guardado
+        const newEventType = this.eventTypeRepository.create(createDto);
+        return await this.eventTypeRepository.save(newEventType);
+    } catch (error) {
+        console.error("Error guardando tipo de evento médico:", error);
+        throw new InternalServerErrorException('Error al guardar el tipo de evento médico.');
+    }
   }
 
   async findAll(): Promise<MedicalEventType[]> {
-    return this.eventTypeRepository.find();
+    try {
+        return await this.eventTypeRepository.find();
+    } catch (error) {
+        console.error("Error obteniendo todos los tipos de evento médico:", error);
+        throw new InternalServerErrorException('Error al obtener los tipos de evento médico.');
+    }
+  }
+
+ 
+  async findOne(id: number): Promise<MedicalEventType | null> { 
+    const eventType = await this.eventTypeRepository.findOneBy({ id });
+    if (!eventType) {
+
+    }
+    return eventType;
   }
 }
