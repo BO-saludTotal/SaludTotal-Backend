@@ -26,7 +26,9 @@ export class ClinicalRecordAttachmentService {
 
     const newAttachment = this.attachmentRepository.create({
       clinicalRecordEntryId: entryId,
-      ...createDto,
+      storagePath: createDto.storagePath, 
+      originalFileName: createDto.originalFileName,
+      mimeType: createDto.mimeType,
     });
 
     try {

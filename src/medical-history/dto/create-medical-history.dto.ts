@@ -94,13 +94,13 @@ export class CreateAttachmentDetailDto {
   mimeType?: string;
 
   @IsNotEmpty()
-  @IsString() // La ruta o el identificador del archivo guardado
-  storagePath: string; // Esto requerirá lógica de subida de archivos separada
+  @IsString() 
+  storagePath: string; 
 }
 
 // --- DTO Principal ---
 export class CreateClinicalRecordEntryDto {
-  // ... (campos existentes: attentionHealthEntityId, eventTypeId, etc.) ...
+
   @IsNotEmpty() @IsInt() attentionHealthEntityId: number;
   @IsOptional() @IsInt() attentionSpaceId?: number;
   @IsOptional() @IsInt() associatedAppointmentId?: number;
@@ -108,11 +108,11 @@ export class CreateClinicalRecordEntryDto {
   @IsNotEmpty() @IsDateString() attentionStartDateTime: string;
   @IsOptional() @IsString() @MaxLength(5000) narrativeSummary?: string;
 
-  // Nuevos campos para los detalles
+
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true }) // Valida cada objeto en el array
-  @Type(() => CreateDiagnosisDetailDto) // Ayuda a class-transformer a instanciar la clase correcta
+  @ValidateNested({ each: true }) 
+  @Type(() => CreateDiagnosisDetailDto)
   diagnoses?: CreateDiagnosisDetailDto[];
 
   @IsOptional()
