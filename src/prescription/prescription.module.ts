@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PrescriptionService } from './prescription.service';
 import { PrescriptionController } from './prescription.controller';
-import { Prescription } from '../entity/prescription.entity';
+import { Prescription } from '../entity/prescription';
 import { PrescriptionMedicationDetail } from '../entity/prescriptionMedicationDetail';
 import { ClinicalRecordEntry } from '../entity/clinicalRecordEntry';
 import { CommercialMedicationPresentation } from '../entity/commercialMedicationPresentation';
