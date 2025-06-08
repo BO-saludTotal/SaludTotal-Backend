@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { CreateClinicalRecordEntryDto } from './dto/create-clinical-record-entry.dto';
 import { UpdateClinicalRecordEntryDto } from './dto/update-clinical-record-entry.dto';
@@ -16,7 +17,10 @@ export class ClinicalRecordEntryService {
     return `This action returns a #${id} clinicalRecordEntry`;
   }
 
-  update(id: number, updateClinicalRecordEntryDto: UpdateClinicalRecordEntryDto) {
+  update(
+    id: number,
+    updateClinicalRecordEntryDto: UpdateClinicalRecordEntryDto,
+  ) {
     return `This action updates a #${id} clinicalRecordEntry`;
   }
 

@@ -7,13 +7,11 @@ import { Role } from '../entity/role';
 import { UserAssignedRole } from '../entity/userAssignedRole';
 import { UserPhone } from '../entity/userPhone';
 import { UserEmail } from '../entity/userEmail';
-import { inheritPropertyInitializers } from '@nestjs/mapped-types';
+//import { inheritPropertyInitializers } from '@nestjs/mapped-types';
 import { PatientDetail } from 'src/entity/patientDetail';
 import { DoctorDetail } from 'src/entity/doctorDetail';
 import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
 import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
-
-
 
 @Module({
   imports: [
@@ -26,7 +24,7 @@ import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail'
       PatientDetail,
       DoctorDetail,
       GovernmentStaffDetail,
-      AdministrativeStaffDetail
+      AdministrativeStaffDetail,
     ]),
   ],
   providers: [UsersService],

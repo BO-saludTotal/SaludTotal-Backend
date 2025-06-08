@@ -11,7 +11,9 @@ describe('ClinicalRecordEntryController', () => {
       providers: [ClinicalRecordEntryService],
     }).compile();
 
-    controller = module.get<ClinicalRecordEntryController>(ClinicalRecordEntryController);
+    controller = module.get<ClinicalRecordEntryController>(
+      ClinicalRecordEntryController,
+    );
   });
 
   it('should be defined', () => {

@@ -1,12 +1,10 @@
-
 import { IsString, IsOptional, MinLength, IsEmail } from 'class-validator';
 
 export class SearchUserQueryDto {
   @IsOptional()
   @IsString()
-  @MinLength(1) 
-  query?: string; 
-
+  @MinLength(1)
+  query?: string;
 
   @IsOptional()
   @IsString()
@@ -15,5 +13,4 @@ export class SearchUserQueryDto {
   @IsOptional()
   @IsEmail()
   email?: string;
-
 }

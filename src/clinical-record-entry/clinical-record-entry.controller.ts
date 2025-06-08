@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ClinicalRecordEntryService } from './clinical-record-entry.service';
 import { CreateClinicalRecordEntryDto } from './dto/create-clinical-record-entry.dto';
 import { UpdateClinicalRecordEntryDto } from './dto/update-clinical-record-entry.dto';
 
 @Controller('clinical-record-entry')
 export class ClinicalRecordEntryController {
-  constructor(private readonly clinicalRecordEntryService: ClinicalRecordEntryService) {}
+  constructor(
+    private readonly clinicalRecordEntryService: ClinicalRecordEntryService,
+  ) {}
 
   @Post()
   create(@Body() createClinicalRecordEntryDto: CreateClinicalRecordEntryDto) {
@@ -23,8 +33,14 @@ export class ClinicalRecordEntryController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClinicalRecordEntryDto: UpdateClinicalRecordEntryDto) {
-    return this.clinicalRecordEntryService.update(+id, updateClinicalRecordEntryDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateClinicalRecordEntryDto: UpdateClinicalRecordEntryDto,
+  ) {
+    return this.clinicalRecordEntryService.update(
+      +id,
+      updateClinicalRecordEntryDto,
+    );
   }
 
   @Delete(':id')

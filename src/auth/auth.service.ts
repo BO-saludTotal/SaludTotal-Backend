@@ -1,16 +1,15 @@
-
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { User } from '../entity/user'; 
+import { User } from '../entity/user';
 import { DoctorHealthEntityAffiliation } from 'src/entity/doctorHealthEntityAffiliation';
 import { AdministrativeStaffDetail } from 'src/entity/administrativeStaffDetail';
 import { GovernmentStaffDetail } from 'src/entity/governmentStaffDetail';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { LoginResponse } from './interfaces/login-response.interface';
+//import { LoginResponse } from './interfaces/login-response.interface';
 import { UsersService } from 'src/user/user.service';
 
 export interface LoginResponsePayload {
@@ -31,7 +30,7 @@ export interface JwtAuthPayload {
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) 
+    @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     @InjectRepository(DoctorHealthEntityAffiliation)
@@ -46,7 +45,7 @@ export class AuthService {
   async validateUser(username: string, plainPassword: string): Promise<User> {
     const user = await this.userRepository
       .createQueryBuilder('user')
-      .addSelect('user.passwordHash') 
+      .addSelect('user.passwordHash')
       .leftJoinAndSelect('user.assignedRoles', 'assignedRoles')
       .leftJoinAndSelect('assignedRoles.role', 'roleEntity')
       .where('user.username = :username', { username })
@@ -137,15 +136,12 @@ export class AuthService {
     };
   }
 
-  async register(createUserDto: CreateUserDto): Promise<User> { 
+  async register(createUserDto: CreateUserDto): Promise<User> {
     try {
-
       return await this.usersService.create(createUserDto);
     } catch (error) {
-
       console.error('Error durante el registro en AuthService:', error);
       throw error;
     }
   }
-
 }

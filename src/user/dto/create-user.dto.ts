@@ -13,7 +13,6 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-
 class CreateUserPhoneDto {
   @IsNotEmpty()
   @IsString()
@@ -57,11 +56,16 @@ export class CreateUserDto {
   roleId: number;
 
   @IsOptional()
-  @IsDateString({}, { message: 'La fecha de nacimiento debe ser una fecha válida.'})
-  fechaNacimiento?: string; 
+  @IsDateString(
+    {},
+    { message: 'La fecha de nacimiento debe ser una fecha válida.' },
+  )
+  fechaNacimiento?: string;
 
   @IsOptional()
-  @IsEnum(['Masculino', 'Femenino', 'Otro', 'PrefieroNoDecir'], { message: 'Género inválido.'})
+  @IsEnum(['Masculino', 'Femenino', 'Otro', 'PrefieroNoDecir'], {
+    message: 'Género inválido.',
+  })
   genero?: 'Masculino' | 'Femenino' | 'Otro' | 'PrefieroNoDecir';
 
   @IsOptional()
@@ -76,17 +80,19 @@ export class CreateUserDto {
   @IsString()
   numeroColegiado?: string;
 
-  @IsOptional() @IsString()
+  @IsOptional()
+  @IsString()
   cargoAdministrativo?: string;
-  @IsOptional() @IsInt()
-  entidadSaludIdAsignada?: number; 
+  @IsOptional()
+  @IsInt()
+  entidadSaludIdAsignada?: number;
 
-
-  @IsOptional() @IsString()
+  @IsOptional()
+  @IsString()
   nombreInstitucionGubernamental?: string;
-  @IsOptional() @IsString()
+  @IsOptional()
+  @IsString()
   cargoEnInstitucion?: string;
-
 
   @IsOptional()
   @IsArray()

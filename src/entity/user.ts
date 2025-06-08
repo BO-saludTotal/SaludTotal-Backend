@@ -97,11 +97,10 @@ export class User extends BaseEntity {
   @OneToMany(() => UserAssignedRole, (assignment) => assignment.user)
   assignedRoles: UserAssignedRole[];
 
-  @OneToOne(() => PatientDetail, detail => detail.user, {
-        cascade: ['insert', 'update']
-    })
+  @OneToOne(() => PatientDetail, (detail) => detail.user, {
+    cascade: ['insert', 'update'],
+  })
   patientDetail: PatientDetail;
-
 
   @OneToOne(() => DoctorDetail, (detail) => detail.user, {
     cascade: ['insert', 'update'],
