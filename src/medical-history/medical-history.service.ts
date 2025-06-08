@@ -308,15 +308,15 @@ export class MedicalHistoryService {
         }
       }
 
-      // 3. Manejar Prescripciones
+    
       if (updateDto.prescriptions !== undefined) {
         if (recordEntry.prescriptions && recordEntry.prescriptions.length > 0) {
           for (const pres of recordEntry.prescriptions) {
-            // Eliminar detalles de medicamentos primero
+       
             if (pres.medicationDetails && pres.medicationDetails.length > 0) {
               await queryRunner.manager.remove(PrescriptionMedicationDetail, pres.medicationDetails);
             }
-            // Luego eliminar la prescripción
+      
             await queryRunner.manager.remove(Prescription, pres);
           }
         }
@@ -336,7 +336,7 @@ export class MedicalHistoryService {
         }
       }
 
-      // 4. Manejar Resultados de Exámenes
+     
       if (updateDto.examResults !== undefined) {
         if (recordEntry.examResults && recordEntry.examResults.length > 0) {
             for (const examRes of recordEntry.examResults) {

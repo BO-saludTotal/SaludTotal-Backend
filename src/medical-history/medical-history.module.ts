@@ -21,27 +21,32 @@ import { ExamResultDetail } from '../entity/examResultDetail';
 import { ExamParameter } from '../entity/examParameter';
 import { ClinicalRecordAttachment } from '../entity/clinicalRecordAttachment';
 import { PrescriptionModule } from 'src/prescription/prescription.module';
+import { ExamResultModule } from 'src/exam-result/exam-result.module';
+import { ClinicalRecordAttachmentModule } from 'src/clinical-record-attachment/clinical-record-attachment.module';
 
 @Module({
   imports: [
     AuthModule,
+    ClinicalRecordAttachmentModule,
+    PrescriptionModule,
+    ExamResultModule,
     TypeOrmModule.forFeature([
       ClinicalRecordEntry,
-      User,
+      User, 
       MedicalEventType,
       HealthEntity,
       PhysicalAttentionSpace,
       MedicalAppointment,
       ClinicalRecordDiagnosis,
       DiagnosisCode,
-      Prescription, PrescriptionModule,
+      Prescription, 
       PrescriptionMedicationDetail,
       CommercialMedicationPresentation,
       GeneralMedication,
-      ExamResult,
+      ExamResult, 
       ExamResultDetail,
       ExamParameter,
-      ClinicalRecordAttachment,
+      ClinicalRecordAttachment
     ]),
   ],
   controllers: [MedicalHistoryController],
