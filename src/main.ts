@@ -2,7 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import 'reflect-metadata';
 
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'; // Importa
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common'; 
 
 async function bootstrap() {
   try {

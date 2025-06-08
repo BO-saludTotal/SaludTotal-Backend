@@ -20,6 +20,7 @@ import { ExamResult } from '../entity/examResult';
 import { ExamResultDetail } from '../entity/examResultDetail';
 import { ExamParameter } from '../entity/examParameter';
 import { ClinicalRecordAttachment } from '../entity/clinicalRecordAttachment';
+import { PrescriptionModule } from 'src/prescription/prescription.module';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { ClinicalRecordAttachment } from '../entity/clinicalRecordAttachment';
       MedicalAppointment,
       ClinicalRecordDiagnosis,
       DiagnosisCode,
-      Prescription,
+      Prescription, PrescriptionModule,
       PrescriptionMedicationDetail,
       CommercialMedicationPresentation,
       GeneralMedication,

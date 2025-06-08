@@ -1,4 +1,14 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateClinicalRecordAttachmentDto } from './create-clinical-record-attachment.dto';
+import { IsString, IsOptional, MaxLength } from 'class-validator';
 
-export class UpdateClinicalRecordAttachmentDto extends PartialType(CreateClinicalRecordAttachmentDto) {}
+export class UpdateClinicalRecordAttachmentDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  originalFileName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  mimeType?: string;
+
+}

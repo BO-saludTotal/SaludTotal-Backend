@@ -1,34 +1,61 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, HttpStatus,NotFoundException, UsePipes, ValidationPipe, HttpCode } from '@nestjs/common';
 import { PrescriptionService } from './prescription.service';
 import { CreatePrescriptionDto } from './dto/create-prescription.dto';
-import { UpdatePrescriptionDto } from './dto/update-prescription.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { AllowedRoles } from 'src/auth/enums/allowed-roles.enum';
 
-@Controller('prescription')
+@Controller('medical-history/entries/:entryId/prescriptions')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class PrescriptionController {
   constructor(private readonly prescriptionService: PrescriptionService) {}
 
   @Post()
-  create(@Body() createPrescriptionDto: CreatePrescriptionDto) {
-    return this.prescriptionService.create(createPrescriptionDto);
+  @Roles(AllowedRoles.Medico)
+  @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }))
+  async create(
+    @Param('entryId', ParseIntPipe) entryId: number,
+    @Body() createDto: CreatePrescriptionDto,
+  ) {
+    const prescription = await this.prescriptionService.create(entryId, createDto);
+    return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Prescripción añadida exitosamente.',
+        data: prescription
+    };
   }
 
   @Get()
-  findAll() {
-    return this.prescriptionService.findAll();
+  @Roles(AllowedRoles.Medico, AllowedRoles.Paciente)
+  async findAll(@Param('entryId', ParseIntPipe) entryId: number) {
+
+    const prescriptions = await this.prescriptionService.findAllByEntryId(entryId);
+    return { statusCode: HttpStatus.OK, data: prescriptions };
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.prescriptionService.findOne(+id);
+  @Get(':prescriptionId')
+  @Roles(AllowedRoles.Medico, AllowedRoles.Paciente)
+  async findOne(
+    @Param('entryId', ParseIntPipe) entryId: number, 
+    @Param('prescriptionId', ParseIntPipe) prescriptionId: number,
+  ) {
+    const prescription = await this.prescriptionService.findOne(prescriptionId);
+
+    if (prescription.clinicalRecordEntryId !== entryId) { 
+        throw new NotFoundException('Prescripción no encontrada para esta entrada de historial.');
+    }
+    return { statusCode: HttpStatus.OK, data: prescription };
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePrescriptionDto: UpdatePrescriptionDto) {
-    return this.prescriptionService.update(+id, updatePrescriptionDto);
-  }
+  @Delete(':prescriptionId')
+  @Roles(AllowedRoles.Medico)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(
+    @Param('entryId', ParseIntPipe) entryId: number, 
+    @Param('prescriptionId', ParseIntPipe) prescriptionId: number,
+  ) {
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.prescriptionService.remove(+id);
+    await this.prescriptionService.remove(prescriptionId);
   }
 }

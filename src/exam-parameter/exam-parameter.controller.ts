@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ExamParameterService } from './exam-parameter.service';
-import { CreateExamParameterDto } from './dto/create-exam-parameter.dto';
+import { CreateExamResultParameterDto } from './dto/create-exam-parameter.dto';
 import { UpdateExamParameterDto } from './dto/update-exam-parameter.dto';
 
 @Controller('exam-parameter')
@@ -8,7 +8,7 @@ export class ExamParameterController {
   constructor(private readonly examParameterService: ExamParameterService) {}
 
   @Post()
-  create(@Body() createExamParameterDto: CreateExamParameterDto) {
+  create(@Body() createExamParameterDto: CreateExamResultParameterDto) {
     return this.examParameterService.create(createExamParameterDto);
   }
 

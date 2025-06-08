@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateExamParameterDto } from './dto/create-exam-parameter.dto';
+import { CreateExamResultParameterDto } from './dto/create-exam-parameter.dto';
 import { UpdateExamParameterDto } from './dto/update-exam-parameter.dto';
 
 @Injectable()
 export class ExamParameterService {
-  create(createExamParameterDto: CreateExamParameterDto) {
+  create(createExamParameterDto: CreateExamResultParameterDto) {
     return 'This action adds a new examParameter';
   }
 

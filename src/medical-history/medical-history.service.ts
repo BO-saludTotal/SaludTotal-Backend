@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import {
   Injectable,
   NotFoundException,
   BadRequestException,
   InternalServerErrorException,
-  //ForbiddenException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -20,16 +20,18 @@ import { DiagnosisCode } from '../entity/diagnosisCode';
 import { Prescription } from '../entity/prescription';
 import { PrescriptionMedicationDetail } from '../entity/prescriptionMedicationDetail';
 import { CommercialMedicationPresentation } from '../entity/commercialMedicationPresentation';
-//import { GeneralMedication } from '../entity/generalMedication';
+import { ExamResultService } from 'src/exam-result/exam-result.service';
 import { ExamResult } from '../entity/examResult';
 import { ExamResultDetail } from '../entity/examResultDetail';
 import { ExamParameter } from '../entity/examParameter';
 import { ClinicalRecordAttachment } from '../entity/clinicalRecordAttachment';
+import { PrescriptionService } from 'src/prescription/prescription.service';
+import { ClinicalRecordAttachmentService } from 'src/clinical-record-attachment/clinical-record-attachment.service';
 
 @Injectable()
 export class MedicalHistoryService {
   constructor(
-    // --- Repositorios PRINCIPALES que faltaban ---
+
     @InjectRepository(ClinicalRecordEntry)
     private readonly entryRepository: Repository<ClinicalRecordEntry>,
     @InjectRepository(User)
@@ -42,7 +44,9 @@ export class MedicalHistoryService {
     private readonly spaceRepository: Repository<PhysicalAttentionSpace>,
     @InjectRepository(MedicalAppointment)
     private readonly appointmentRepository: Repository<MedicalAppointment>,
-    // --- DataSource y repositorios de detalle (estos ya los tenías) ---
+    private readonly prescriptionService: PrescriptionService,
+    private readonly examResultService: ExamResultService,
+    private readonly attachmentService: ClinicalRecordAttachmentService,
     private readonly dataSource: DataSource,
     @InjectRepository(ClinicalRecordDiagnosis)
     private readonly diagnosisRepository: Repository<ClinicalRecordDiagnosis>,
@@ -69,14 +73,14 @@ export class MedicalHistoryService {
     attendingDoctorId: string,
     dto: CreateClinicalRecordEntryDto,
   ): Promise<ClinicalRecordEntry> {
-    // Validar paciente
+
     const patient = await this.userRepository.findOneBy({ id: patientId });
     if (!patient) {
       throw new NotFoundException(
         `Paciente con ID ${patientId} no encontrado.`,
       );
     }
-    // Validar médico
+
     const doctor = await this.userRepository.findOneBy({
       id: attendingDoctorId,
     });
@@ -85,7 +89,7 @@ export class MedicalHistoryService {
         `Médico (usuario) con ID ${attendingDoctorId} no encontrado.`,
       );
     }
-    // Validar tipo de evento
+
     const eventType = await this.eventTypeRepository.findOneBy({
       id: dto.eventTypeId,
     });
@@ -94,7 +98,7 @@ export class MedicalHistoryService {
         `Tipo de Evento Médico con ID ${dto.eventTypeId} no encontrado.`,
       );
     }
-    // Validar entidad de salud
+
     const healthEntity = await this.healthEntityRepository.findOneBy({
       id: dto.attentionHealthEntityId,
     });
@@ -103,7 +107,7 @@ export class MedicalHistoryService {
         `Entidad de Salud con ID ${dto.attentionHealthEntityId} no encontrada.`,
       );
     }
-    // Validar espacio (opcional)
+
     if (dto.attentionSpaceId !== undefined && dto.attentionSpaceId !== null) {
       const space = await this.spaceRepository.findOneBy({
         id: dto.attentionSpaceId,
@@ -114,7 +118,7 @@ export class MedicalHistoryService {
         );
       }
     }
-    // Validar cita (opcional)
+
     if (
       dto.associatedAppointmentId !== undefined &&
       dto.associatedAppointmentId !== null
@@ -153,27 +157,45 @@ export class MedicalHistoryService {
       );
       const savedEntry = await queryRunner.manager.save(newEntry);
 
-      // Guardar Detalles (diagnoses, prescriptions, etc.)
+
       if (dto.diagnoses && dto.diagnoses.length > 0) {
-        /* ... tu lógica ... */
+        for (const diagDto of dto.diagnoses) {
+
+          const codeExists = await this.diagnosisCodeRepository.findOneBy({ cieCode: diagDto.cieCode });
+          if (!codeExists) throw new BadRequestException(`Código CIE ${diagDto.cieCode} no válido.`);
+
+          const diagnosis = queryRunner.manager.create(ClinicalRecordDiagnosis, {
+            clinicalRecordEntryId: savedEntry.id,
+
+            cieCode: diagDto.cieCode,
+            diagnosisType: diagDto.diagnosisType,
+          });
+          await queryRunner.manager.save(diagnosis);
+        }
       }
       if (dto.prescriptions && dto.prescriptions.length > 0) {
-        /* ... tu lógica ... */
+        	for (const presDto of dto.prescriptions) {
+          await this.prescriptionService.create(savedEntry.id, presDto);
+        }
       }
       if (dto.examResults && dto.examResults.length > 0) {
-        /* ... tu lógica ... */
+        for (const examDto of dto.examResults) {
+          await this.examResultService.create(savedEntry.id, examDto);
+        }
       }
       if (dto.attachments && dto.attachments.length > 0) {
-        /* ... tu lógica ... */
+        for (const attachDto of dto.attachments) {
+          await this.attachmentService.create(savedEntry.id, attachDto);
+        }
       }
 
       await queryRunner.commitTransaction();
 
       return this.entryRepository.findOneOrFail({
-        // Usa this.entryRepository aquí
+   
         where: { id: savedEntry.id },
         relations: {
-          /* ... tus relations para el GET ... */ eventType: true,
+          eventType: true,
           attendingDoctor: true,
           attentionHealthEntity: true,
           associatedAppointment: true,
@@ -189,7 +211,7 @@ export class MedicalHistoryService {
         },
       });
     } catch (error) {
-      /* ... tu manejo de error ... */
+
     } finally {
       await queryRunner.release();
     }
@@ -212,7 +234,7 @@ export class MedicalHistoryService {
       where: { patientUserId: patientId },
       order: { attentionStartDateTime: 'DESC' },
       relations: {
-        /* ... tus relations ... */ eventType: true,
+        eventType: true,
         attendingDoctor: true,
         attentionHealthEntity: true,
         associatedAppointment: true,
