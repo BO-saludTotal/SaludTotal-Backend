@@ -398,11 +398,12 @@ export class MedicalHistoryService {
       });
 
     } catch (error) {
-      console.error('Error en createEntry:', error);
-      await queryRunner.rollbackTransaction();
-      throw new InternalServerErrorException(
-        'Error al crear la entrada en la historia clínica.',
-      );
+  await queryRunner.rollbackTransaction();
+  throw new InternalServerErrorException({
+    message: 'Error en createEntry',
+    detail: error.message,
+    stack: error.stack,
+  });
     }
   }
 }
