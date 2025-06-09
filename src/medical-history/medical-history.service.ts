@@ -75,70 +75,47 @@ export class MedicalHistoryService {
   attendingDoctorId: string,
   dto: CreateClinicalRecordEntryDto,
 ): Promise<ClinicalRecordEntry> {
-  const patient = await this.userRepository.findOneBy({ id: patientId });
-  if (!patient) {
-    throw new NotFoundException(
-      `Paciente con ID ${patientId} no encontrado.`,
-    );
-  }
-
-  const doctor = await this.userRepository.findOneBy({
-    id: attendingDoctorId,
-  });
-  if (!doctor) {
-    throw new NotFoundException(
-      `Médico (usuario) con ID ${attendingDoctorId} no encontrado.`,
-    );
-  }
-
-  const eventType = await this.eventTypeRepository.findOneBy({
-    id: dto.eventTypeId,
-  });
-  if (!eventType) {
-    throw new BadRequestException(
-      `Tipo de Evento Médico con ID ${dto.eventTypeId} no encontrado.`,
-    );
-  }
-
-  const healthEntity = await this.healthEntityRepository.findOneBy({
-    id: dto.attentionHealthEntityId,
-  });
-  if (!healthEntity) {
-    throw new BadRequestException(
-      `Entidad de Salud con ID ${dto.attentionHealthEntityId} no encontrada.`,
-    );
-  }
-
-  if (dto.attentionSpaceId !== undefined && dto.attentionSpaceId !== null) {
-    const space = await this.spaceRepository.findOneBy({
-      id: dto.attentionSpaceId,
-    });
-    if (!space) {
-      throw new BadRequestException(
-        `Espacio de Atención con ID ${dto.attentionSpaceId} no encontrado.`,
-      );
-    }
-  }
-
-  if (
-    dto.associatedAppointmentId !== undefined &&
-    dto.associatedAppointmentId !== null
-  ) {
-    const appointment = await this.appointmentRepository.findOneBy({
-      id: dto.associatedAppointmentId,
-    });
-    if (!appointment) {
-      throw new BadRequestException(
-        `Cita Médica con ID ${dto.associatedAppointmentId} no encontrada.`,
-      );
-    }
-  }
-
   const queryRunner = this.dataSource.createQueryRunner();
   await queryRunner.connect();
   await queryRunner.startTransaction();
 
   try {
+    const patient = await this.userRepository.findOneBy({ id: patientId });
+    if (!patient) {
+      throw new NotFoundException(`Paciente con ID ${patientId} no encontrado.`);
+    }
+
+    const doctor = await this.userRepository.findOneBy({ id: attendingDoctorId });
+    if (!doctor) {
+      throw new NotFoundException(`Médico con ID ${attendingDoctorId} no encontrado.`);
+    }
+
+    const eventType = await this.eventTypeRepository.findOneBy({ id: dto.eventTypeId });
+    if (!eventType) {
+      throw new BadRequestException(`Tipo de evento con ID ${dto.eventTypeId} no encontrado.`);
+    }
+
+    const healthEntity = await this.healthEntityRepository.findOneBy({
+      id: dto.attentionHealthEntityId,
+    });
+    if (!healthEntity) {
+      throw new BadRequestException(`Entidad de salud con ID ${dto.attentionHealthEntityId} no encontrada.`);
+    }
+
+    if (dto.attentionSpaceId !== undefined && dto.attentionSpaceId !== null) {
+      const space = await this.spaceRepository.findOneBy({ id: dto.attentionSpaceId });
+      if (!space) {
+        throw new BadRequestException(`Espacio de atención con ID ${dto.attentionSpaceId} no encontrado.`);
+      }
+    }
+
+    if (dto.associatedAppointmentId !== undefined && dto.associatedAppointmentId !== null) {
+      const appointment = await this.appointmentRepository.findOneBy({ id: dto.associatedAppointmentId });
+      if (!appointment) {
+        throw new BadRequestException(`Cita médica con ID ${dto.associatedAppointmentId} no encontrada.`);
+      }
+    }
+
     const newEntryData: Partial<ClinicalRecordEntry> = {
       patientUserId: patientId,
       attendingDoctorUserId: attendingDoctorId,
@@ -152,21 +129,14 @@ export class MedicalHistoryService {
     if (dto.associatedAppointmentId !== undefined)
       newEntryData.associatedAppointmentId = dto.associatedAppointmentId;
 
-    const newEntry = queryRunner.manager.create(
-      ClinicalRecordEntry,
-      newEntryData,
-    );
+    const newEntry = queryRunner.manager.create(ClinicalRecordEntry, newEntryData);
     const savedEntry = await queryRunner.manager.save(newEntry);
 
     if (dto.diagnoses && dto.diagnoses.length > 0) {
       for (const diagDto of dto.diagnoses) {
-        const codeExists = await this.diagnosisCodeRepository.findOneBy({
-          cieCode: diagDto.cieCode,
-        });
+        const codeExists = await this.diagnosisCodeRepository.findOneBy({ cieCode: diagDto.cieCode });
         if (!codeExists)
-          throw new BadRequestException(
-            `Código CIE ${diagDto.cieCode} no válido.`,
-          );
+          throw new BadRequestException(`Código CIE ${diagDto.cieCode} no válido.`);
 
         const diagnosis = queryRunner.manager.create(ClinicalRecordDiagnosis, {
           clinicalRecordEntryId: savedEntry.id,
@@ -215,16 +185,16 @@ export class MedicalHistoryService {
         attachments: true,
       },
     });
+
   } catch (error) {
-    await queryRunner.rollbackTransaction(); 
-    console.error('Error al crear entrada clínica:', error);
-    throw new InternalServerErrorException(
-      'Error interno al crear entrada clínica javivivivi.',
-    );
+    await queryRunner.rollbackTransaction();
+    console.error('🔥 ERROR CAPTURADO en createEntry:', error);
+    throw new InternalServerErrorException('Ocurrió un error al crear la entrada clínica.');
   } finally {
     await queryRunner.release();
   }
 }
+
 
   async getPatientHistoryEntries(
     patientId: string,
