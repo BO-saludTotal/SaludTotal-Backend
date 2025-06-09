@@ -9,7 +9,7 @@ import {
 import { DataSource, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClinicalRecordEntry } from 'src/entity/clinicalRecordEntry';
-import { CreateClinicalRecordEntryDto } from './dto/create-medical-history.dto';
+import { CreateClinicalRecordEntryDto } from 'src/clinical-record-entry/dto/create-clinical-record-entry.dto';
 import { User } from '../entity/user';
 import { MedicalEventType } from '../entity/medicalEventType';
 import { HealthEntity } from '../entity/healthEntity';
