@@ -1,7 +1,7 @@
 
 import { IsNotEmpty, IsString, MaxLength, IsOptional, IsDateString, IsArray, ValidateNested, ArrayMinSize } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateExamResultParameterDto } from 'src/medical-history/dto/create-medical-history.dto';
+import { CreateExamResultParameterDto } from 'src/clinical-record-entry/dto/create-clinical-record-entry.dto';
 
 export class CreateExamResultDto {
   @IsNotEmpty({ message: 'El nombre general del examen es requerido.'})
