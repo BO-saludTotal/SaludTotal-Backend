@@ -397,8 +397,16 @@ export class MedicalHistoryService {
          }
       });
 
-    } catch (error) { NotFoundException }
-    finally { await queryRunner.release(); }
-    throw new InternalServerErrorException('Flujo inesperado alcanzado en updateEntry.'); 
+    } catch (error) {
+      console.error('Error en createEntry:', error);
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(
+        'Error al crear la entrada en la historia clínica.',
+      );
+    }
   }
 }
+
+
+
+
