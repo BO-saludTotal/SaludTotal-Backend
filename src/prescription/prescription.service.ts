@@ -22,23 +22,22 @@ export class PrescriptionService {
   ) {}
 
   async create(
-    entryId: number,
-    createDto: CreatePrescriptionDto,
-  ): Promise<Prescription> {
-    const recordEntry = await this.entryRepository.findOneBy({ id: entryId });
-    if (!recordEntry) {
-      throw new NotFoundException(`Entrada de historial con ID ${entryId} no encontrada.`);
-    }
+  recordEntry: ClinicalRecordEntry, // <--- ACEPTA LA ENTIDAD COMPLETA
+  createDto: CreatePrescriptionDto,
+): Promise<Prescription> {
+  // Ya no necesitas buscar recordEntry aquí, ya lo tienes
+  // if (!recordEntry) { ... } // Esta validación se hace en el servicio que llama
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+  const queryRunner = this.dataSource.createQueryRunner(); // Usar su propia transacción o participar en la existente
+  await queryRunner.connect();
+  await queryRunner.startTransaction(); // O usar el queryRunner del servicio padre si se pasa
 
-    try {
-      const newPrescriptionEntity = queryRunner.manager.create(Prescription, {
-        clinicalRecordEntryId: entryId,
-        prescriptionDate: new Date(createDto.prescriptionDate),
-      });
+  try {
+    const newPrescriptionEntity = queryRunner.manager.create(Prescription, {
+      // clinicalRecordEntryId: recordEntry.id, // Puedes usar el ID
+      clinicalRecordEntry: recordEntry,      // O asignar la entidad directamente si la relación está configurada
+      prescriptionDate: new Date(createDto.prescriptionDate),
+    });
       const savedPrescription = await queryRunner.manager.save(newPrescriptionEntity);
 
       const medicationDetails: PrescriptionMedicationDetail[] = [];
