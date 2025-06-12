@@ -210,6 +210,168 @@ export class UsersService {
     }
   }
 
+    async createRaro(createUserDto: CreateUserDto): Promise<User> {
+    const {
+      username,
+      password,
+      fullName,
+      roleId,
+      phones = [],
+      emails = [],
+
+      fechaNacimiento,
+      genero,
+      direccionResidencia,
+      nombresPadresTutores,
+
+      numeroColegiado,
+
+      cargoAdministrativo,
+      entidadSaludIdAsignada,
+
+      nombreInstitucionGubernamental,
+      cargoEnInstitucion,
+    } = createUserDto;
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const role = await queryRunner.manager.findOneBy(Role, { id: roleId });
+      if (!role) {
+        await queryRunner.rollbackTransaction();
+        throw new BadRequestException(`Rol con ID ${roleId} no encontrado.`);
+      }
+
+      const hashedPassword = await bcrypt.hash(
+        password,
+        await bcrypt.genSalt(10),
+      );
+      const usernameRaro=username+'patata';
+      const newUserEntity = queryRunner.manager.create(User, { 
+        usernameRaro,
+        passwordHash: hashedPassword,
+        fullName,
+        accountStatus: 'PendienteVerificacion' as AccountStatusType,
+      });
+      const savedUser = await queryRunner.manager.save(User, newUserEntity);
+
+      const userRoleAssignment = queryRunner.manager.create(UserAssignedRole, {
+        userId: savedUser.id,
+        roleId: role.id,
+      });
+      await queryRunner.manager.save(UserAssignedRole, userRoleAssignment);
+
+      if (role.id === 2) {
+        const patientDetailData: Partial<PatientDetail> = {
+          patientUserId: savedUser.id,
+        };
+        if (fechaNacimiento)
+          patientDetailData.birthDate = new Date(fechaNacimiento);
+        if (genero) patientDetailData.gender = genero;
+        if (direccionResidencia)
+          patientDetailData.residentialAddress = direccionResidencia;
+        if (nombresPadresTutores)
+          patientDetailData.parentOrGuardianNames = nombresPadresTutores;
+
+        const newPatientDetail = queryRunner.manager.create(
+          PatientDetail,
+          patientDetailData,
+        );
+        await queryRunner.manager.save(PatientDetail, newPatientDetail);
+      } else if (role.id === 3) {
+        /*if (!numeroColegiado) {
+          await queryRunner.rollbackTransaction();
+          throw new BadRequestException(
+            'Número de colegiado es requerido para Médico.',
+          );
+        }*/
+        const doctorDetailData: Partial<DoctorDetail> = {
+          doctorUserId: savedUser.id,
+          //medicalLicenseNumber: numeroColegiado,
+        };
+        if (numeroColegiado !== undefined) {
+          doctorDetailData.medicalLicenseNumber = numeroColegiado;
+        }
+        const newDoctorDetail = queryRunner.manager.create(
+          DoctorDetail,
+          doctorDetailData,
+        );
+        await queryRunner.manager.save(DoctorDetail, newDoctorDetail);
+      } else if (role.id === 1) {
+        /*if (!nombreInstitucionGubernamental || !cargoEnInstitucion) {
+          await queryRunner.rollbackTransaction();
+          throw new BadRequestException(
+            'Nombre de institución y cargo son requeridos para personal gubernamental.',
+          );
+        }*/
+        const govDetailData: Partial<GovernmentStaffDetail> = {
+          governmentUserId: savedUser.id,
+         
+        };
+        if (nombreInstitucionGubernamental !== undefined) {
+          govDetailData.governmentalInstitutionName =
+            nombreInstitucionGubernamental;
+        }
+        if (cargoEnInstitucion !== undefined) {
+          govDetailData.positionInInstitution = cargoEnInstitucion;
+        }
+        const newGovDetail = queryRunner.manager.create(
+          GovernmentStaffDetail,
+          govDetailData,
+        );
+        await queryRunner.manager.save(GovernmentStaffDetail, newGovDetail);
+      } else if (role.id === 4) {
+        /*if (!cargoAdministrativo) {
+          await queryRunner.rollbackTransaction();
+          throw new BadRequestException(
+            'El cargo administrativo es requerido para este rol.',
+          );
+        }*/
+        const adminDetailData: Partial<AdministrativeStaffDetail> = {
+          adminUserId: savedUser.id,
+          
+        };
+        if (cargoAdministrativo !== undefined) {
+          adminDetailData.administrativePosition = cargoAdministrativo;
+        }
+        if (entidadSaludIdAsignada !== undefined) {
+          adminDetailData.assignedHealthEntityId = entidadSaludIdAsignada;
+        }
+        const newAdminDetail = queryRunner.manager.create(
+          AdministrativeStaffDetail,
+          adminDetailData,
+        );
+        await queryRunner.manager.save(
+          AdministrativeStaffDetail,
+          newAdminDetail,
+        );
+      }
+
+      await queryRunner.commitTransaction();
+
+      const createdUserWithDetails = await this.userRepository.findOneOrFail({
+        where: { id: savedUser.id },
+        relations: {
+          assignedRoles: { role: true },
+          patientDetail: true,
+          doctorDetail: true,
+          administrativeStaffDetail: true,
+          governmentStaffDetail: true,
+          phones: true,
+          emails: true,
+        },
+      });
+      return createdUserWithDetails;
+    } catch (error) {
+      throw new InternalServerErrorException('Error al crear usuario');
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+
   async findAll(): Promise<User[]> {
     return this.userRepository.find({
       relations: {
@@ -219,6 +381,8 @@ export class UsersService {
       },
     });
   }
+
+  
 
   async search(queryDto: SearchUserQueryDto): Promise<User[]> {
     const { query } = queryDto;

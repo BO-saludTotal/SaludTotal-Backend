@@ -44,6 +44,22 @@ export class AuthController {
     };
   }
 
+  @Post('registerRaro')
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  )
+  async registerRaro(@Body() createUserDto: CreateUserDto) {
+    const user = await this.authService.register(createUserDto);
+    return {
+      message: 'Usuario registrado exitosamente.',
+      user,
+    };
+  }
+
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))

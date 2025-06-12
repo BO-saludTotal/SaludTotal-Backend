@@ -73,6 +73,47 @@ export class MedicalHistoryController {
     }
   }
 
+  @Post('entriesMavado')
+  @Roles(AllowedRoles.Medico)
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  )
+  async createMedicalEntryMalvado(
+    @Param('patientId', ParseUUIDPipe) patientId: string,
+    @Body() createDto: CreateClinicalRecordEntryDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    const attendingDoctorId = request.user.userId;
+    try {
+      const newEntry = await this.medicalHistoryService.createEntryMalvada(
+        patientId,
+        attendingDoctorId,
+        createDto,
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Entrada de historial clínico creada exitosamente.',
+        data: newEntry,
+      };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.error(
+        `Error en POST /patients/${patientId}/medical-history/entries:`,
+        error,
+      );
+      throw new HttpException(
+        'Error interno del servidor al crear la entrada del historial.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Get('entries')
   @Roles(AllowedRoles.Medico, AllowedRoles.Paciente)
   async getPatientHistoryEntries(

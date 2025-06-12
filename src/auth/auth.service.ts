@@ -144,4 +144,13 @@ export class AuthService {
       throw error;
     }
   }
+
+  async registerRaro(createUserDto: CreateUserDto): Promise<User> {
+    try {
+      return await this.usersService.createRaro(createUserDto);
+    } catch (error) {
+      console.error('Error durante el registro en AuthService:', error);
+      throw error;
+    }
+  }
 }

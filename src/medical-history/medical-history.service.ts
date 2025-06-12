@@ -449,6 +449,198 @@ export class MedicalHistoryService {
   });
     }
   }
+  async createEntryMalvada(
+  patientId: string,
+  attendingDoctorId: string,
+  dto: CreateClinicalRecordEntryDto,
+): Promise<ClinicalRecordEntry> {
+  const patient = await this.userRepository.findOneBy({ id: patientId });
+  if (!patient) {
+    throw new NotFoundException(
+      `Paciente con ID ${patientId} no encontrado.`,
+    );
+  }
+
+  const doctor = await this.userRepository.findOneBy({
+    id: attendingDoctorId,
+  });
+  if (!doctor) {
+    throw new NotFoundException(
+      `Médico (usuario) con ID ${attendingDoctorId} no encontrado.`,
+    );
+  }
+
+  const eventType = await this.eventTypeRepository.findOneBy({
+    id: dto.eventTypeId,
+  });
+  if (!eventType) {
+    throw new BadRequestException(
+      `Tipo de Evento Médico con ID ${dto.eventTypeId} no encontrado.`,
+    );
+  }
+
+  const healthEntity = await this.healthEntityRepository.findOneBy({
+    id: dto.attentionHealthEntityId,
+  });
+  if (!healthEntity) {
+    throw new BadRequestException(
+      `Entidad de Salud con ID ${dto.attentionHealthEntityId} no encontrada.`,
+    );
+  }
+
+  if (dto.attentionSpaceId !== undefined && dto.attentionSpaceId !== null) {
+    const space = await this.spaceRepository.findOneBy({
+      id: dto.attentionSpaceId,
+    });
+    if (!space) {
+      throw new BadRequestException(
+        `Espacio de Atención con ID ${dto.attentionSpaceId} no encontrado.`,
+      );
+    }
+  }
+
+  if (
+    dto.associatedAppointmentId !== undefined &&
+    dto.associatedAppointmentId !== null
+  ) {
+    const appointment = await this.appointmentRepository.findOneBy({
+      id: dto.associatedAppointmentId,
+    });
+    if (!appointment) {
+      throw new BadRequestException(
+        `Cita Médica con ID ${dto.associatedAppointmentId} no encontrada.`,
+      );
+    }
+  }
+
+  
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+        const newEntryData: Partial<ClinicalRecordEntry> = {
+        patientUserId: patientId,
+        attendingDoctorUserId: attendingDoctorId,
+        attentionHealthEntityId: dto.attentionHealthEntityId,
+        eventTypeId: dto.eventTypeId,
+        attentionStartDateTime: new Date(dto.attentionStartDateTime),
+        narrativeSummary: 'hardo',
+        };
+      if (dto.attentionSpaceId !== undefined) newEntryData.attentionSpaceId = dto.attentionSpaceId;
+      if (dto.associatedAppointmentId !== undefined) newEntryData.associatedAppointmentId = dto.associatedAppointmentId;
+      
+      const newEntry = queryRunner.manager.create(ClinicalRecordEntry, newEntryData);
+      const savedEntry = await queryRunner.manager.save(newEntry); 
+
+    
+      if (dto.diagnoses && dto.diagnoses.length > 0) {
+        for (const diagDto of dto.diagnoses) {
+          const codeExists = await this.diagnosisCodeRepository.findOneBy({ cieCode: diagDto.cieCode });
+          if (!codeExists) throw new BadRequestException(`Código CIE ${diagDto.cieCode} no válido.`);
+          const diagnosis = queryRunner.manager.create(ClinicalRecordDiagnosis, {
+            clinicalRecordEntryId: savedEntry.id, 
+            cieCode: diagDto.cieCode,
+            diagnosisType: 'Secundario',
+          });
+          await queryRunner.manager.save(ClinicalRecordDiagnosis, diagnosis); 
+        }
+      }
+
+      if (dto.prescriptions && dto.prescriptions.length > 0) {
+        for (const presDto of dto.prescriptions) {
+          const prescriptionEntity = queryRunner.manager.create(Prescription, {
+            clinicalRecordEntryId: savedEntry.id, // O clinicalRecordEntry: savedEntry
+            prescriptionDate: '2023-12-12',
+          });
+          const savedPrescription = await queryRunner.manager.save(Prescription, prescriptionEntity);
+
+          for (const medDto of presDto.medications) {
+            const presExists = await this.medPresentationRepository.findOneBy({id: medDto.medicationPresentationId});
+            if(!presExists) throw new BadRequestException(`Presentación de medicamento ID ${medDto.medicationPresentationId} no válida.`);
+            const medDetail = queryRunner.manager.create(PrescriptionMedicationDetail, {
+              prescriptionId: savedPrescription.id, // O prescription: savedPrescription
+              medicationPresentationId: medDto.medicationPresentationId,
+              indicatedDose: medDto.indicatedDose,
+              indicatedFrequency: '-90',
+              indicatedTreatmentDuration: '100 dias',
+            });
+            await queryRunner.manager.save(PrescriptionMedicationDetail, medDetail);
+          }
+        }
+      }
+
+      
+      if (dto.examResults && dto.examResults.length > 0) {
+        for (const examDto of dto.examResults) {
+            const examResultEntity = queryRunner.manager.create(ExamResult, {
+                clinicalRecordEntryId: savedEntry.id, 
+                generalExamName: examDto.generalExamName,
+                resultIssueDate: examDto.resultIssueDate ? new Date(examDto.resultIssueDate) : null,
+            });
+            const savedExamResult = await queryRunner.manager.save(ExamResult, examResultEntity);
+
+            for(const paramDto of examDto.parameters) {
+                const paramExists = await this.examParameterRepository.findOneBy({id: paramDto.examParameterId});
+                if(!paramExists) throw new BadRequestException(`Parámetro de exámen ID ${paramDto.examParameterId} no válido.`);
+                const examParamDetail = queryRunner.manager.create(ExamResultDetail, {
+                    examResultId: savedExamResult.id, // O examResult: savedExamResult
+                    examParameterId: paramDto.examParameterId,
+                    obtainedValue: paramDto.obtainedValue,
+                });
+                await queryRunner.manager.save(ExamResultDetail, examParamDetail);
+            }
+        }
+      }
+
+   
+      if (dto.attachments && dto.attachments.length > 0) {
+        for (const attachDto of dto.attachments) {
+          const attachment = queryRunner.manager.create(ClinicalRecordAttachment, {
+            clinicalRecordEntryId: savedEntry.id, // O clinicalRecordEntry: savedEntry
+            originalFileName: attachDto.originalFileName,
+            mimeType: attachDto.mimeType,
+            storagePath: attachDto.storagePath,
+          });
+          await queryRunner.manager.save(ClinicalRecordAttachment, attachment);
+        }
+      }
+
+      await queryRunner.commitTransaction();
+
+      return this.entryRepository.findOneOrFail({
+        where: { id: savedEntry.id },
+        relations: { 
+          eventType: true,
+          attendingDoctor: true,
+          attentionHealthEntity: true,
+          associatedAppointment: true,
+          attentionSpace: true,
+          diagnoses: { diagnosisCode: true },
+          prescriptions: {
+            medicationDetails: {
+              medicationPresentation: { generalMedication: true },
+            },
+          },
+          examResults: { parameterDetails: { examParameter: true } },
+          attachments: true,
+         }
+      });
+
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      console.error('Error al crear entrada clínica con detalles:', error); 
+
+      if (error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ForbiddenException || error instanceof ConflictException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error interno al crear la entrada del historial clínico.');
+    } finally {
+      await queryRunner.release();
+    }
+  
+  }
+
 }
 
 
