@@ -17,7 +17,7 @@ export class GovernmentStaffDetail extends BaseEntity {
     name: 'NombreInstitucionGubernamental',
     type: 'varchar',
     length: 255,
-    nullable: false,
+    nullable: true, //perdoname Branko
   })
   governmentalInstitutionName: string;
 
@@ -25,7 +25,7 @@ export class GovernmentStaffDetail extends BaseEntity {
     name: 'CargoEnInstitucion',
     type: 'varchar',
     length: 150,
-    nullable: false,
+    nullable: true, //perdoname Branko
   })
   positionInInstitution: string;
 
