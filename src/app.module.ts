@@ -30,6 +30,7 @@ import { UserPhoneModule } from './user-phone/user-phone.module';
 import { AuthModule } from './auth/auth.module';
 import { MedicalHistoryModule } from './medical-history/medical-history.module';
 import { MedicalEventTypeModule } from './medical-event-type/medical-event-type.module';
+import { AvailabilitySlotModule } from './availability-slot/availability-slot.module';
 
 
 @Module({
@@ -40,7 +41,7 @@ import { MedicalEventTypeModule } from './medical-event-type/medical-event-type.
     AdministrativeStaffDetailModule, DoctorHealthEntityAffiliationModule, DoctorSpecialtyCertificationModule, GeneralMedicationModule,
      GovernmentStaffDetailModule, HealthEntitySpecialtyModule, MedicalSpecialtyModule, PatientDetailsModule, PhysicalAttentionSpaceModule,
       PrescriptionModule, RoleModule, UsersModule, UserAdressModule, UserAssignedRoleModule, UserPhoneModule, AuthModule, MedicalHistoryModule,
-      MedicalEventTypeModule, HealthEntityModule],
+      MedicalEventTypeModule, AvailabilitySlotModule, HealthEntityModule],
   controllers: [AppController, AuthController, UsersController],
   providers: [AppService, AuthService, UsersService],
 })
