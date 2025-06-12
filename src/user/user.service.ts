@@ -1,4 +1,4 @@
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Injectable,
   ConflictException,
@@ -7,7 +7,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, ILike, Or, Brackets } from 'typeorm';
+import { Repository, DataSource, /*ILike, Or,*/ Brackets } from 'typeorm';
 import { User, AccountStatusType } from '../entity/user';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -71,8 +71,6 @@ export class UsersService {
       cargoEnInstitucion,
     } = createUserDto;
 
-
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -109,7 +107,7 @@ export class UsersService {
         };
         if (fechaNacimiento)
           patientDetailData.birthDate = new Date(fechaNacimiento);
-        if (genero) patientDetailData.gender = genero as any;
+        if (genero) patientDetailData.gender = genero;
         if (direccionResidencia)
           patientDetailData.residentialAddress = direccionResidencia;
         if (nombresPadresTutores)
@@ -121,49 +119,62 @@ export class UsersService {
         );
         await queryRunner.manager.save(PatientDetail, newPatientDetail);
       } else if (role.id === 3) {
-        if (!numeroColegiado) {
+        /*if (!numeroColegiado) {
           await queryRunner.rollbackTransaction();
           throw new BadRequestException(
             'Número de colegiado es requerido para Médico.',
           );
-        }
+        }*/
         const doctorDetailData: Partial<DoctorDetail> = {
           doctorUserId: savedUser.id,
-          medicalLicenseNumber: numeroColegiado,
+          //medicalLicenseNumber: numeroColegiado,
         };
+        if (numeroColegiado !== undefined) {
+          doctorDetailData.medicalLicenseNumber = numeroColegiado;
+        }
         const newDoctorDetail = queryRunner.manager.create(
           DoctorDetail,
           doctorDetailData,
         );
         await queryRunner.manager.save(DoctorDetail, newDoctorDetail);
       } else if (role.id === 1) {
-        if (!nombreInstitucionGubernamental || !cargoEnInstitucion) {
+        /*if (!nombreInstitucionGubernamental || !cargoEnInstitucion) {
           await queryRunner.rollbackTransaction();
           throw new BadRequestException(
             'Nombre de institución y cargo son requeridos para personal gubernamental.',
           );
-        }
+        }*/
         const govDetailData: Partial<GovernmentStaffDetail> = {
           governmentUserId: savedUser.id,
-          governmentalInstitutionName: nombreInstitucionGubernamental,
-          positionInInstitution: cargoEnInstitucion,
+          //governmentalInstitutionName: nombreInstitucionGubernamental,
+          //positionInInstitution: cargoEnInstitucion,
         };
+        if (nombreInstitucionGubernamental !== undefined) {
+          govDetailData.governmentalInstitutionName =
+            nombreInstitucionGubernamental;
+        }
+        if (cargoEnInstitucion !== undefined) {
+          govDetailData.positionInInstitution = cargoEnInstitucion;
+        }
         const newGovDetail = queryRunner.manager.create(
           GovernmentStaffDetail,
           govDetailData,
         );
         await queryRunner.manager.save(GovernmentStaffDetail, newGovDetail);
       } else if (role.id === 4) {
-        if (!cargoAdministrativo) {
+        /*if (!cargoAdministrativo) {
           await queryRunner.rollbackTransaction();
           throw new BadRequestException(
             'El cargo administrativo es requerido para este rol.',
           );
-        }
+        }*/
         const adminDetailData: Partial<AdministrativeStaffDetail> = {
           adminUserId: savedUser.id,
-          administrativePosition: cargoAdministrativo,
+          //administrativePosition: cargoAdministrativo,
         };
+        if (cargoAdministrativo !== undefined) {
+          adminDetailData.administrativePosition = cargoAdministrativo;
+        }
         if (entidadSaludIdAsignada !== undefined) {
           adminDetailData.assignedHealthEntityId = entidadSaludIdAsignada;
         }
