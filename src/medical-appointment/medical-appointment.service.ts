@@ -6,6 +6,9 @@ import { CreateMedicalAppointmentDto } from './dto/create-medical-appointment.dt
 import { AvailabilitySlot, SlotStatus } from '../entity/availabilitySlot'; 
 import { User } from '../entity/user'; 
 import { AppointmentChangeHistory } from '../entity/appointmentChangeHistory'; 
+import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto'; 
+import { CancelAppointmentDto } from './dto/cancel-appointment.dto';   
+import { AllowedRoles } from '../auth/enums/allowed-roles.enum';   
 
 @Injectable()
 export class MedicalAppointmentService {
@@ -14,15 +17,15 @@ export class MedicalAppointmentService {
     private readonly appointmentRepository: Repository<MedicalAppointment>,
     @InjectRepository(AvailabilitySlot)
     private readonly slotRepository: Repository<AvailabilitySlot>,
-    @InjectRepository(User) // Para validar al paciente
+    @InjectRepository(User) 
     private readonly userRepository: Repository<User>,
     @InjectRepository(AppointmentChangeHistory)
     private readonly changeHistoryRepository: Repository<AppointmentChangeHistory>,
-    private readonly dataSource: DataSource, // Para transacciones
+    private readonly dataSource: DataSource, 
   ) {}
 
   async create(
-    patientUserId: string, // UUID del paciente autenticado
+    patientUserId: string, 
     createDto: CreateMedicalAppointmentDto,
   ): Promise<MedicalAppointment> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -30,14 +33,12 @@ export class MedicalAppointmentService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. Validar que el usuario paciente exista (aunque JwtAuthGuard ya lo hizo, una doble verificación no daña)
+
       const patient = await queryRunner.manager.findOneBy(User, { id: patientUserId });
       if (!patient) {
         throw new NotFoundException(`Usuario paciente con ID ${patientUserId} no encontrado.`);
       }
-      // Aquí podrías verificar explícitamente si el usuario tiene el rol "Paciente" si es necesario.
 
-      // 2. Obtener y validar el slot de disponibilidad
       const slot = await queryRunner.manager.findOneBy(AvailabilitySlot, { id: createDto.slotId });
       if (!slot) {
         throw new NotFoundException(`Slot de disponibilidad con ID ${createDto.slotId} no encontrado.`);
@@ -46,25 +47,25 @@ export class MedicalAppointmentService {
         throw new BadRequestException(`El slot con ID ${createDto.slotId} ya no está disponible.`);
       }
 
-      // 3. Actualizar el estado del slot a 'Confirmado' (o 'Reservado')
-      slot.status = 'Confirmado' as SlotStatus; // O 'Reservado' si hay un paso de confirmación
+
+      slot.status = 'Confirmado' as SlotStatus; 
       await queryRunner.manager.save(AvailabilitySlot, slot);
 
-      // 4. Crear la nueva cita médica
+      
       const newAppointmentEntity = queryRunner.manager.create(MedicalAppointment, {
-        slotId: slot.id, // o slot: slot si la relación está configurada para aceptar la entidad
+        slotId: slot.id, 
         patientUserId: patientUserId,
-        // requestDateTime se maneja por @CreateDateColumn en la entidad MedicalAppointment
-        status: 'Confirmada' as AppointmentStatusType, // Estado inicial
+       
+        status: 'Confirmada' as AppointmentStatusType, 
         patientReason: createDto.patientReason,
       });
       const savedAppointment = await queryRunner.manager.save(MedicalAppointment, newAppointmentEntity);
 
-      // 5. (Opcional pero recomendado) Crear entrada en HistorialCambiosCita
+     
       const historyEntry = queryRunner.manager.create(AppointmentChangeHistory, {
         appointmentId: savedAppointment.id,
-        changedByUserId: patientUserId, // El paciente mismo creó la cita
-        // changeDateTime se maneja por @CreateDateColumn
+        changedByUserId: patientUserId, 
+       
         newStatus: savedAppointment.status,
         reasonForChangeOrCancellation: 'Creación de cita',
       });
@@ -72,18 +73,18 @@ export class MedicalAppointmentService {
 
       await queryRunner.commitTransaction();
 
-      // Devolver la cita creada, cargando las relaciones que el frontend podría necesitar
+     
       return this.appointmentRepository.findOneOrFail({
         where: { id: savedAppointment.id },
         relations: {
-          slot: { // Detalles del slot reservado
-            doctorUser: { doctorDetail: true }, // Info del médico
+          slot: { 
+            doctorUser: { doctorDetail: true }, 
             healthEntity: true,
             attentionSpace: true,
             offeredAttentionType: true,
           },
-          patientUser: { patientDetail: true }, // Info del paciente
-          // changeHistory: true, // Opcional cargar el historial de cambios aquí
+          patientUser: { patientDetail: true }, 
+    
         },
       });
 
@@ -99,5 +100,193 @@ export class MedicalAppointmentService {
     }
   }
 
-  // Aquí irían los métodos para findAllByPatient, findOne, update (reschedule), cancel, etc.
+  async findMyAppointments(patientUserId: string): Promise<MedicalAppointment[]> {
+    return this.appointmentRepository.find({
+      where: { patientUserId: patientUserId },
+      relations: { /* ... las mismas relaciones que en create para consistencia ... */
+        slot: { doctorUser: { doctorDetail: true }, healthEntity: true, attentionSpace: true, offeredAttentionType: true },
+        patientUser: { patientDetail: true },
+      },
+      order: { requestDateTime: 'DESC' }, // O por slot.startDateTime
+    });
+  }
+
+  async findOne(appointmentId: number, requestingUserId: string, userRoles: string[]): Promise<MedicalAppointment> {
+    const appointment = await this.appointmentRepository.findOne({
+      where: { id: appointmentId },
+      relations: { /* ... relaciones completas ... */
+        slot: { doctorUser: { doctorDetail: true }, healthEntity: true, attentionSpace: true, offeredAttentionType: true },
+        patientUser: { patientDetail: true },
+        changeHistory: { changedByUser: true }, // Para ver quién hizo cambios
+      },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException(`Cita con ID ${appointmentId} no encontrada.`);
+    }
+
+
+    if (userRoles.includes(AllowedRoles.Paciente as string) && appointment.patientUserId !== requestingUserId) {
+      throw new ForbiddenException('No tienes permiso para ver esta cita.');
+    }
+   
+
+    return appointment;
+  }
+
+  async reschedule(
+    appointmentId: number,
+    patientUserId: string, 
+    rescheduleDto: RescheduleAppointmentDto,
+  ): Promise<MedicalAppointment> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const appointment = await queryRunner.manager.findOne(MedicalAppointment, {
+        where: { id: appointmentId, patientUserId: patientUserId }, 
+        relations: ['slot'], 
+      });
+
+      if (!appointment) {
+        throw new NotFoundException(`Cita con ID ${appointmentId} no encontrada para este paciente o ya no se puede modificar.`);
+      }
+      if (appointment.status !== 'Confirmada' as AppointmentStatusType && appointment.status !== 'Solicitada' as AppointmentStatusType) {
+          throw new BadRequestException('Solo se pueden reprogramar citas confirmadas o solicitadas.');
+      }
+
+     
+      const now = new Date();
+      const appointmentTime = new Date(appointment.slot.startDateTime); 
+      const diffHours = (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+      if (diffHours < 24) { // Ejemplo: Límite de 24 horas
+        throw new BadRequestException('No se puede reprogramar la cita con menos de 24 horas de antelación.');
+      }
+
+     
+      const newSlot = await queryRunner.manager.findOneBy(AvailabilitySlot, { id: rescheduleDto.newSlotId });
+      if (!newSlot) {
+        throw new NotFoundException(`Nuevo slot de disponibilidad con ID ${rescheduleDto.newSlotId} no encontrado.`);
+      }
+      if (newSlot.status !== 'Disponible' as SlotStatus) {
+        throw new BadRequestException(`El nuevo slot con ID ${rescheduleDto.newSlotId} ya no está disponible.`);
+      }
+
+      if (newSlot.doctorUserId !== appointment.slot.doctorUserId) {
+          throw new BadRequestException('Solo se puede reprogramar con el mismo médico.');
+      }
+
+
+      const oldSlotId = appointment.slotId;
+      const oldSlot = await queryRunner.manager.findOneBy(AvailabilitySlot, { id: oldSlotId });
+
+ 
+      if (oldSlot) {
+        oldSlot.status = 'Disponible' as SlotStatus;
+        await queryRunner.manager.save(AvailabilitySlot, oldSlot);
+      }
+
+
+      newSlot.status = 'Confirmado' as SlotStatus; 
+      await queryRunner.manager.save(AvailabilitySlot, newSlot);
+
+
+      const previousStatus = appointment.status;
+      appointment.slotId = newSlot.id;
+      appointment.slot = newSlot; 
+      appointment.status = 'Modificada' as AppointmentStatusType;
+      
+      if(rescheduleDto.reason) appointment.patientReason = rescheduleDto.reason;
+      const updatedAppointment = await queryRunner.manager.save(MedicalAppointment, appointment);
+
+  
+      const historyEntry = queryRunner.manager.create(AppointmentChangeHistory, {
+        appointmentId: updatedAppointment.id,
+        changedByUserId: patientUserId,
+        previousStatus: previousStatus,
+        newStatus: updatedAppointment.status,
+        reasonForChangeOrCancellation: `Reprogramada a nuevo slot ID: ${newSlot.id}. Motivo: ${rescheduleDto.reason || 'No especificado'}`,
+      });
+      await queryRunner.manager.save(AppointmentChangeHistory, historyEntry);
+
+      await queryRunner.commitTransaction();
+      return this.findOne(updatedAppointment.id, patientUserId, [AllowedRoles.Paciente as string]); 
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+  
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async cancel(
+    appointmentId: number,
+    requestingUserId: string, 
+    userRoles: string[],
+    cancelDto: CancelAppointmentDto,
+  ): Promise<{ message: string }> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const appointment = await queryRunner.manager.findOne(MedicalAppointment, {
+        where: { id: appointmentId },
+        relations: ['slot', 'patientUser'], 
+      });
+
+      if (!appointment) {
+        throw new NotFoundException(`Cita con ID ${appointmentId} no encontrada.`);
+      }
+
+      // Verificar permisos
+      const isPatientOfAppointment = appointment.patientUserId === requestingUserId;
+      const isDoctorOfAppointment = appointment.slot.doctorUserId === requestingUserId && userRoles.includes(AllowedRoles.Medico as string);
+
+      if (!isPatientOfAppointment && !isDoctorOfAppointment) {
+        // Podrías añadir un rol Admin que también pueda cancelar
+        throw new ForbiddenException('No tienes permiso para cancelar esta cita.');
+      }
+
+      if (appointment.status === ('CanceladaPorPaciente' as AppointmentStatusType) || appointment.status === ('CanceladaPorMedico' as AppointmentStatusType)) {
+          throw new BadRequestException('La cita ya ha sido cancelada.');
+      }
+      // Aquí también podrías añadir lógica de límite de tiempo para cancelar
+
+      const previousStatus = appointment.status;
+      appointment.status = isPatientOfAppointment ? 'CanceladaPorPaciente' as AppointmentStatusType : 'CanceladaPorMedico' as AppointmentStatusType;
+      await queryRunner.manager.save(MedicalAppointment, appointment);
+
+      // Liberar el slot
+      if (appointment.slot) {
+        const slotToFree = await queryRunner.manager.findOneBy(AvailabilitySlot, { id: appointment.slotId });
+        if (slotToFree) {
+          slotToFree.status = 'Disponible' as SlotStatus;
+          await queryRunner.manager.save(AvailabilitySlot, slotToFree);
+        }
+      }
+
+      // Registrar cambio en historial
+      const historyEntry = queryRunner.manager.create(AppointmentChangeHistory, {
+        appointmentId: appointment.id,
+        changedByUserId: requestingUserId,
+        previousStatus: previousStatus,
+        newStatus: appointment.status,
+        reasonForChangeOrCancellation: cancelDto.reason || 'Cancelación de cita',
+      });
+      await queryRunner.manager.save(AppointmentChangeHistory, historyEntry);
+
+      await queryRunner.commitTransaction();
+      return { message: 'Cita cancelada exitosamente.' };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      // ... manejo de errores ...
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
 }
