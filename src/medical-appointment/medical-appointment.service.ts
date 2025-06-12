@@ -159,9 +159,9 @@ export class MedicalAppointmentService {
      
       const now = new Date();
       const appointmentTime = new Date(appointment.slot.startDateTime); 
-      const diffMinutes = (appointmentTime.getTime() - now.getTime()) / (1000 * 60); // Diferencia en minutos
-      if (diffMinutes < 1) {
-        throw new BadRequestException('No se puede reprogramar la cita con menos de 1 minuto de antelación.');
+      const diffHours = (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+      if (diffHours < 24) { 
+        throw new BadRequestException('No se puede reprogramar la cita con menos de 24 horas de antelación.');
       }
 
      
@@ -188,7 +188,7 @@ export class MedicalAppointmentService {
       }
 
 
-      newSlot.status = 'Confirmado' as SlotStatus; 
+      newSlot.status = 'Confirmada' as SlotStatus; 
       await queryRunner.manager.save(AvailabilitySlot, newSlot);
 
 
@@ -241,12 +241,12 @@ export class MedicalAppointmentService {
         throw new NotFoundException(`Cita con ID ${appointmentId} no encontrada.`);
       }
 
-      // Verificar permisos
+   
       const isPatientOfAppointment = appointment.patientUserId === requestingUserId;
       const isDoctorOfAppointment = appointment.slot.doctorUserId === requestingUserId && userRoles.includes(AllowedRoles.Medico as string);
 
       if (!isPatientOfAppointment && !isDoctorOfAppointment) {
-        // Podrías añadir un rol Admin que también pueda cancelar
+   
         throw new ForbiddenException('No tienes permiso para cancelar esta cita.');
       }
 
