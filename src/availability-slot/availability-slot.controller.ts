@@ -11,6 +11,13 @@ export class AvailabilitySlotController {
   constructor(private readonly slotService: AvailabilitySlotService) {}
 
   @Get('ping') 
+  ping() {
+    return { message: 'Pong desde availability-slots!' };
+  }
+
+  @Get('search/available')
+
+  @Get('search/available') 
   @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: true }))
   async findAvailableSlots(@Query() searchDto: SearchAvailableSlotsDto) {
