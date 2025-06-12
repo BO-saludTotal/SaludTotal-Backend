@@ -159,9 +159,9 @@ export class MedicalAppointmentService {
      
       const now = new Date();
       const appointmentTime = new Date(appointment.slot.startDateTime); 
-      const diffHours = (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-      if (diffHours < 24) { 
-        throw new BadRequestException('No se puede reprogramar la cita con menos de 24 horas de antelación.');
+      const diffMinutes = (appointmentTime.getTime() - now.getTime()) / (1000 * 60); // Diferencia en minutos
+      if (diffMinutes < 1) {
+        throw new BadRequestException('No se puede reprogramar la cita con menos de 1 minuto de antelación.');
       }
 
      
