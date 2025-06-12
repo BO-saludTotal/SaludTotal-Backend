@@ -152,16 +152,16 @@ export class MedicalAppointmentService {
       if (!appointment) {
         throw new NotFoundException(`Cita con ID ${appointmentId} no encontrada para este paciente o ya no se puede modificar.`);
       }
-      if (appointment.status !== 'Confirmada' as AppointmentStatusType && appointment.status !== 'Solicitada' as AppointmentStatusType) {
+      if (appointment.status !== 'Confirmado' as AppointmentStatusType && appointment.status !== 'Solicitada' as AppointmentStatusType) {
           throw new BadRequestException('Solo se pueden reprogramar citas confirmadas o solicitadas.');
       }
 
      
       const now = new Date();
       const appointmentTime = new Date(appointment.slot.startDateTime); 
-      const diffMinutes = (appointmentTime.getTime() - now.getTime()) / (1000 * 60); // Diferencia en minutos
-      if (diffMinutes < 1) {
-        throw new BadRequestException('No se puede reprogramar la cita con menos de 1 minuto de antelación.');
+      const diffHours = (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+      if (diffHours < 24) { 
+        throw new BadRequestException('No se puede reprogramar la cita con menos de 24 horas de antelación.');
       }
 
      
@@ -188,7 +188,7 @@ export class MedicalAppointmentService {
       }
 
 
-      newSlot.status = 'Confirmada' as SlotStatus; 
+      newSlot.status = 'Confirmado' as SlotStatus; 
       await queryRunner.manager.save(AvailabilitySlot, newSlot);
 
 
@@ -253,13 +253,13 @@ export class MedicalAppointmentService {
       if (appointment.status === ('CanceladaPorPaciente' as AppointmentStatusType) || appointment.status === ('CanceladaPorMedico' as AppointmentStatusType)) {
           throw new BadRequestException('La cita ya ha sido cancelada.');
       }
-      // Aquí también podrías añadir lógica de límite de tiempo para cancelar
+    
 
       const previousStatus = appointment.status;
       appointment.status = isPatientOfAppointment ? 'CanceladaPorPaciente' as AppointmentStatusType : 'CanceladaPorMedico' as AppointmentStatusType;
       await queryRunner.manager.save(MedicalAppointment, appointment);
 
-      // Liberar el slot
+    
       if (appointment.slot) {
         const slotToFree = await queryRunner.manager.findOneBy(AvailabilitySlot, { id: appointment.slotId });
         if (slotToFree) {
@@ -268,7 +268,7 @@ export class MedicalAppointmentService {
         }
       }
 
-      // Registrar cambio en historial
+      
       const historyEntry = queryRunner.manager.create(AppointmentChangeHistory, {
         appointmentId: appointment.id,
         changedByUserId: requestingUserId,
@@ -282,7 +282,7 @@ export class MedicalAppointmentService {
       return { message: 'Cita cancelada exitosamente.' };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      // ... manejo de errores ...
+    
       throw error;
     } finally {
       await queryRunner.release();

@@ -48,7 +48,7 @@ export class MedicalAppointment extends BaseEntity {
     type: 'enum',
     enum: [
       'Solicitada',
-      'Confirmada',
+      'Confirmado',
       'Modificada',
       'CanceladaPorPaciente',
       'CanceladaPorMedico',
