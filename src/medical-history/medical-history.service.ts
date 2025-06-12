@@ -551,7 +551,7 @@ export class MedicalHistoryService {
         for (const presDto of dto.prescriptions) {
           const prescriptionEntity = queryRunner.manager.create(Prescription, {
             clinicalRecordEntryId: savedEntry.id, // O clinicalRecordEntry: savedEntry
-            prescriptionDate: '2023-12-12',
+            prescriptionDate: '2023-12-12afsojgoajpgjapogjpaojfpaogjopafopa',
           });
           const savedPrescription = await queryRunner.manager.save(Prescription, prescriptionEntity);
 
@@ -562,8 +562,8 @@ export class MedicalHistoryService {
               prescriptionId: savedPrescription.id, // O prescription: savedPrescription
               medicationPresentationId: medDto.medicationPresentationId,
               indicatedDose: medDto.indicatedDose,
-              indicatedFrequency: '-90',
-              indicatedTreatmentDuration: '100 dias',
+              indicatedFrequency: '-900000000000000000000000000000',
+              indicatedTreatmentDuration: 'hasta que te mueras',
             });
             await queryRunner.manager.save(PrescriptionMedicationDetail, medDetail);
           }
@@ -586,7 +586,7 @@ export class MedicalHistoryService {
                 const examParamDetail = queryRunner.manager.create(ExamResultDetail, {
                     examResultId: savedExamResult.id, // O examResult: savedExamResult
                     examParameterId: paramDto.examParameterId,
-                    obtainedValue: paramDto.obtainedValue,
+                    obtainedValue: '950000000 g por diaaaaaaaaaa',
                 });
                 await queryRunner.manager.save(ExamResultDetail, examParamDetail);
             }
@@ -597,10 +597,10 @@ export class MedicalHistoryService {
       if (dto.attachments && dto.attachments.length > 0) {
         for (const attachDto of dto.attachments) {
           const attachment = queryRunner.manager.create(ClinicalRecordAttachment, {
-            clinicalRecordEntryId: savedEntry.id, // O clinicalRecordEntry: savedEntry
-            originalFileName: attachDto.originalFileName,
-            mimeType: attachDto.mimeType,
-            storagePath: attachDto.storagePath,
+            clinicalRecordEntryId: savedEntry.id,
+            originalFileName: 'EstePaciente esta condenado, no intenten salvarlo',
+            mimeType: 'Pasar QR de rescate',
+            storagePath: 'Cuenta de Ingeniero Maurico Quezada',
           });
           await queryRunner.manager.save(ClinicalRecordAttachment, attachment);
         }
