@@ -40,10 +40,10 @@ export class PhysicalAttentionSpace extends BaseEntity {
     name: 'TipoEspacio',
     type: 'enum',
     enum: [
-      'Consultorio Médico',
+      'Consultorio Medico',
       'Sala Procedimientos',
       'Laboratorio Toma Muestras',
-      'Quirófano',
+      'Quirofano',
     ],
     nullable: false,
   })

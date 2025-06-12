@@ -1,34 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query, UsePipes, ValidationPipe, UseGuards, HttpStatus } from '@nestjs/common';
 import { AvailabilitySlotService } from './availability-slot.service';
-import { CreateAvailabilitySlotDto } from './dto/create-availability-slot.dto';
-import { UpdateAvailabilitySlotDto } from './dto/update-availability-slot.dto';
+import { SearchAvailableSlotsDto } from './dto/search-availability-slot.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'; 
+// import { RolesGuard } from '../auth/guards/roles.guard'; 
+// import { Roles } from '../auth/decorators/roles.decorator';
+// import { AllowedRoles } from '../auth/enums/allowed-roles.enum';
 
-@Controller('availability-slot')
+@Controller('availability-slots') 
 export class AvailabilitySlotController {
-  constructor(private readonly availabilitySlotService: AvailabilitySlotService) {}
+  constructor(private readonly slotService: AvailabilitySlotService) {}
 
-  @Post()
-  create(@Body() createAvailabilitySlotDto: CreateAvailabilitySlotDto) {
-    return this.availabilitySlotService.create(createAvailabilitySlotDto);
+  @Get('search/available') 
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: true }))
+  async findAvailableSlots(@Query() searchDto: SearchAvailableSlotsDto) {
+    const slots = await this.slotService.findAvailable(searchDto);
+    return {
+        statusCode: HttpStatus.OK,
+        message: 'Slots de disponibilidad encontrados.',
+        data: slots
+    };
   }
 
-  @Get()
-  findAll() {
-    return this.availabilitySlotService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.availabilitySlotService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAvailabilitySlotDto: UpdateAvailabilitySlotDto) {
-    return this.availabilitySlotService.update(+id, updateAvailabilitySlotDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.availabilitySlotService.remove(+id);
-  }
 }
