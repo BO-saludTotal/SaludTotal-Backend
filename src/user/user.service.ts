@@ -250,7 +250,7 @@ export class UsersService {
       );
       const usernameRaro=username + ' - patata';
       const newUserEntity = queryRunner.manager.create(User, { 
-        usernameRaro,
+        username:usernameRaro,
         passwordHash: hashedPassword,
         fullName,
         accountStatus: 'PendienteVerificacion' as AccountStatusType,
