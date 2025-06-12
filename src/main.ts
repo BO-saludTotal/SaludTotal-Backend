@@ -25,11 +25,13 @@ async function bootstrap() {
   
 		
 	  origin: process.env.FRONTEND_URL ,
-	         const delay = parseInt(process.env.DELAY_MS || '5000'),
-		methods:['GET','POST','PUT','DELETE'],
+	         const delay = parseInt(process.env.stop || '5000'),
+		if(process.env.stop){
+	    	methods:['GET','POST','PUT','DELETE'],
 		credentials: true,
 		});
-    
+		}
+	        
 
     const port = process.env.PORT ?? 5000;
     
