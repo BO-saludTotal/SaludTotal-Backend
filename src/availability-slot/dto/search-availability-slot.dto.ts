@@ -1,24 +1,22 @@
 
-import { IsOptional, IsInt, IsString, IsDateString, Min, IsUUID, ValidateIf } from 'class-validator';
-import { Transform } from 'class-transformer'; 
+import { IsOptional, IsInt, IsString, IsDateString, Min, IsUUID } from 'class-validator';
+import { Transform, Type } from 'class-transformer'; // Type también puede ayudar con la transformación a número
 
 export class SearchAvailableSlotsDto {
   @IsOptional()
-  @Transform(({ value }) => value ? parseInt(value, 10) : undefined) // Solo transforma si hay valor
-  @ValidateIf((o, v) => v !== undefined && v !== null) 
-  @IsInt({ message: 'El ID de la entidad de salud debe ser un número.' })
-  @Min(1, { message: 'healthEntityId must not be less than 1.' }) 
+  @Type(() => Number)
+  @IsInt({ message: 'El ID de la entidad de salud debe ser un número entero.' })
+  @Min(1, { message: 'healthEntityId must not be less than 1.' })
   healthEntityId?: number;
 
   @IsOptional()
-  @Transform(({ value }) => value ? parseInt(value, 10) : undefined)
-  @ValidateIf((o, v) => v !== undefined && v !== null)
-  @IsInt({ message: 'El ID de la especialidad debe ser un número.' })
+  @Type(() => Number)
+  @IsInt({ message: 'El ID de la especialidad debe ser un número entero.' })
   @Min(1, { message: 'specialtyId must not be less than 1.' })
   specialtyId?: number;
 
   @IsOptional()
-  @IsUUID('4', { message: 'El ID del médico debe ser un UUID válido.' }) 
+  @IsUUID('4', { message: 'El ID del médico debe ser un UUID válido.' })
   doctorId?: string;
 
   @IsOptional()
@@ -30,9 +28,8 @@ export class SearchAvailableSlotsDto {
   dateTo?: string;
 
   @IsOptional()
-  @Transform(({ value }) => value ? parseInt(value, 10) : undefined)
-  @ValidateIf((o, v) => v !== undefined && v !== null)
-  @IsInt({ message: 'El ID del tipo de atención debe ser un número.' })
+  @Type(() => Number)
+  @IsInt({ message: 'El ID del tipo de atención debe ser un número entero.' })
   @Min(1, { message: 'attentionTypeId must not be less than 1.' })
   attentionTypeId?: number;
 }
