@@ -200,6 +200,7 @@ export class MedicalHistoryService {
 
   async getPatientHistoryEntries(
     patientId: string,
+    entryType?: number,
   ): Promise<ClinicalRecordEntry[]> {
     const patient = await this.userRepository.findOneBy({ id: patientId });
     if (!patient) {
@@ -209,7 +210,10 @@ export class MedicalHistoryService {
     }
 
     return this.entryRepository.find({
-      where: { patientUserId: patientId },
+      where: {
+        patientUserId: patientId,
+        ...(entryType !== undefined ? { eventTypeId: entryType } : {}),
+      },
       order: { attentionStartDateTime: 'DESC' },
       relations: {
         /* ... tus relations ... */ eventType: true,

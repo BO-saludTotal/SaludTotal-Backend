@@ -77,7 +77,7 @@ export class AuthService {
           'Se requiere codigo de afiliacion para el doctor',
         );
       }
-      const [doctorId, healthEntityId] = loginDto.affiliationCode.split('-');
+      const [doctorId, healthEntityId] = loginDto.affiliationCode.split('_');
       const doctorHealthEntityAffiliation =
         await this.doctorAffliationRepository.findOne({
           where: {

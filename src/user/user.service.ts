@@ -74,8 +74,6 @@ export class UsersService {
       cargoEnInstitucion,
     } = createUserDto;
 
-
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -99,31 +97,43 @@ export class UsersService {
         accountStatus: 'PendienteVerificacion' as AccountStatusType,
       });
       const savedUser = await queryRunner.manager.save(User, newUserEntity);
-
-      const userRoleAssignment = queryRunner.manager.create(UserAssignedRole, {
-        userId: savedUser.id,
-        roleId: role.id,
-      });
-      await queryRunner.manager.save(UserAssignedRole, userRoleAssignment);
-
-      if (role.id === 2) {
-        const patientDetailData: Partial<PatientDetail> = {
-          patientUserId: savedUser.id,
-        };
-        if (fechaNacimiento)
-          patientDetailData.birthDate = new Date(fechaNacimiento);
-        if (genero) patientDetailData.gender = genero as any;
-        if (direccionResidencia)
-          patientDetailData.residentialAddress = direccionResidencia;
-        if (nombresPadresTutores)
-          patientDetailData.parentOrGuardianNames = nombresPadresTutores;
-
-        const newPatientDetail = queryRunner.manager.create(
-          PatientDetail,
-          patientDetailData,
+      const userPatientRoleAssignment = queryRunner.manager.create(
+        UserAssignedRole,
+        {
+          userId: savedUser.id,
+          roleId: 2,
+        },
+      );
+      await queryRunner.manager.save(
+        UserAssignedRole,
+        userPatientRoleAssignment,
+      );
+      if (role.id !== 2) {
+        const userRoleAssignment = queryRunner.manager.create(
+          UserAssignedRole,
+          {
+            userId: savedUser.id,
+            roleId: role.id,
+          },
         );
-        await queryRunner.manager.save(PatientDetail, newPatientDetail);
-      } else if (role.id === 3) {
+        await queryRunner.manager.save(UserAssignedRole, userRoleAssignment);
+      }
+      const patientDetailData: Partial<PatientDetail> = {
+        patientUserId: savedUser.id,
+      };
+      if (fechaNacimiento)
+        patientDetailData.birthDate = new Date(fechaNacimiento);
+      if (genero) patientDetailData.gender = genero as any;
+      if (direccionResidencia)
+        patientDetailData.residentialAddress = direccionResidencia;
+      if (nombresPadresTutores)
+        patientDetailData.parentOrGuardianNames = nombresPadresTutores;
+      const newPatientDetail = queryRunner.manager.create(
+        PatientDetail,
+        patientDetailData,
+      );
+      await queryRunner.manager.save(PatientDetail, newPatientDetail);
+      if (role.id === 3) {
         if (!numeroColegiado) {
           await queryRunner.rollbackTransaction();
           throw new BadRequestException(

@@ -47,7 +47,7 @@ export const dataSourceOptions: DataSourceOptions = {
   username: process.env.DB_USER || 'admin',
   password: process.env.DB_PASSWORD || 'admin2402',
   database: process.env.DB_NAME ||'STotal',
-  synchronize: false,
+  synchronize: true,
   logging: true,
   entities: [
     MedicalAppointment,

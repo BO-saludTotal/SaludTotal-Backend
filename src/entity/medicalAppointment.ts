@@ -14,7 +14,6 @@ import { User } from './user';
 import { AppointmentChangeHistory } from './appointmentChangeHistory';
 import { ClinicalRecordEntry } from './clinicalRecordEntry';
 
-
 export type AppointmentStatusType =
   | 'Solicitada'
   | 'Confirmada'
@@ -78,6 +77,4 @@ export class MedicalAppointment extends BaseEntity {
 
   @OneToMany(() => ClinicalRecordEntry, (entry) => entry.associatedAppointment)
   clinicalRecords: ClinicalRecordEntry[];
-
-
 }

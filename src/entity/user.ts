@@ -126,7 +126,7 @@ export class User extends BaseEntity {
   @OneToMany(() => ClinicalRecordEntry, (entry) => entry.patientUser)
   clinicalEntriesAsPatient: ClinicalRecordEntry[];
 
-  @OneToMany(() => ClinicalRecordEntry, (entry) => entry.patientUser)
+  @OneToMany(() => ClinicalRecordEntry, (entry) => entry.attendingDoctor)
   clinicalEntriesAsDoctor: ClinicalRecordEntry[];
 
   @OneToMany(() => UserPhone, (entry) => entry.phoneNumber)

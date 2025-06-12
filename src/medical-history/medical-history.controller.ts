@@ -20,6 +20,7 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { AllowedRoles } from 'src/auth/enums/allowed-roles.enum';
 import { Request } from 'express';
+import { GetHistoryDto } from './dto/get-history.dto';
 
 interface AuthenticatedRequest extends Request {
   user: { userId: string; username: string; roles: string[] };
@@ -76,11 +77,12 @@ export class MedicalHistoryController {
   async getPatientHistoryEntries(
     @Param('patientId', ParseUUIDPipe) patientIdFromUrl: string,
     @Req() request: AuthenticatedRequest,
+    @Body() getHistoryDto: GetHistoryDto,
   ) {
     const authenticatedUser = request.user;
 
     if (
-      authenticatedUser.roles.includes(AllowedRoles.Paciente as string) &&
+      !authenticatedUser.roles.includes(AllowedRoles.Medico as string) &&
       authenticatedUser.userId !== patientIdFromUrl
     ) {
       throw new ForbiddenException(
@@ -89,10 +91,10 @@ export class MedicalHistoryController {
     }
 
     try {
-      const entries =
-        await this.medicalHistoryService.getPatientHistoryEntries(
-          patientIdFromUrl,
-        );
+      const entries = await this.medicalHistoryService.getPatientHistoryEntries(
+        patientIdFromUrl,
+        getHistoryDto.medicalEventType,
+      );
       if (!entries || entries.length === 0) {
         return {
           statusCode: HttpStatus.OK,

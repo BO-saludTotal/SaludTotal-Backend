@@ -29,18 +29,50 @@ import { UserAssignedRoleModule } from './user-assigned-role/user-assigned-role.
 import { UserPhoneModule } from './user-phone/user-phone.module';
 import { AuthModule } from './auth/auth.module';
 import { MedicalHistoryModule } from './medical-history/medical-history.module';
-
+import { ClinicalRecordAttachmentController } from './clinical-record-attachment/clinical-record-attachment.controller';
+import { ClinicalRecordAttachmentService } from './clinical-record-attachment/clinical-record-attachment.service';
+import { ClinicalRecordAttachmentModule } from './clinical-record-attachment/clinical-record-attachment.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions), ConfigModule.forRoot({
+  imports: [
+    TypeOrmModule.forRoot(dataSourceOptions),
+    ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env', 
-    }), MedicalAppointmentModule, DoctorDetailModule, HealthEntityModule, 
-    AdministrativeStaffDetailModule, DoctorHealthEntityAffiliationModule, DoctorSpecialtyCertificationModule, GeneralMedicationModule,
-     GovernmentStaffDetailModule, HealthEntitySpecialtyModule, MedicalSpecialtyModule, PatientDetailsModule, PhysicalAttentionSpaceModule,
-      PrescriptionModule, RoleModule, UsersModule, UserAdressModule, UserAssignedRoleModule, UserPhoneModule, AuthModule, MedicalHistoryModule],
-  controllers: [AppController, AuthController, UsersController],
-  providers: [AppService, AuthService, UsersService],
+      envFilePath: '.env',
+    }),
+    MedicalAppointmentModule,
+    DoctorDetailModule,
+    HealthEntityModule,
+    AdministrativeStaffDetailModule,
+    DoctorHealthEntityAffiliationModule,
+    DoctorSpecialtyCertificationModule,
+    GeneralMedicationModule,
+    GovernmentStaffDetailModule,
+    HealthEntitySpecialtyModule,
+    MedicalSpecialtyModule,
+    PatientDetailsModule,
+    PhysicalAttentionSpaceModule,
+    PrescriptionModule,
+    RoleModule,
+    UsersModule,
+    UserAdressModule,
+    UserAssignedRoleModule,
+    UserPhoneModule,
+    AuthModule,
+    MedicalHistoryModule,
+    ClinicalRecordAttachmentModule,
+  ],
+  controllers: [
+    AppController,
+    AuthController,
+    UsersController,
+    ClinicalRecordAttachmentController,
+  ],
+  providers: [
+    AppService,
+    AuthService,
+    UsersService,
+    ClinicalRecordAttachmentService,
+  ],
 })
 export class AppModule {}
-

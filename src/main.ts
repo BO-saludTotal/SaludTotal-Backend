@@ -18,20 +18,17 @@ async function bootstrap() {
     app.useGlobalInterceptors(
       new ClassSerializerInterceptor(app.get(Reflector)),
     );
-    
-    
+
     app.enableCors({
-		origin: process.env.FRONTEND_URL ,
-		methods:['GET','POST','PUT','DELETE'],
-		credentials: true,
-		});
-    
+      origin: process.env.FRONTEND_URL,
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      credentials: true,
+    });
 
     const port = process.env.PORT ?? 5000;
-    
+
     await app.listen(port);
-    
-    
+
     console.log(`Application is running`);
   } catch (error) {
     console.error('Error durante el bootstrap:', error);

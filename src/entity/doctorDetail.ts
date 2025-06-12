@@ -21,7 +21,7 @@ export class DoctorDetail extends BaseEntity {
     type: 'varchar',
     length: 50,
     unique: true,
-    nullable: false,
+    nullable: true,
   })
   @Index('IDX_MedicosDetalles_NumeroColegiadoUnico', { unique: true })
   medicalLicenseNumber: string;
