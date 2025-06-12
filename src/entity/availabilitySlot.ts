@@ -68,11 +68,11 @@ export class AvailabilitySlot extends BaseEntity {
     nullable: false,
   })
   status: SlotStatus;
-
+/*
   @Index('IDX_DoctorSlotUnique', { unique: true })
   @Column()
   doctorSlotUnique: string;
-
+*/
   @ManyToOne(() => User, (user) => user.availabilitySlotsAsDoctor, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
