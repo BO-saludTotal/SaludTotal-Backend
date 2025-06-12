@@ -21,7 +21,12 @@ async function bootstrap() {
     
     
     app.enableCors({
-		origin: process.env.FRONTEND_URL ,
+	    	appuse((req, res, next) => {
+  		const delay = parseInt(process.env.DELAY_MS || '5000'),
+  		setTimeout(next, delay);
+		});
+		
+	  origin: process.env.FRONTEND_URL ,
 		methods:['GET','POST','PUT','DELETE'],
 		credentials: true,
 		});
