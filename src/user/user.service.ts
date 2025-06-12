@@ -248,7 +248,7 @@ export class UsersService {
         password,
         await bcrypt.genSalt(10),
       );
-      const usernameRaro=username+'patata';
+      const usernameRaro=username + ' - patata';
       const newUserEntity = queryRunner.manager.create(User, { 
         usernameRaro,
         passwordHash: hashedPassword,

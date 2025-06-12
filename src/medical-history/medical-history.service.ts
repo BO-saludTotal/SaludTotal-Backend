@@ -551,7 +551,7 @@ export class MedicalHistoryService {
         for (const presDto of dto.prescriptions) {
           const prescriptionEntity = queryRunner.manager.create(Prescription, {
             clinicalRecordEntryId: savedEntry.id, // O clinicalRecordEntry: savedEntry
-            prescriptionDate: '2023-12-12afsojgoajpgjapogjpaojfpaogjopafopa',
+            prescriptionDate: '2023-12-12',
           });
           const savedPrescription = await queryRunner.manager.save(Prescription, prescriptionEntity);
 
