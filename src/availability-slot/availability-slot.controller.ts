@@ -10,7 +10,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class AvailabilitySlotController {
   constructor(private readonly slotService: AvailabilitySlotService) {}
 
-  @Get('search/available') 
+  @Get('ping') 
   @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: true }))
   async findAvailableSlots(@Query() searchDto: SearchAvailableSlotsDto) {
