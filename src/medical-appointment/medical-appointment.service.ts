@@ -103,21 +103,21 @@ export class MedicalAppointmentService {
   async findMyAppointments(patientUserId: string): Promise<MedicalAppointment[]> {
     return this.appointmentRepository.find({
       where: { patientUserId: patientUserId },
-      relations: { /* ... las mismas relaciones que en create para consistencia ... */
+      relations: { 
         slot: { doctorUser: { doctorDetail: true }, healthEntity: true, attentionSpace: true, offeredAttentionType: true },
         patientUser: { patientDetail: true },
       },
-      order: { requestDateTime: 'DESC' }, // O por slot.startDateTime
+      order: { requestDateTime: 'DESC' }, 
     });
   }
 
   async findOne(appointmentId: number, requestingUserId: string, userRoles: string[]): Promise<MedicalAppointment> {
     const appointment = await this.appointmentRepository.findOne({
       where: { id: appointmentId },
-      relations: { /* ... relaciones completas ... */
+      relations: { 
         slot: { doctorUser: { doctorDetail: true }, healthEntity: true, attentionSpace: true, offeredAttentionType: true },
         patientUser: { patientDetail: true },
-        changeHistory: { changedByUser: true }, // Para ver quién hizo cambios
+        changeHistory: { changedByUser: true }, 
       },
     });
 
@@ -159,9 +159,9 @@ export class MedicalAppointmentService {
      
       const now = new Date();
       const appointmentTime = new Date(appointment.slot.startDateTime); 
-      const diffHours = (appointmentTime.getTime() - now.getTime()) / (1000 * 60 * 60);
-      if (diffHours < 24) { // Ejemplo: Límite de 24 horas
-        throw new BadRequestException('No se puede reprogramar la cita con menos de 24 horas de antelación.');
+      const diffMinutes = (appointmentTime.getTime() - now.getTime()) / (1000 * 60); // Diferencia en minutos
+      if (diffMinutes < 1) {
+        throw new BadRequestException('No se puede reprogramar la cita con menos de 1 minuto de antelación.');
       }
 
      
