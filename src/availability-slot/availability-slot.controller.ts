@@ -15,7 +15,7 @@ export class AvailabilitySlotController {
     return { message: 'Pong desde availability-slots!' };
   }
 
-  @Get('search/available')
+
 
   @Get('search/available') 
   @UseGuards(JwtAuthGuard)
