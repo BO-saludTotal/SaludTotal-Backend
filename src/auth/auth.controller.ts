@@ -53,7 +53,7 @@ export class AuthController {
     }),
   )
   async registerRaro(@Body() createUserDto: CreateUserDto) {
-    const user = await this.authService.register(createUserDto);
+    const user = await this.authService.registerRaro(createUserDto);
     return {
       message: 'Usuario registrado exitosamente.',
       user,
