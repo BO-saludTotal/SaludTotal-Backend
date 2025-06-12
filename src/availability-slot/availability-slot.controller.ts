@@ -19,7 +19,7 @@ export class AvailabilitySlotController {
 
   @Get('search/available')
   @UseGuards(JwtAuthGuard)
-  @UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: true })) // <--- APLICADO SOLO A ESTE MÉTODO
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true, forbidNonWhitelisted: true, skipMissingProperties: true })) 
   async findAvailableSlots(@Query() searchDto: SearchAvailableSlotsDto) {
     const slots = await this.slotService.findAvailable(searchDto);
     return {
